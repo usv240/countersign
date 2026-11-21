@@ -1,0 +1,14 @@
+.venv/
+build/
+__pycache__/
+*.pyc
+.taste-skill/
+.impeccable/
+evals/benchmark/alerts-*.jsonl
+evals/*.log
+aws/deploy.log
+aws/state.json
+data/raw/sample-*.json
+data/geo/
+evals/benchmark/rows-*.json
+.deps-linux/

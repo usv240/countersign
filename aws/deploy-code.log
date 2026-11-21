@@ -1,0 +1,9 @@
+[deploy] zip 38.6 MB
+[deploy] lambda cs-tools
+[deploy] lambda cs-hook
+[deploy] lambda cs-sender
+[deploy] lambda cs-api
+[deploy] lambda cs-runner
+[deploy] lambda cs-pager
+[deploy] lambda cs-escalated
+[deploy] lambda cs-recorder

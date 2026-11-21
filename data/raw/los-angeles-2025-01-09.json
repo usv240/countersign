@@ -1,0 +1,967 @@
+{
+ "incident": "los-angeles-2025-01-09",
+ "title": "Los Angeles County Kenneth Fire evacuation alert sent county-wide",
+ "source": "https://www.fema.gov/api/open/v1/IpawsArchivedAlerts",
+ "filter": "sent ge '2025-01-09T23:40:00.000Z' and sent le '2025-01-10T01:00:00.000Z' and cogId eq 200971",
+ "count": 3,
+ "records": [
+  {
+   "originalMessage": "<alert xmlns=\"urn:oasis:names:tc:emergency:cap:1.2\"><identifier>test-lac-954844-1736467014323</identifier><sender>[redacted sender]</sender><sent>2025-01-10T00:56:54+01:00</sent><status>Actual</status><msgType>Alert</msgType><scope>Public</scope><code>IPAWSv1.0</code><incidents>incidents</incidents><info><language>en-US</language><category>Fire</category><event>Fire Warning</event><responseType>Prepare</responseType><urgency>Immediate</urgency><severity>Extreme</severity><certainty>Observed</certainty><eventCode><valueName>SAME</valueName><value>FRW</value></eventCode><effective>2025-01-10T00:56:54+01:00</effective><expires>2025-01-11T00:56:54+01:00</expires><senderName>Public Alert System</senderName><headline>Kenneth Fire Evacuation Warning</headline><description>NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.</description><instruction>NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.</instruction><parameter><valueName>CMAMtext</valueName><value>LACoFD: NEW: Fast Wildfire. EVACUATION WARNING. Prepare to leave. Alertla.org</value></parameter><parameter><valueName>CMAMlongtext</valueName><value>NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.</value></parameter><parameter><valueName>EAS-ORG</valueName><value>CIV</value></parameter><parameter><valueName>timezone</valueName><value>EST</value></parameter><parameter><valueName>WEAHandling</valueName><value>Imminent Threat</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>EAS</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>NWEM</value></parameter><area><areaDesc>Los Angeles</areaDesc><geocode><valueName>SAME</valueName><value>006037</value></geocode></area></info><info><language>es-US</language><category>Fire</category><event>Fire Warning</event><responseType>Prepare</responseType><urgency>Immediate</urgency><severity>Extreme</severity><certainty>Observed</certainty><eventCode><valueName>SAME</valueName><value>FRW</value></eventCode><effective>2025-01-10T00:56:54+01:00</effective><expires>2025-01-11T00:56:54+01:00</expires><senderName>Public Alert System</senderName><headline>Kenneth Fire Evacuation Warning</headline><description>NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.</description><instruction>NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.</instruction><parameter><valueName>CMAMtext</valueName><value>LACoFD: NUEVA - Advertencia de evacuacion en su area. Mas informacion en alertla.org.</value></parameter><parameter><valueName>CMAMlongtext</valueName><value>NUEVA: Este es un mensaje de emergencia del Departamento de Bomberos del Condado de Los Angeles. Se ha emitido una ADVERTENCIA DE EVACUACION en su area. Mantengase alerta y este listo para evacuar. Reuna a sus seres queridos, mascotas y suministros. Continue monitoreando el clima local, las noticias y la pagina web alertla.org para informacion</value></parameter><parameter><valueName>EAS-ORG</valueName><value>CIV</value></parameter><parameter><valueName>timezone</valueName><value>EST</value></parameter><parameter><valueName>WEAHandling</valueName><value>Imminent Threat</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>EAS</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>NWEM</value></parameter><area><areaDesc>Los Angeles</areaDesc><geocode><valueName>SAME</valueName><value>006037</value></geocode></area></info><Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:edx=\"http://gov.fema.ipaws.services/IPAWS_CAPService/\" xmlns:ns2=\"http://gov.fema.ipaws.services/capresponse\" xmlns:ns4=\"http://gov.fema.ipaws.services/caprequest\"><SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/><Reference URI=\"\"><Transforms><Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></Transforms><DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><DigestValue>o/GtXnRAWd50biCCZSZULK6xVEo0NKj/uVXaRjifzWI=</DigestValue></Reference></SignedInfo><SignatureValue>I9cKm2nwyyja6Td+Jr3KpkmlwM/vrRUghUlW38w+Iqu5yj0fLfpLjsKqzwOJhys0NxTpRVA8eEN1&#13;\n5INGyfW+QNnIKEkXFePTQvrbxT7/sfz2N7c4vbukG2JDwea4vxX6WACjsMPpYw/yoX0Gr4VlwPv7&#13;\nH2gk8YoyQU8TSVKCmAXnHxBcviqwz2KtAN5hyNrJWnwR6IEJzz7TiRY/L6w8W+5wmtk2QirnCsQl&#13;\nRfuTS21+/+Sz4vXLiYaRMZY7W3Vqigq7zYV/JSf2Su0pLNaqIuewwEAT1zE0ya8dszZWkYOlYS5J&#13;\nXhwtD1ZUsgNl6cTqysuquk1mNUgSwhBLMWEZnw==</SignatureValue><KeyInfo><X509Data><X509SubjectName>CN=ipawsopen200971,OU=A01410D0000017F328A9E7000179BC0,OU=Devices IPAWS,OU=National Continuity Programs,O=FEMA IPAWS,C=US</X509SubjectName><X509Certificate>MIIGMDCCBRigAwIBAgIQQAF/MoqekSwCQJcZ9afKXDANBgkqhkiG9w0BAQsFADBdMQswCQYDVQQG&#13;\nEwJVUzESMBAGA1UEChMJSWRlblRydXN0MSAwHgYDVQQLExdJZGVuVHJ1c3QgR2xvYmFsIENvbW1v&#13;\nbjEYMBYGA1UEAxMPSUdDIERldmljZSBDQSAxMB4XDTIyMDIyNTIwMjAxOVoXDTI1MDIyNDIwMjAx&#13;\nOFowgaUxCzAJBgNVBAYTAlVTMRMwEQYDVQQKEwpGRU1BIElQQVdTMSUwIwYDVQQLExxOYXRpb25h&#13;\nbCBDb250aW51aXR5IFByb2dyYW1zMRYwFAYDVQQLEw1EZXZpY2VzIElQQVdTMSgwJgYDVQQLEx9B&#13;\nMDE0MTBEMDAwMDAxN0YzMjhBOUU3MDAwMTc5QkMwMRgwFgYDVQQDEw9pcGF3c29wZW4yMDA5NzEw&#13;\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQChMA0ibQL9YHL6XkIkv501ns6TfIul6tkj&#13;\nbVnI8+D0VRkW3t4t1YZAQ7mizvPvUCqIuADc/0NhqcqHZm8h7D/3/aLe1NTSBYFGdKPJm/VsRIv+&#13;\no9bZpINCWbECyzCXyIpYz6sHDQS3PkfAnar2aZZbiphGINjSMcLQgOjv+LRMx5vViugG0+KSJalb&#13;\nxdMwLtg+KAOE9WDk6aN1CGEXS1i0kuffm/25P+INShaaZFRr31cOnI6w+x6vR9UyIL57gRA9WOEy&#13;\nuQ9nWw6YM5VU4kF0m7Xc/uQV6DRg5Zj9nU5LVIUdDO4ClWSBk5g/2on74vUhDCn+EtAu6IxldFmq&#13;\nXJvfAgMBAAGjggKhMIICnTAOBgNVHQ8BAf8EBAMCBaAwfQYIKwYBBQUHAQEEcTBvMCkGCCsGAQUF&#13;\nBzABhh1odHRwOi8vaWdjLm9jc3AuaWRlbnRydXN0LmNvbTBCBggrBgEFBQcwAoY2aHR0cDovL3Zh&#13;\nbGlkYXRpb24uaWRlbnRydXN0LmNvbS9jZXJ0cy9pZ2NkZXZpY2VjYTEucDdjMB8GA1UdIwQYMBaA&#13;\nFJNyQZr/34qKK85jvM2qbXqZjqLnMIIBNAYDVR0gBIIBKzCCAScwggEjBgtghkgBhvkvAGQlAjCC&#13;\nARIwSwYIKwYBBQUHAgEWP2h0dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20vY2VydGlmaWNhdGVz&#13;\nL3BvbGljeS9pZ2MvaW5kZXguaHRtbDCBwgYIKwYBBQUHAgIwgbUMgbJDZXJ0aWZpY2F0ZSB1c2Ug&#13;\ncmVzdHJpY3RlZCB0byBSZWx5aW5nIFBhcnR5KHMpIGluIGFjY29yZGFuY2Ugd2l0aCBJR0MtQ1Ag&#13;\nKHNlZSBodHRwczovL3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRpZmljYXRlcy9wb2xpY3kvaWdj&#13;\nL2luZGV4Lmh0bWwpLiBJR0MtQ1BTIGluY29ycG9yYXRlZCBieSByZWZlcmVuY2UuMEUGA1UdHwQ+&#13;\nMDwwOqA4oDaGNGh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2lnY2RldmljZWNh&#13;\nMS5jcmwwGgYDVR0RBBMwEYIPaXBhd3NvcGVuMjAwOTcxMB0GA1UdDgQWBBQHssdGqybVjUO0x4FS&#13;\nzF4G+SO8mDAxBgNVHSUEKjAoBggrBgEFBQcDAgYIKwYBBQUHAwUGCCsGAQUFBwMGBggrBgEFBQcD&#13;\nBzANBgkqhkiG9w0BAQsFAAOCAQEAh1VSmQLPG83CXNsn3cKwZxGzHYwhzxnA6PgkLqCn4J+a9a7T&#13;\nNl/YoWaB4x7gE8hQ/iyRyX85q9m/P++pDqR02ptKtUY9TZSXi1UCkb/0YOl/hf8m1q1Gljp81uEW&#13;\nucqZfUlIKBPx2/BFzB2W2HCqJd8i0Z5DS/mgXGYLAGIHnUUrE812PMCoROlFdJDY65LIfJbkDlaS&#13;\nlTlfVAwJrLSdSLN8GRyxdvLEH3mTXfFI0r8HZk6ouSLdCHho8sL0t/bd4YO4MUP0ePGTHywG+pQ0&#13;\n3xKacagahx2YfAMUnQ4GbVtD1b2DblsvQogildLGoFIgPB1l5km0/Sr8Jbn/meKyjA==</X509Certificate></X509Data></KeyInfo></Signature></alert>",
+   "identifier": "test-lac-954844-1736467014323",
+   "sender": "[redacted sender]",
+   "sent": "2025-01-09T23:56:54.000Z",
+   "status": "Actual",
+   "msgType": "Alert",
+   "source": null,
+   "scope": "Public",
+   "restriction": null,
+   "addresses": null,
+   "code": [
+    "IPAWSv1.0"
+   ],
+   "note": null,
+   "searchGeometry": null,
+   "incidents": "incidents",
+   "cogId": 200971,
+   "id": "59e67a9a-4b05-4f61-b5fd-adbd5d144d26",
+   "xmlns": "urn:oasis:names:tc:emergency:cap:1.2",
+   "info": [
+    {
+     "area": [
+      {
+       "geocode": [
+        {
+         "id": 4566,
+         "name": "SAME",
+         "value": "006037"
+        }
+       ],
+       "areaDesc": "Los Angeles"
+      }
+     ],
+     "event": "Fire Warning",
+     "expires": "2025-01-11T00:56:54+01:00",
+     "urgency": "Immediate",
+     "category": [
+      "Fire"
+     ],
+     "headline": "Kenneth Fire Evacuation Warning",
+     "language": "en-US",
+     "severity": "Extreme",
+     "certainty": "Observed",
+     "effective": "2025-01-10T00:56:54+01:00",
+     "eventCode": [
+      {
+       "id": 2427,
+       "name": "SAME",
+       "value": "FRW"
+      }
+     ],
+     "parameter": [
+      {
+       "name": "CMAMtext",
+       "value": "LACoFD: NEW: Fast Wildfire. EVACUATION WARNING. Prepare to leave. Alertla.org"
+      },
+      {
+       "name": "CMAMlongtext",
+       "value": "NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information."
+      },
+      {
+       "name": "EAS-ORG",
+       "value": "CIV"
+      },
+      {
+       "name": "timezone",
+       "value": "EST"
+      },
+      {
+       "name": "WEAHandling",
+       "value": "Imminent Threat"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "EAS"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "NWEM"
+      }
+     ],
+     "senderName": "Public Alert System",
+     "description": "NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.",
+     "instruction": "NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.",
+     "responseType": [
+      "Prepare"
+     ]
+    },
+    {
+     "area": [
+      {
+       "geocode": [
+        {
+         "id": 4566,
+         "name": "SAME",
+         "value": "006037"
+        }
+       ],
+       "areaDesc": "Los Angeles"
+      }
+     ],
+     "event": "Fire Warning",
+     "expires": "2025-01-11T00:56:54+01:00",
+     "urgency": "Immediate",
+     "category": [
+      "Fire"
+     ],
+     "headline": "Kenneth Fire Evacuation Warning",
+     "language": "es-US",
+     "severity": "Extreme",
+     "certainty": "Observed",
+     "effective": "2025-01-10T00:56:54+01:00",
+     "eventCode": [
+      {
+       "id": 2427,
+       "name": "SAME",
+       "value": "FRW"
+      }
+     ],
+     "parameter": [
+      {
+       "name": "CMAMtext",
+       "value": "LACoFD: NUEVA - Advertencia de evacuacion en su area. Mas informacion en alertla.org."
+      },
+      {
+       "name": "CMAMlongtext",
+       "value": "NUEVA: Este es un mensaje de emergencia del Departamento de Bomberos del Condado de Los Angeles. Se ha emitido una ADVERTENCIA DE EVACUACION en su area. Mantengase alerta y este listo para evacuar. Reuna a sus seres queridos, mascotas y suministros. Continue monitoreando el clima local, las noticias y la pagina web alertla.org para informacion"
+      },
+      {
+       "name": "EAS-ORG",
+       "value": "CIV"
+      },
+      {
+       "name": "timezone",
+       "value": "EST"
+      },
+      {
+       "name": "WEAHandling",
+       "value": "Imminent Threat"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "EAS"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "NWEM"
+      }
+     ],
+     "senderName": "Public Alert System",
+     "description": "NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.",
+     "instruction": "NEW: This is an emergency message from the Los Angeles County Fire Department. An EVACUATION WARNING has been issued in your area. Remain vigilant of any threats and be ready to evacuate. Gather loved ones, pets, and supplies. Continue to monitor local weather, news, and the webpage alertla.org for more information.",
+     "responseType": [
+      "Prepare"
+     ]
+    }
+   ]
+  },
+  {
+   "originalMessage": "<alert xmlns=\"urn:oasis:names:tc:emergency:cap:1.2\"><identifier>test-lac-954844-1736467181833</identifier><sender>[redacted sender]</sender><sent>2025-01-10T00:59:41+01:00</sent><status>Actual</status><msgType>Cancel</msgType><scope>Public</scope><code>IPAWSv1.0</code><references>[redacted sender],test-lac-954844-1736467014323,2025-01-10T00:56:54+01:00</references><Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:edx=\"http://gov.fema.ipaws.services/IPAWS_CAPService/\" xmlns:ns2=\"http://gov.fema.ipaws.services/capresponse\" xmlns:ns4=\"http://gov.fema.ipaws.services/caprequest\"><SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/><Reference URI=\"\"><Transforms><Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></Transforms><DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><DigestValue>bx3nIUJOMX5qrHZnbMam+EJyGFU+NMBWP8mNvJoeaQE=</DigestValue></Reference></SignedInfo><SignatureValue>Yo40UF/+mtA3mRvFOSSJpVPudBzqDVTKOsGT1s0cO1BaQ1gijps/uAai8WRRAVICcu6t2JXN5rUV&#13;\nGlfxrdGu6PXeh629mqwC0Zx+zEBlntewK1a9Hl/4ewniS5viPreVYsKLIb75wFx8YWxMRQcSbZCA&#13;\nhmuvDQTEG4DzPl4eSWnbvvrIyV07Ej8ZAKk64NKrTefQniFKBqJk/0WM2P9ujPeykpyjimmCtmdR&#13;\nEO6bsN+CNyPYy+Ms39kngSglH/5Iu4DAHTy9ts2UCtw49Z/W05EL+HRFQ4CopbP/mO9NAVGfnc2Y&#13;\n/wzdHFei5GVfPpJI+0A865lpA1DfC7UbfoofRg==</SignatureValue><KeyInfo><X509Data><X509SubjectName>CN=ipawsopen200971,OU=A01410D0000017F328A9E7000179BC0,OU=Devices IPAWS,OU=National Continuity Programs,O=FEMA IPAWS,C=US</X509SubjectName><X509Certificate>MIIGMDCCBRigAwIBAgIQQAF/MoqekSwCQJcZ9afKXDANBgkqhkiG9w0BAQsFADBdMQswCQYDVQQG&#13;\nEwJVUzESMBAGA1UEChMJSWRlblRydXN0MSAwHgYDVQQLExdJZGVuVHJ1c3QgR2xvYmFsIENvbW1v&#13;\nbjEYMBYGA1UEAxMPSUdDIERldmljZSBDQSAxMB4XDTIyMDIyNTIwMjAxOVoXDTI1MDIyNDIwMjAx&#13;\nOFowgaUxCzAJBgNVBAYTAlVTMRMwEQYDVQQKEwpGRU1BIElQQVdTMSUwIwYDVQQLExxOYXRpb25h&#13;\nbCBDb250aW51aXR5IFByb2dyYW1zMRYwFAYDVQQLEw1EZXZpY2VzIElQQVdTMSgwJgYDVQQLEx9B&#13;\nMDE0MTBEMDAwMDAxN0YzMjhBOUU3MDAwMTc5QkMwMRgwFgYDVQQDEw9pcGF3c29wZW4yMDA5NzEw&#13;\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQChMA0ibQL9YHL6XkIkv501ns6TfIul6tkj&#13;\nbVnI8+D0VRkW3t4t1YZAQ7mizvPvUCqIuADc/0NhqcqHZm8h7D/3/aLe1NTSBYFGdKPJm/VsRIv+&#13;\no9bZpINCWbECyzCXyIpYz6sHDQS3PkfAnar2aZZbiphGINjSMcLQgOjv+LRMx5vViugG0+KSJalb&#13;\nxdMwLtg+KAOE9WDk6aN1CGEXS1i0kuffm/25P+INShaaZFRr31cOnI6w+x6vR9UyIL57gRA9WOEy&#13;\nuQ9nWw6YM5VU4kF0m7Xc/uQV6DRg5Zj9nU5LVIUdDO4ClWSBk5g/2on74vUhDCn+EtAu6IxldFmq&#13;\nXJvfAgMBAAGjggKhMIICnTAOBgNVHQ8BAf8EBAMCBaAwfQYIKwYBBQUHAQEEcTBvMCkGCCsGAQUF&#13;\nBzABhh1odHRwOi8vaWdjLm9jc3AuaWRlbnRydXN0LmNvbTBCBggrBgEFBQcwAoY2aHR0cDovL3Zh&#13;\nbGlkYXRpb24uaWRlbnRydXN0LmNvbS9jZXJ0cy9pZ2NkZXZpY2VjYTEucDdjMB8GA1UdIwQYMBaA&#13;\nFJNyQZr/34qKK85jvM2qbXqZjqLnMIIBNAYDVR0gBIIBKzCCAScwggEjBgtghkgBhvkvAGQlAjCC&#13;\nARIwSwYIKwYBBQUHAgEWP2h0dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20vY2VydGlmaWNhdGVz&#13;\nL3BvbGljeS9pZ2MvaW5kZXguaHRtbDCBwgYIKwYBBQUHAgIwgbUMgbJDZXJ0aWZpY2F0ZSB1c2Ug&#13;\ncmVzdHJpY3RlZCB0byBSZWx5aW5nIFBhcnR5KHMpIGluIGFjY29yZGFuY2Ugd2l0aCBJR0MtQ1Ag&#13;\nKHNlZSBodHRwczovL3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRpZmljYXRlcy9wb2xpY3kvaWdj&#13;\nL2luZGV4Lmh0bWwpLiBJR0MtQ1BTIGluY29ycG9yYXRlZCBieSByZWZlcmVuY2UuMEUGA1UdHwQ+&#13;\nMDwwOqA4oDaGNGh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2lnY2RldmljZWNh&#13;\nMS5jcmwwGgYDVR0RBBMwEYIPaXBhd3NvcGVuMjAwOTcxMB0GA1UdDgQWBBQHssdGqybVjUO0x4FS&#13;\nzF4G+SO8mDAxBgNVHSUEKjAoBggrBgEFBQcDAgYIKwYBBQUHAwUGCCsGAQUFBwMGBggrBgEFBQcD&#13;\nBzANBgkqhkiG9w0BAQsFAAOCAQEAh1VSmQLPG83CXNsn3cKwZxGzHYwhzxnA6PgkLqCn4J+a9a7T&#13;\nNl/YoWaB4x7gE8hQ/iyRyX85q9m/P++pDqR02ptKtUY9TZSXi1UCkb/0YOl/hf8m1q1Gljp81uEW&#13;\nucqZfUlIKBPx2/BFzB2W2HCqJd8i0Z5DS/mgXGYLAGIHnUUrE812PMCoROlFdJDY65LIfJbkDlaS&#13;\nlTlfVAwJrLSdSLN8GRyxdvLEH3mTXfFI0r8HZk6ouSLdCHho8sL0t/bd4YO4MUP0ePGTHywG+pQ0&#13;\n3xKacagahx2YfAMUnQ4GbVtD1b2DblsvQogildLGoFIgPB1l5km0/Sr8Jbn/meKyjA==</X509Certificate></X509Data></KeyInfo></Signature></alert>",
+   "identifier": "test-lac-954844-1736467181833",
+   "sender": "[redacted sender]",
+   "sent": "2025-01-09T23:59:41.000Z",
+   "status": "Actual",
+   "msgType": "Cancel",
+   "source": null,
+   "scope": "Public",
+   "restriction": null,
+   "addresses": null,
+   "code": [
+    "IPAWSv1.0"
+   ],
+   "note": null,
+   "searchGeometry": null,
+   "incidents": null,
+   "cogId": 200971,
+   "id": "436080a1-ec13-4dc5-b1d9-1d06e75a1578",
+   "xmlns": "urn:oasis:names:tc:emergency:cap:1.2",
+   "info": null
+  },
+  {
+   "originalMessage": "<alert xmlns=\"urn:oasis:names:tc:emergency:cap:1.2\"><identifier>test-lac-954922-1736468329510</identifier><sender>[redacted sender]</sender><sent>2025-01-10T01:18:49+01:00</sent><status>Actual</status><msgType>Alert</msgType><scope>Public</scope><code>IPAWSv1.0</code><incidents>incidents</incidents><info><language>en-US</language><category>Other</category><event>Fire Warning</event><responseType>Execute</responseType><urgency>Immediate</urgency><severity>Extreme</severity><certainty>Observed</certainty><eventCode><valueName>SAME</valueName><value>FRW</value></eventCode><effective>2025-01-10T01:18:49+01:00</effective><expires>2025-01-10T02:18:49+01:00</expires><senderName>Public Alert System</senderName><headline>Alert from AlertLACounty</headline><description>LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org for more information</description><instruction></instruction><parameter><valueName>CMAMtext</valueName><value>LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org</value></parameter><parameter><valueName>CMAMlongtext</valueName><value>LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org for more information</value></parameter><parameter><valueName>EAS-ORG</valueName><value>CIV</value></parameter><parameter><valueName>timezone</valueName><value>EST</value></parameter><parameter><valueName>WEAHandling</valueName><value>Imminent Threat</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>EAS</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>NWEM</value></parameter><area><areaDesc>Los Angeles</areaDesc><polygon>33.77885,-118.416997 33.743171,-118.390819 33.765294,-118.372794 33.757801,-118.351766 33.737461,-118.346616 33.709977,-118.289538 33.771002,-118.268081 33.768148,-118.132468 33.752092,-118.120023 33.762796,-118.096419 33.7842,-118.105861 33.826992,-118.066808 33.8523,-118.061658 33.869405,-118.044063 33.910017,-117.984839 33.95417,-117.982264 33.956306,-117.815753 34.002569,-117.797729 34.030315,-117.766829 34.022846,-117.736789 34.173168,-117.68057 34.292029,-117.648812 34.393017,-117.658254 34.394079,-117.68057 34.42205,-117.680999 34.810338,-117.684175 34.790604,-118.860055 34.295716,-118.614579 34.227617,-118.607713 34.229036,-118.659211 34.159462,-118.654061 34.149518,-118.789674 34.055705,-118.927003 34.051438,-118.528748 33.940428,-118.389703 33.806454,-118.37597 33.77885,-118.416997</polygon><geocode><valueName>SAME</valueName><value>006037</value></geocode></area></info><info><language>es-US</language><category>Other</category><event>Fire Warning</event><responseType>Execute</responseType><urgency>Immediate</urgency><severity>Extreme</severity><certainty>Observed</certainty><eventCode><valueName>SAME</valueName><value>FRW</value></eventCode><effective>2025-01-10T01:18:49+01:00</effective><expires>2025-01-10T02:18:49+01:00</expires><senderName>Public Alert System</senderName><headline>Alert from AlertLACounty</headline><description>LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org for more information</description><instruction></instruction><parameter><valueName>CMAMtext</valueName><value>LACoOEM: Ignore la ultima ADVERTENCIA DE EVACUACION. Era solo para Kenneth Fire.AlertLA.or</value></parameter><parameter><valueName>CMAMlongtext</valueName><value>LACoOEM: Ignore la ultima ADVERTENCIA DE EVACUACION. Era solo para Kenneth Fire. AlertLA.org</value></parameter><parameter><valueName>EAS-ORG</valueName><value>CIV</value></parameter><parameter><valueName>timezone</valueName><value>EST</value></parameter><parameter><valueName>WEAHandling</valueName><value>Imminent Threat</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>EAS</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>NWEM</value></parameter><area><areaDesc>Los Angeles</areaDesc><polygon>33.77885,-118.416997 33.743171,-118.390819 33.765294,-118.372794 33.757801,-118.351766 33.737461,-118.346616 33.709977,-118.289538 33.771002,-118.268081 33.768148,-118.132468 33.752092,-118.120023 33.762796,-118.096419 33.7842,-118.105861 33.826992,-118.066808 33.8523,-118.061658 33.869405,-118.044063 33.910017,-117.984839 33.95417,-117.982264 33.956306,-117.815753 34.002569,-117.797729 34.030315,-117.766829 34.022846,-117.736789 34.173168,-117.68057 34.292029,-117.648812 34.393017,-117.658254 34.394079,-117.68057 34.42205,-117.680999 34.810338,-117.684175 34.790604,-118.860055 34.295716,-118.614579 34.227617,-118.607713 34.229036,-118.659211 34.159462,-118.654061 34.149518,-118.789674 34.055705,-118.927003 34.051438,-118.528748 33.940428,-118.389703 33.806454,-118.37597 33.77885,-118.416997</polygon><geocode><valueName>SAME</valueName><value>006037</value></geocode></area></info><Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:edx=\"http://gov.fema.ipaws.services/IPAWS_CAPService/\" xmlns:ns2=\"http://gov.fema.ipaws.services/capresponse\" xmlns:ns4=\"http://gov.fema.ipaws.services/caprequest\"><SignedInfo><CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/><Reference URI=\"\"><Transforms><Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></Transforms><DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><DigestValue>a1q9pIYY1YIr68fSEU+jFr2DYbpEm2urDx8PQi0grho=</DigestValue></Reference></SignedInfo><SignatureValue>cJa1PVvmeYR4njkF8cm40ZBz8D+/QPhgZ99waXO5bvipYb4xmYoAD7e9RBxJhqScMRwQyDcrEfdT&#13;\n21E6NJncVRdlP17HgRP7rJP6ClMzWiH0H1M0RwSnJSqttnTcsyU4X9Cm150ADqRa2/4Cl7P3KdS5&#13;\nh0KB4/ZCjL+krk/9KU6knmAykE7uXyylmnye7F4judqdpXoc/6tSeXdwrOUqFjFPTm/cPd9+VVVb&#13;\nZYnABU4Z2Dt3iC2/veGC0tvbd1ZA0jOeMiKFiYRMiaLEV0cNmoLX3ijE4f45hWSaWV2z9yI+4K54&#13;\nOTbJyV4YZ4ZjpA+rtJc5FgoUeXSN9XiZ6nxP5w==</SignatureValue><KeyInfo><X509Data><X509SubjectName>CN=ipawsopen200971,OU=A01410D0000017F328A9E7000179BC0,OU=Devices IPAWS,OU=National Continuity Programs,O=FEMA IPAWS,C=US</X509SubjectName><X509Certificate>MIIGMDCCBRigAwIBAgIQQAF/MoqekSwCQJcZ9afKXDANBgkqhkiG9w0BAQsFADBdMQswCQYDVQQG&#13;\nEwJVUzESMBAGA1UEChMJSWRlblRydXN0MSAwHgYDVQQLExdJZGVuVHJ1c3QgR2xvYmFsIENvbW1v&#13;\nbjEYMBYGA1UEAxMPSUdDIERldmljZSBDQSAxMB4XDTIyMDIyNTIwMjAxOVoXDTI1MDIyNDIwMjAx&#13;\nOFowgaUxCzAJBgNVBAYTAlVTMRMwEQYDVQQKEwpGRU1BIElQQVdTMSUwIwYDVQQLExxOYXRpb25h&#13;\nbCBDb250aW51aXR5IFByb2dyYW1zMRYwFAYDVQQLEw1EZXZpY2VzIElQQVdTMSgwJgYDVQQLEx9B&#13;\nMDE0MTBEMDAwMDAxN0YzMjhBOUU3MDAwMTc5QkMwMRgwFgYDVQQDEw9pcGF3c29wZW4yMDA5NzEw&#13;\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQChMA0ibQL9YHL6XkIkv501ns6TfIul6tkj&#13;\nbVnI8+D0VRkW3t4t1YZAQ7mizvPvUCqIuADc/0NhqcqHZm8h7D/3/aLe1NTSBYFGdKPJm/VsRIv+&#13;\no9bZpINCWbECyzCXyIpYz6sHDQS3PkfAnar2aZZbiphGINjSMcLQgOjv+LRMx5vViugG0+KSJalb&#13;\nxdMwLtg+KAOE9WDk6aN1CGEXS1i0kuffm/25P+INShaaZFRr31cOnI6w+x6vR9UyIL57gRA9WOEy&#13;\nuQ9nWw6YM5VU4kF0m7Xc/uQV6DRg5Zj9nU5LVIUdDO4ClWSBk5g/2on74vUhDCn+EtAu6IxldFmq&#13;\nXJvfAgMBAAGjggKhMIICnTAOBgNVHQ8BAf8EBAMCBaAwfQYIKwYBBQUHAQEEcTBvMCkGCCsGAQUF&#13;\nBzABhh1odHRwOi8vaWdjLm9jc3AuaWRlbnRydXN0LmNvbTBCBggrBgEFBQcwAoY2aHR0cDovL3Zh&#13;\nbGlkYXRpb24uaWRlbnRydXN0LmNvbS9jZXJ0cy9pZ2NkZXZpY2VjYTEucDdjMB8GA1UdIwQYMBaA&#13;\nFJNyQZr/34qKK85jvM2qbXqZjqLnMIIBNAYDVR0gBIIBKzCCAScwggEjBgtghkgBhvkvAGQlAjCC&#13;\nARIwSwYIKwYBBQUHAgEWP2h0dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20vY2VydGlmaWNhdGVz&#13;\nL3BvbGljeS9pZ2MvaW5kZXguaHRtbDCBwgYIKwYBBQUHAgIwgbUMgbJDZXJ0aWZpY2F0ZSB1c2Ug&#13;\ncmVzdHJpY3RlZCB0byBSZWx5aW5nIFBhcnR5KHMpIGluIGFjY29yZGFuY2Ugd2l0aCBJR0MtQ1Ag&#13;\nKHNlZSBodHRwczovL3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRpZmljYXRlcy9wb2xpY3kvaWdj&#13;\nL2luZGV4Lmh0bWwpLiBJR0MtQ1BTIGluY29ycG9yYXRlZCBieSByZWZlcmVuY2UuMEUGA1UdHwQ+&#13;\nMDwwOqA4oDaGNGh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2lnY2RldmljZWNh&#13;\nMS5jcmwwGgYDVR0RBBMwEYIPaXBhd3NvcGVuMjAwOTcxMB0GA1UdDgQWBBQHssdGqybVjUO0x4FS&#13;\nzF4G+SO8mDAxBgNVHSUEKjAoBggrBgEFBQcDAgYIKwYBBQUHAwUGCCsGAQUFBwMGBggrBgEFBQcD&#13;\nBzANBgkqhkiG9w0BAQsFAAOCAQEAh1VSmQLPG83CXNsn3cKwZxGzHYwhzxnA6PgkLqCn4J+a9a7T&#13;\nNl/YoWaB4x7gE8hQ/iyRyX85q9m/P++pDqR02ptKtUY9TZSXi1UCkb/0YOl/hf8m1q1Gljp81uEW&#13;\nucqZfUlIKBPx2/BFzB2W2HCqJd8i0Z5DS/mgXGYLAGIHnUUrE812PMCoROlFdJDY65LIfJbkDlaS&#13;\nlTlfVAwJrLSdSLN8GRyxdvLEH3mTXfFI0r8HZk6ouSLdCHho8sL0t/bd4YO4MUP0ePGTHywG+pQ0&#13;\n3xKacagahx2YfAMUnQ4GbVtD1b2DblsvQogildLGoFIgPB1l5km0/Sr8Jbn/meKyjA==</X509Certificate></X509Data></KeyInfo></Signature></alert>",
+   "identifier": "test-lac-954922-1736468329510",
+   "sender": "[redacted sender]",
+   "sent": "2025-01-10T00:18:49.000Z",
+   "status": "Actual",
+   "msgType": "Alert",
+   "source": null,
+   "scope": "Public",
+   "restriction": null,
+   "addresses": null,
+   "code": [
+    "IPAWSv1.0"
+   ],
+   "note": null,
+   "searchGeometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        -118.416997,
+        33.77885
+       ],
+       [
+        -118.390819,
+        33.743171
+       ],
+       [
+        -118.372794,
+        33.765294
+       ],
+       [
+        -118.351766,
+        33.757801
+       ],
+       [
+        -118.346616,
+        33.737461
+       ],
+       [
+        -118.289538,
+        33.709977
+       ],
+       [
+        -118.268081,
+        33.771002
+       ],
+       [
+        -118.132468,
+        33.768148
+       ],
+       [
+        -118.120023,
+        33.752092
+       ],
+       [
+        -118.096419,
+        33.762796
+       ],
+       [
+        -118.105861,
+        33.7842
+       ],
+       [
+        -118.066808,
+        33.826992
+       ],
+       [
+        -118.061658,
+        33.8523
+       ],
+       [
+        -118.044063,
+        33.869405
+       ],
+       [
+        -117.984839,
+        33.910017
+       ],
+       [
+        -117.982264,
+        33.95417
+       ],
+       [
+        -117.815753,
+        33.956306
+       ],
+       [
+        -117.797729,
+        34.002569
+       ],
+       [
+        -117.766829,
+        34.030315
+       ],
+       [
+        -117.736789,
+        34.022846
+       ],
+       [
+        -117.68057,
+        34.173168
+       ],
+       [
+        -117.648812,
+        34.292029
+       ],
+       [
+        -117.658254,
+        34.393017
+       ],
+       [
+        -117.68057,
+        34.394079
+       ],
+       [
+        -117.680999,
+        34.42205
+       ],
+       [
+        -117.684175,
+        34.810338
+       ],
+       [
+        -118.860055,
+        34.790604
+       ],
+       [
+        -118.614579,
+        34.295716
+       ],
+       [
+        -118.607713,
+        34.227617
+       ],
+       [
+        -118.659211,
+        34.229036
+       ],
+       [
+        -118.654061,
+        34.159462
+       ],
+       [
+        -118.789674,
+        34.149518
+       ],
+       [
+        -118.927003,
+        34.055705
+       ],
+       [
+        -118.528748,
+        34.051438
+       ],
+       [
+        -118.389703,
+        33.940428
+       ],
+       [
+        -118.37597,
+        33.806454
+       ],
+       [
+        -118.416997,
+        33.77885
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        -118.416997,
+        33.77885
+       ],
+       [
+        -118.390819,
+        33.743171
+       ],
+       [
+        -118.372794,
+        33.765294
+       ],
+       [
+        -118.351766,
+        33.757801
+       ],
+       [
+        -118.346616,
+        33.737461
+       ],
+       [
+        -118.289538,
+        33.709977
+       ],
+       [
+        -118.268081,
+        33.771002
+       ],
+       [
+        -118.132468,
+        33.768148
+       ],
+       [
+        -118.120023,
+        33.752092
+       ],
+       [
+        -118.096419,
+        33.762796
+       ],
+       [
+        -118.105861,
+        33.7842
+       ],
+       [
+        -118.066808,
+        33.826992
+       ],
+       [
+        -118.061658,
+        33.8523
+       ],
+       [
+        -118.044063,
+        33.869405
+       ],
+       [
+        -117.984839,
+        33.910017
+       ],
+       [
+        -117.982264,
+        33.95417
+       ],
+       [
+        -117.815753,
+        33.956306
+       ],
+       [
+        -117.797729,
+        34.002569
+       ],
+       [
+        -117.766829,
+        34.030315
+       ],
+       [
+        -117.736789,
+        34.022846
+       ],
+       [
+        -117.68057,
+        34.173168
+       ],
+       [
+        -117.648812,
+        34.292029
+       ],
+       [
+        -117.658254,
+        34.393017
+       ],
+       [
+        -117.68057,
+        34.394079
+       ],
+       [
+        -117.680999,
+        34.42205
+       ],
+       [
+        -117.684175,
+        34.810338
+       ],
+       [
+        -118.860055,
+        34.790604
+       ],
+       [
+        -118.614579,
+        34.295716
+       ],
+       [
+        -118.607713,
+        34.227617
+       ],
+       [
+        -118.659211,
+        34.229036
+       ],
+       [
+        -118.654061,
+        34.159462
+       ],
+       [
+        -118.789674,
+        34.149518
+       ],
+       [
+        -118.927003,
+        34.055705
+       ],
+       [
+        -118.528748,
+        34.051438
+       ],
+       [
+        -118.389703,
+        33.940428
+       ],
+       [
+        -118.37597,
+        33.806454
+       ],
+       [
+        -118.416997,
+        33.77885
+       ]
+      ]
+     ]
+    ]
+   },
+   "incidents": "incidents",
+   "cogId": 200971,
+   "id": "98dff992-3063-4193-8854-9117d498f8ee",
+   "xmlns": "urn:oasis:names:tc:emergency:cap:1.2",
+   "info": [
+    {
+     "area": [
+      {
+       "geocode": [
+        {
+         "id": 4566,
+         "name": "SAME",
+         "value": "006037"
+        }
+       ],
+       "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -118.416997,
+           33.77885
+          ],
+          [
+           -118.390819,
+           33.743171
+          ],
+          [
+           -118.372794,
+           33.765294
+          ],
+          [
+           -118.351766,
+           33.757801
+          ],
+          [
+           -118.346616,
+           33.737461
+          ],
+          [
+           -118.289538,
+           33.709977
+          ],
+          [
+           -118.268081,
+           33.771002
+          ],
+          [
+           -118.132468,
+           33.768148
+          ],
+          [
+           -118.120023,
+           33.752092
+          ],
+          [
+           -118.096419,
+           33.762796
+          ],
+          [
+           -118.105861,
+           33.7842
+          ],
+          [
+           -118.066808,
+           33.826992
+          ],
+          [
+           -118.061658,
+           33.8523
+          ],
+          [
+           -118.044063,
+           33.869405
+          ],
+          [
+           -117.984839,
+           33.910017
+          ],
+          [
+           -117.982264,
+           33.95417
+          ],
+          [
+           -117.815753,
+           33.956306
+          ],
+          [
+           -117.797729,
+           34.002569
+          ],
+          [
+           -117.766829,
+           34.030315
+          ],
+          [
+           -117.736789,
+           34.022846
+          ],
+          [
+           -117.68057,
+           34.173168
+          ],
+          [
+           -117.648812,
+           34.292029
+          ],
+          [
+           -117.658254,
+           34.393017
+          ],
+          [
+           -117.68057,
+           34.394079
+          ],
+          [
+           -117.680999,
+           34.42205
+          ],
+          [
+           -117.684175,
+           34.810338
+          ],
+          [
+           -118.860055,
+           34.790604
+          ],
+          [
+           -118.614579,
+           34.295716
+          ],
+          [
+           -118.607713,
+           34.227617
+          ],
+          [
+           -118.659211,
+           34.229036
+          ],
+          [
+           -118.654061,
+           34.159462
+          ],
+          [
+           -118.789674,
+           34.149518
+          ],
+          [
+           -118.927003,
+           34.055705
+          ],
+          [
+           -118.528748,
+           34.051438
+          ],
+          [
+           -118.389703,
+           33.940428
+          ],
+          [
+           -118.37597,
+           33.806454
+          ],
+          [
+           -118.416997,
+           33.77885
+          ]
+         ]
+        ]
+       },
+       "areaDesc": "Los Angeles"
+      }
+     ],
+     "event": "Fire Warning",
+     "expires": "2025-01-10T02:18:49+01:00",
+     "urgency": "Immediate",
+     "category": [
+      "Other"
+     ],
+     "headline": "Alert from AlertLACounty",
+     "language": "en-US",
+     "severity": "Extreme",
+     "certainty": "Observed",
+     "effective": "2025-01-10T01:18:49+01:00",
+     "eventCode": [
+      {
+       "id": 2427,
+       "name": "SAME",
+       "value": "FRW"
+      }
+     ],
+     "parameter": [
+      {
+       "name": "CMAMtext",
+       "value": "LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org"
+      },
+      {
+       "name": "CMAMlongtext",
+       "value": "LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org for more information"
+      },
+      {
+       "name": "EAS-ORG",
+       "value": "CIV"
+      },
+      {
+       "name": "timezone",
+       "value": "EST"
+      },
+      {
+       "name": "WEAHandling",
+       "value": "Imminent Threat"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "EAS"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "NWEM"
+      }
+     ],
+     "senderName": "Public Alert System",
+     "description": "LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org for more information",
+     "instruction": "",
+     "responseType": [
+      "Execute"
+     ]
+    },
+    {
+     "area": [
+      {
+       "geocode": [
+        {
+         "id": 4566,
+         "name": "SAME",
+         "value": "006037"
+        }
+       ],
+       "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -118.416997,
+           33.77885
+          ],
+          [
+           -118.390819,
+           33.743171
+          ],
+          [
+           -118.372794,
+           33.765294
+          ],
+          [
+           -118.351766,
+           33.757801
+          ],
+          [
+           -118.346616,
+           33.737461
+          ],
+          [
+           -118.289538,
+           33.709977
+          ],
+          [
+           -118.268081,
+           33.771002
+          ],
+          [
+           -118.132468,
+           33.768148
+          ],
+          [
+           -118.120023,
+           33.752092
+          ],
+          [
+           -118.096419,
+           33.762796
+          ],
+          [
+           -118.105861,
+           33.7842
+          ],
+          [
+           -118.066808,
+           33.826992
+          ],
+          [
+           -118.061658,
+           33.8523
+          ],
+          [
+           -118.044063,
+           33.869405
+          ],
+          [
+           -117.984839,
+           33.910017
+          ],
+          [
+           -117.982264,
+           33.95417
+          ],
+          [
+           -117.815753,
+           33.956306
+          ],
+          [
+           -117.797729,
+           34.002569
+          ],
+          [
+           -117.766829,
+           34.030315
+          ],
+          [
+           -117.736789,
+           34.022846
+          ],
+          [
+           -117.68057,
+           34.173168
+          ],
+          [
+           -117.648812,
+           34.292029
+          ],
+          [
+           -117.658254,
+           34.393017
+          ],
+          [
+           -117.68057,
+           34.394079
+          ],
+          [
+           -117.680999,
+           34.42205
+          ],
+          [
+           -117.684175,
+           34.810338
+          ],
+          [
+           -118.860055,
+           34.790604
+          ],
+          [
+           -118.614579,
+           34.295716
+          ],
+          [
+           -118.607713,
+           34.227617
+          ],
+          [
+           -118.659211,
+           34.229036
+          ],
+          [
+           -118.654061,
+           34.159462
+          ],
+          [
+           -118.789674,
+           34.149518
+          ],
+          [
+           -118.927003,
+           34.055705
+          ],
+          [
+           -118.528748,
+           34.051438
+          ],
+          [
+           -118.389703,
+           33.940428
+          ],
+          [
+           -118.37597,
+           33.806454
+          ],
+          [
+           -118.416997,
+           33.77885
+          ]
+         ]
+        ]
+       },
+       "areaDesc": "Los Angeles"
+      }
+     ],
+     "event": "Fire Warning",
+     "expires": "2025-01-10T02:18:49+01:00",
+     "urgency": "Immediate",
+     "category": [
+      "Other"
+     ],
+     "headline": "Alert from AlertLACounty",
+     "language": "es-US",
+     "severity": "Extreme",
+     "certainty": "Observed",
+     "effective": "2025-01-10T01:18:49+01:00",
+     "eventCode": [
+      {
+       "id": 2427,
+       "name": "SAME",
+       "value": "FRW"
+      }
+     ],
+     "parameter": [
+      {
+       "name": "CMAMtext",
+       "value": "LACoOEM: Ignore la ultima ADVERTENCIA DE EVACUACION. Era solo para Kenneth Fire.AlertLA.or"
+      },
+      {
+       "name": "CMAMlongtext",
+       "value": "LACoOEM: Ignore la ultima ADVERTENCIA DE EVACUACION. Era solo para Kenneth Fire. AlertLA.org"
+      },
+      {
+       "name": "EAS-ORG",
+       "value": "CIV"
+      },
+      {
+       "name": "timezone",
+       "value": "EST"
+      },
+      {
+       "name": "WEAHandling",
+       "value": "Imminent Threat"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "EAS"
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "NWEM"
+      }
+     ],
+     "senderName": "Public Alert System",
+     "description": "LACoOEM: Disregard last EVACUATION WARNING. It was for Kenneth Fire Only. AlertLA.org for more information",
+     "instruction": "",
+     "responseType": [
+      "Execute"
+     ]
+    }
+   ]
+  }
+ ]
+}

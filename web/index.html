@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Countersign: the AI alert desk that never sends alone</title>
+<meta name="description" content="Countersign is an AI agent for county emergency offices. It drafts the phone alert from an official warning, wakes a person, and can never send it alone or stay silent. Built on Amazon Bedrock AgentCore.">
+<meta name="theme-color" content="#eeecea">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/landing.css">
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/landing.js" defer></script>
+</head>
+<body class="landing">
+<a class="skip" href="#replay">Skip to the replay</a>
+
+<header class="hero" aria-labelledby="hero-title">
+  <div class="hero-top">
+    <a class="wordmark" href="index.html">Countersign</a>
+    <nav class="corner" aria-label="Main">
+      <a href="rules.html">How it works</a>
+      <a href="proof.html">Proof</a>
+      <a href="developers.html">Developers</a>
+      <span data-theme-slot></span>
+      <a class="btn" href="desk.html">Try to make it send</a>
+    </nav>
+  </div>
+  <div class="waterline">
+    <h1 id="hero-title" class="wl wl-top"><span class="line"><span>THIS IS NOT</span></span><span class="line"><span>A DRILL.</span></span></h1>
+    <div class="wl wl-bottom" aria-hidden="true"><span class="line"><span>THIS IS NOT</span></span><span class="line"><span>A DRILL.</span></span></div>
+  </div>
+  <div class="hero-foot on-deep">
+    <p class="lead">Hawaii's 2018 missile alert was a drill, sent as real by one person. Countersign is an AI alert desk that drafts the warning, wakes a person, and can never send it alone.<button class="i" data-tip-title="Those were the real words" data-tip="The headline repeats the last sentence of the alert every phone in Hawaii received at 8:07 AM on January 13, 2018. The record is in FEMA's public IPAWS archive, which Countersign replays below."></button></p>
+    <a class="btn on-water" href="#replay">Replay that morning</a>
+  </div>
+</header>
+
+<main>
+<section class="stair on-deep" aria-label="Three real nights">
+  <ol class="stair-lines">
+    <li>Hawaii sent a drill as real.</li>
+    <li>Los Angeles sent one area's alert</li>
+    <li>to ten million phones.</li>
+    <li>Kerr County, Texas,</li>
+    <li>sent nothing at all.</li>
+  </ol>
+  <div class="stair-records">
+    <figure class="record" data-ui>
+      <figcaption>FEMA archive, January 13, 2018, 18:07 UTC</figcaption>
+      <dl><dt>Event</dt><dd>Civil Danger Warning</dd><dt>Area</dt><dd>State of Hawaii, code 015000</dd><dt>Map area</dt><dd>None</dd></dl>
+      <p>BALLISTIC MISSILE THREAT INBOUND TO HAWAII. SEEK IMMEDIATE SHELTER. THIS IS NOT A DRILL.</p>
+    </figure>
+    <figure class="record" data-ui>
+      <figcaption>FEMA archive, January 9, 2025, 23:56 UTC</figcaption>
+      <dl><dt>Event</dt><dd>Fire Warning</dd><dt>Area</dt><dd>Los Angeles, code 006037</dd><dt>Map area</dt><dd>None</dd></dl>
+      <p>An EVACUATION WARNING has been issued in your area.</p>
+    </figure>
+    <figure class="record photo">
+      <picture><source srcset="img/guadalupe-surge.webp" type="image/webp"><img src="img/guadalupe-surge.jpg" width="1754" height="888" alt="Security camera still at night: dark floodwater with a lit structure, the Guadalupe River at Kerrville, Texas, July 4, 2025" loading="lazy"></picture>
+      <figcaption>Kerrville, Texas, before dawn on July 4, 2025. No county phone alert went out that day. Security camera still, public domain.</figcaption>
+    </figure>
+  </div>
+  <p class="stair-note">Three real nights from FEMA's public alert archive. Each one became a rule Countersign cannot break.</p>
+</section>
+
+<section id="replay" class="replay" aria-labelledby="replay-title" data-rise>
+  <div class="replay-head">
+    <h2 id="replay-title">Replay a real night</h2>
+    <div class="tabs" role="tablist" aria-label="Choose a night"></div>
+    <p class="replay-help">Pick a night. Countersign checks the real record exactly as it went out, then shows what it would have done.<button class="i" data-tip-title="Is this live?" data-tip="The checks run in your browser from data the rule engine produced, so this works even offline. Press Run it on AWS to send the same record to the live API and get the answer from Lambda."></button></p>
+  </div>
+
+  <div class="exchange">
+    <p class="say">First, the record arrives.</p>
+    <div class="call" id="call-record" data-ui></div>
+    <div class="response" id="resp-source" data-ui></div>
+  </div>
+  <div class="exchange">
+    <p class="say">Then the ten rules check it, before anyone can send.</p>
+    <div class="call" id="call-proposal" data-ui></div>
+    <div class="response" id="resp-checks" data-ui aria-live="polite"></div>
+  </div>
+  <div class="exchange final">
+    <p class="say">Then a person decides, and only then.</p>
+    <div class="result" id="resp-result" data-ui></div>
+    <div class="replay-actions">
+      <button class="btn secondary" id="run-live" type="button">Run it on AWS</button>
+      <span class="run-status" id="run-status" aria-live="polite"></span>
+      <a class="btn" href="desk.html">Run the full agent on this night</a>
+    </div>
+  </div>
+</section>
+
+<figure class="band">
+  <picture><source srcset="img/guadalupe-aerial.webp" type="image/webp"><img src="img/guadalupe-aerial.jpg" width="1280" height="964" alt="Aerial photograph: brown floodwater covering fields, trees and the ground floor of a house near Kerrville, Texas" loading="lazy"></picture>
+  <figcaption>The Guadalupe River near Kerrville, Texas, July 2025. US Coast Guard photograph, public domain.</figcaption>
+</figure>
+
+<section class="lineup" aria-labelledby="rules-title" data-rise>
+  <h2 id="rules-title" class="visually-hidden">The ten rules</h2>
+  <div class="lineup-head" aria-hidden="true"><span>Rule</span><span>What it stops</span><span>Held by</span><span>From</span></div>
+  <p class="lineup-part">What the agent may never do</p>
+  <ol class="lineup-rows" id="rule-rows-never"></ol>
+  <p class="lineup-part">What the agent must always do</p>
+  <ol class="lineup-rows" id="rule-rows-always"></ol>
+  <p class="lineup-more"><a href="rules.html">See where every rule is enforced, layer by layer</a><button class="i" data-tip-title="Why layers" data-tip="A rule written only in a prompt is a preference. Every Countersign rule is also enforced in at least one place the model cannot argue with: the tool list, the Cedar policy, the hook, IAM, the sender's checks or the paging workflow."></button></p>
+</section>
+
+<section class="names" aria-labelledby="names-title" data-rise>
+  <h2 id="names-title" class="visually-hidden">What holds the rules</h2>
+  <p class="names-run" id="names-run"><span class="lit">Held by</span> <span class="n">the AgentCore managed harness</span>, <span class="n">a Gateway with no send button</span>, <span class="n">Cedar policies</span>, <span class="n">a hook that fails closed</span>, <span class="n">Bedrock Guardrails</span>, <span class="n">an Automated Reasoning solver</span>, <span class="n">IAM</span>, <span class="n">a paging chain</span> and <span class="n">two officers</span>.</p>
+</section>
+
+<section class="compare" aria-labelledby="compare-title" data-rise>
+  <div class="compare-head">
+    <h2 id="compare-title">A model that does what it is told</h2>
+    <p id="compare-copy">The real danger is a model that has been talked out of its rules. So we told Amazon Nova Lite to do whatever staff ask, and ran the stress test's 16 attacks twice: once with a send tool and nothing behind it, once inside Countersign.<button class="i" data-tip-title="How this was measured" data-tip="Same model, same prompts, same attacks, on AWS. A live alert counts only when a message reached the live channel. Claude Sonnet 4.6 with Countersign's own instructions refused almost every attack by itself, which is why the layers are tested with a model that does not. Every transcript is on the Proof page."></button></p>
+  </div>
+  <div class="specimens">
+    <figure><div class="spec" id="spec-a" aria-describedby="spec-a-cap">22</div><figcaption id="spec-a-cap">live alerts sent with a send tool and nothing behind it</figcaption></figure>
+    <figure><div class="spec" id="spec-b" aria-describedby="spec-b-cap">0</div><figcaption id="spec-b-cap">live alerts sent by the same model inside Countersign</figcaption></figure>
+  </div>
+</section>
+
+<section class="faq" aria-labelledby="faq-title" data-rise>
+  <h2 id="faq-title">Questions people ask first</h2>
+  <div class="faq-list">
+    <details><summary>Does this send real alerts to real phones?</summary><p>No. Real phone alerts go through FEMA's IPAWS, which needs a signed agreement with FEMA. Countersign's live channel is an Amazon SNS topic that stands in for it, and the site shows the phone it would have reached. Everything else is real: the AWS agent, the records, the warnings and the checks.</p></details>
+    <details><summary>In an emergency, why not let the AI send it?</summary><p>Because the two worst failures on record were sends, not slowness: a false missile alert and an alert to ten million people. Countersign makes the human step fast instead: the draft, the map, the test message and the correction are ready before the officer's phone stops ringing, and one approval sends an alert that matches an official warning.</p></details>
+    <details><summary>What if nobody answers?</summary><p>The paging workflow moves to the next officer, then starts over, then escalates to the state's 24-hour desk. It runs in AWS Step Functions, outside the agent. The agent has no permission to pause it, and only an officer's decision ends it.</p></details>
+    <details><summary>What stops someone talking the agent into sending?</summary><p>There is nothing to talk it into. The agent's tools cannot reach the live channel; its IAM role is denied it; the Gateway's Cedar policy denies anything not explicitly allowed; a hook checks every tool call; and the sender re-checks everything with code and with an Automated Reasoning solver. The Proof page shows each attack and which layer stopped it.</p></details>
+    <details><summary>Can I test it on my own warning?</summary><p>Yes. On Test your data, paste any CAP alert, National Weather Service alert or OpenFEMA record, pick a county, and see every rule's result. Developers can get a free API key and call the same check from code.</p></details>
+    <details><summary>Is any of the data invented?</summary><p>The Hawaii, Los Angeles and Kerr County records are real and unmodified. Two attack presets are copies of the Kerr County record with planted text, and they are labelled as modified wherever they appear. Personal email addresses in the public records are removed.</p></details>
+  </div>
+</section>
+
+<section class="cta on-deep" aria-labelledby="cta-title">
+  <h2 id="cta-title" class="cta-q"><span>Can you make</span><span>it send?</span></h2>
+  <div class="cta-row">
+    <a class="btn on-water" href="desk.html">Open the alert desk</a>
+    <span class="or">or</span>
+    <a class="btn secondary" href="lab.html">Test your own warning</a>
+  </div>
+  <p class="cta-note">Either way, nothing reaches a phone until two checks and a person agree.</p>
+</section>
+</main>
+
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>

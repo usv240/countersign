@@ -1,0 +1,123 @@
+{
+ "2023": {
+  "phone_alerts_scored": 2312,
+  "error": {
+   "n": 16,
+   "held": 1,
+   "held_pct": 6.2,
+   "confirm_whole_county": 12,
+   "confirm_pct": 75.0,
+   "clear": 3,
+   "held_by": {
+    "R3": 1
+   }
+  },
+  "cancelled": {
+   "n": 568,
+   "held": 28,
+   "held_pct": 4.9,
+   "confirm_whole_county": 218,
+   "confirm_pct": 38.4,
+   "clear": 322,
+   "held_by": {
+    "R3": 22,
+    "R4": 8
+   }
+  },
+  "ordinary": {
+   "n": 1728,
+   "held": 263,
+   "held_pct": 15.2,
+   "confirm_whole_county": 693,
+   "confirm_pct": 40.1,
+   "clear": 772,
+   "held_by": {
+    "R3": 227,
+    "R4": 43,
+    "R5": 3
+   }
+  },
+  "year": 2023,
+  "messages_in_archive": 8401
+ },
+ "2024": {
+  "phone_alerts_scored": 3593,
+  "error": {
+   "n": 26,
+   "held": 0,
+   "held_pct": 0.0,
+   "confirm_whole_county": 25,
+   "confirm_pct": 96.2,
+   "clear": 1,
+   "held_by": {}
+  },
+  "cancelled": {
+   "n": 846,
+   "held": 61,
+   "held_pct": 7.2,
+   "confirm_whole_county": 251,
+   "confirm_pct": 29.7,
+   "clear": 534,
+   "held_by": {
+    "R3": 54,
+    "R4": 7
+   }
+  },
+  "ordinary": {
+   "n": 2721,
+   "held": 460,
+   "held_pct": 16.9,
+   "confirm_whole_county": 853,
+   "confirm_pct": 31.3,
+   "clear": 1408,
+   "held_by": {
+    "R3": 410,
+    "R4": 49,
+    "R5": 7
+   }
+  },
+  "year": 2024,
+  "messages_in_archive": 9567
+ },
+ "2025": {
+  "phone_alerts_scored": 4080,
+  "error": {
+   "n": 11,
+   "held": 1,
+   "held_pct": 9.1,
+   "confirm_whole_county": 4,
+   "confirm_pct": 36.4,
+   "clear": 6,
+   "held_by": {
+    "R4": 1
+   }
+  },
+  "cancelled": {
+   "n": 1060,
+   "held": 78,
+   "held_pct": 7.4,
+   "confirm_whole_county": 286,
+   "confirm_pct": 27.0,
+   "clear": 696,
+   "held_by": {
+    "R4": 19,
+    "R3": 61
+   }
+  },
+  "ordinary": {
+   "n": 3009,
+   "held": 419,
+   "held_pct": 13.9,
+   "confirm_whole_county": 761,
+   "confirm_pct": 25.3,
+   "clear": 1829,
+   "held_by": {
+    "R3": 363,
+    "R4": 66,
+    "R5": 2
+   }
+  },
+  "year": 2025,
+  "messages_in_archive": 10129
+ }
+}

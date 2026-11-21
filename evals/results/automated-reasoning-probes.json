@@ -1,0 +1,72 @@
+[
+ {
+  "probe": "one officer, official warning, all set",
+  "expect": "valid",
+  "got": "valid",
+  "all": [
+   "valid"
+  ],
+  "seconds": 4.1,
+  "ok": true
+ },
+ {
+  "probe": "one officer, no official warning",
+  "expect": "invalid",
+  "got": "invalid",
+  "all": [
+   "invalid"
+  ],
+  "seconds": 3.5,
+  "ok": true
+ },
+ {
+  "probe": "two officers, no official warning",
+  "expect": "valid",
+  "got": "valid",
+  "all": [
+   "valid"
+  ],
+  "seconds": 3.4,
+  "ok": true
+ },
+ {
+  "probe": "agent requested",
+  "expect": "invalid",
+  "got": "invalid",
+  "all": [
+   "invalid"
+  ],
+  "seconds": 3.2,
+  "ok": true
+ },
+ {
+  "probe": "no correction",
+  "expect": "invalid",
+  "got": "invalid",
+  "all": [
+   "invalid"
+  ],
+  "seconds": 3.4,
+  "ok": true
+ },
+ {
+  "probe": "class does not qualify",
+  "expect": "invalid",
+  "got": "invalid",
+  "all": [
+   "invalid"
+  ],
+  "seconds": 3.8,
+  "ok": true
+ },
+ {
+  "probe": "already sent",
+  "expect": "invalid",
+  "got": "invalid",
+  "all": [
+   "invalid"
+  ],
+  "seconds": 3.4,
+  "ok": true
+ }
+]

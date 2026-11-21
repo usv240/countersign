@@ -1,0 +1,194 @@
+{
+ "incident": "hawaii-2018-01-13",
+ "title": "Hawaii false ballistic missile alert",
+ "source": "https://www.fema.gov/api/open/v1/IpawsArchivedAlerts",
+ "filter": "sent ge '2018-01-13T18:00:00.000Z' and sent le '2018-01-13T19:00:00.000Z' and cogId eq 200003",
+ "count": 3,
+ "records": [
+  {
+   "originalMessage": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><alert xmlns=\"urn:oasis:names:tc:emergency:cap:1.2\"><identifier>AS-HI-fa360b2d-020d-45b5-8bd6-303006e514e4</identifier><sender>[redacted sender]</sender><sent>2018-01-13T11:07:08-07:00</sent><status>Actual</status><msgType>Alert</msgType><source>AlertSense</source><scope>Public</scope><addresses></addresses><code>IPAWSv1.0</code><info><language>en-US</language><category>Safety</category><event>Civil Danger Warning</event><responseType>Execute</responseType><urgency>Immediate</urgency><severity>Extreme</severity><certainty>Observed</certainty><eventCode><valueName>SAME</valueName><value>CDW</value></eventCode><effective>2018-01-13T11:07:08-07:00</effective><expires>2018-01-13T21:07:08-07:00</expires><senderName>Hawaii Emergency Management Agency,HI</senderName><headline>Intercontinental Ballistic Missile Attack</headline><description>The U.S. Pacific Command has detected a missile threat to Hawaii. A missile may impact on land or sea within minutes. THIS IS NOT A DRILL.</description><instruction>If you are indoors, stay indoors.  If you are outdoors, seek immediate shelter in a building.  Remain indoors well away from windows.  If you are driving, pull safely to the side of the road and seek shelter in a building or lay on the floor.\n \nWe will announce when the threat has ended. Take immediate action measures.THIS IS NOT A DRILL.Take immediate action measures.</instruction><parameter><valueName>EAS-ORG</valueName><value>CIV</value></parameter><parameter><valueName>CMAMtext</valueName><value>BALLISTIC MISSILE THREAT INBOUND TO HAWAII. SEEK IMMEDIATE SHELTER. THIS IS NOT A DRILL.</value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>NWEM</value></parameter><resource><resourceDesc>EAS Broadcast Content</resourceDesc><mimeType>audio/x-ipaws-audio-mp3</mimeType><uri>https://cap.alertsense.com:443/Files/Download/1af5789d-fcf7-4840-b213-c4f2380c7e6f/CDWBMDr121817rh.mp3</uri></resource><area><areaDesc>State of Hawaii</areaDesc><geocode><valueName>SAME</valueName><value>015000</value></geocode></area></info><ds:Signature xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/><ds:Reference URI=\"\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>8+jxw44D/k2BrS3UH9FA8zwBCqn6AV7C3HBuLFQCJdc=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>ZrqMtQuAG3yWa/NQj0pqHB3+CY3SjC107WbXpryKeb3MToBN2kM251JeUS/qk0icYmxAXOVK4UCPCvFkph+7ztLGbUsScqZGuTrGDlqNkjFwC9DZ3FwpdpqygJPgOe4Hh+p6bPFblHe2e9dhOVljV9GQBPXX62gaAEcxUZKgm3sHViCVN/sCfspdGUHFMuwd28OO3YFIF32YWMNV0hFMhvrruNl+Ta11f94Jvz6TPCjN4z3aV2EOTmX6BhkCRSjiTGmqniBt77oRHnLREACZc1tjF7OI7hYLQKP7iwGI2SBlOXLfsuUe0/NRmtpP8f3Kz1NFobDu0/v/5oqpmJDFvA==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509SubjectName>CN=IPAWSOPEN_200003, OU=7F00000100000158E4A89A1A000030D4, OU=Devices IPAWS, OU=National Continuity Programs, O=FEMA IPAWS, C=US</ds:X509SubjectName><ds:X509Certificate>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</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></alert>",
+   "identifier": "AS-HI-fa360b2d-020d-45b5-8bd6-303006e514e4",
+   "sender": "[redacted sender]",
+   "sent": "2018-01-13T18:07:08.000Z",
+   "status": "Actual",
+   "msgType": "Alert",
+   "source": "AlertSense",
+   "scope": "Public",
+   "restriction": null,
+   "addresses": "",
+   "code": [
+    "IPAWSv1.0"
+   ],
+   "note": null,
+   "searchGeometry": null,
+   "incidents": null,
+   "cogId": 200003,
+   "id": "a0ede7fc-faf1-4b71-a25a-4b9a6fa1796f",
+   "xmlns": "urn:oasis:names:tc:emergency:cap:1.2",
+   "info": [
+    {
+     "areas": [
+      {
+       "geocode": [
+        {
+         "id": 28931,
+         "name": "SAME",
+         "value": "015000"
+        }
+       ],
+       "areaDesc": "State of Hawaii"
+      }
+     ],
+     "event": "Civil Danger Warning",
+     "expires": "2018-01-13T21:07:08-07:00",
+     "urgency": "Immediate",
+     "category": [
+      "Safety"
+     ],
+     "headline": "Intercontinental Ballistic Missile Attack",
+     "language": "en-US",
+     "severity": "Extreme",
+     "certainty": "Observed",
+     "effective": "2018-01-13T11:07:08-07:00",
+     "eventCode": [
+      {
+       "id": 108422,
+       "name": "SAME",
+       "value": "CDW"
+      }
+     ],
+     "resources": [
+      {
+       "uri": "https://cap.alertsense.com:443/Files/Download/1af5789d-fcf7-4840-b213-c4f2380c7e6f/CDWBMDr121817rh.mp3",
+       "mimeType": "audio/x-ipaws-audio-mp3",
+       "resourceDesc": "EAS Broadcast Content"
+      }
+     ],
+     "parameters": [
+      {
+       "name": "EAS-ORG",
+       "value": "CIV"
+      },
+      {
+       "name": "CMAMtext",
+       "value": "BALLISTIC MISSILE THREAT INBOUND TO HAWAII. SEEK IMMEDIATE SHELTER. THIS IS NOT A DRILL."
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "NWEM"
+      }
+     ],
+     "senderName": "Hawaii Emergency Management Agency,HI",
+     "description": "The U.S. Pacific Command has detected a missile threat to Hawaii. A missile may impact on land or sea within minutes. THIS IS NOT A DRILL.",
+     "instruction": "If you are indoors, stay indoors.  If you are outdoors, seek immediate shelter in a building.  Remain indoors well away from windows.  If you are driving, pull safely to the side of the road and seek shelter in a building or lay on the floor.\n \nWe will announce when the threat has ended. Take immediate action measures.THIS IS NOT A DRILL.Take immediate action measures.",
+     "responseType": [
+      "Execute"
+     ]
+    }
+   ]
+  },
+  {
+   "originalMessage": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><alert xmlns=\"urn:oasis:names:tc:emergency:cap:1.2\"><identifier>AS-HI-b3dbb926-a36e-479c-851a-8cf2ab3fe27c</identifier><sender>[redacted sender]</sender><sent>2018-01-13T11:12:42-07:00</sent><status>Actual</status><msgType>Cancel</msgType><source>AlertSense</source><scope>Public</scope><code>IPAWSv1.0</code><references>[redacted sender],AS-HI-fa360b2d-020d-45b5-8bd6-303006e514e4,2018-01-13T11:07:08-07:00</references><ds:Signature xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/><ds:Reference URI=\"\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>YWARDz4ofO40G04bXcBFHfW5GcZ0Gp6PS/9ggLgQDZM=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>M/7vfet+Y9h6I9QteYEBG1E4bHgDxlnynx+qrw+te9u0X/papK9cOI95EiZEzJQzc1EaXxu5C+L18tDO5ukbxlzMVxQ+Rr968btUgW21eFZiI4kLkhtQ24G8x22cPzDpoFTsJZdX4TdItVLWJ8ddUtrjrTb61NHpYwHSrpHL0n2AW6YlVBhXPNO73yDL3kOnyl5Y/gFTM2JVne7br+x7P8QKTFJvU6Zx9ShOAAieWgrshcwHK9r4U25W5lJ0CXCeErSs1Cbd/acBYLTP6rWIqWAosB3hrYlrfe8+Y66ZI4m/j7WUv5WpDYOJ+RuUQKxTq3EKq/YaWthxkH+gFtOM4w==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509SubjectName>CN=IPAWSOPEN_200003, OU=7F00000100000158E4A89A1A000030D4, OU=Devices IPAWS, OU=National Continuity Programs, O=FEMA IPAWS, C=US</ds:X509SubjectName><ds:X509Certificate>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</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></alert>",
+   "identifier": "AS-HI-b3dbb926-a36e-479c-851a-8cf2ab3fe27c",
+   "sender": "[redacted sender]",
+   "sent": "2018-01-13T18:12:42.000Z",
+   "status": "Actual",
+   "msgType": "Cancel",
+   "source": "AlertSense",
+   "scope": "Public",
+   "restriction": null,
+   "addresses": null,
+   "code": [
+    "IPAWSv1.0"
+   ],
+   "note": null,
+   "searchGeometry": null,
+   "incidents": null,
+   "cogId": 200003,
+   "id": "22e15e29-afc9-4eba-8fbe-f670cb69c45f",
+   "xmlns": "urn:oasis:names:tc:emergency:cap:1.2",
+   "info": null
+  },
+  {
+   "originalMessage": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><alert xmlns=\"urn:oasis:names:tc:emergency:cap:1.2\"><identifier>AS-HI-ef0ffbd6-9216-489a-b1c7-7ce6848b824f</identifier><sender>[redacted sender]</sender><sent>2018-01-13T11:45:00-07:00</sent><status>Actual</status><msgType>Alert</msgType><source>AlertSense</source><scope>Public</scope><addresses></addresses><code>IPAWSv1.0</code><info><language>en-US</language><category>Safety</category><event>Civil Emergency Message</event><responseType>Execute</responseType><urgency>Immediate</urgency><severity>Extreme</severity><certainty>Observed</certainty><eventCode><valueName>SAME</valueName><value>CEM</value></eventCode><effective>2018-01-13T11:45:00-07:00</effective><expires>2018-01-13T12:45:00-07:00</expires><senderName>Hawaii Emergency Management Agency,HI</senderName><headline>False Alarm. There is no missile threat to Hawaii. </headline><description>False Alarm. There is no missile threat or danger to the State of Hawaii. Repeat There is no missile threat or danger to the State of Hawaii. False Alarm. </description><parameter><valueName>EAS-ORG</valueName><value>CIV</value></parameter><parameter><valueName>CMAMtext</valueName><value>There is no missile threat or danger to the State of Hawaii. Repeat. False Alarm. </value></parameter><parameter><valueName>BLOCKCHANNEL</valueName><value>NWEM</value></parameter><resource><resourceDesc>EAS Broadcast Content</resourceDesc><mimeType>audio/x-ipaws-audio-mp3</mimeType><uri>https://storage-tts.alertsense.com/tts-generated-audio/5fb610030bf8a90624e4d740d51a2daf.mp3</uri></resource><area><areaDesc>State of Hawaii</areaDesc><geocode><valueName>SAME</valueName><value>015000</value></geocode></area></info><ds:Signature xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/><ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/><ds:Reference URI=\"\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/></ds:Transforms><ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/><ds:DigestValue>NwuPrnr5nDfN4fTQpK1928nocCjauyiy+jEpBUww/ig=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>HB456kKlCeoZAlDmoSmJgXuzDFZMdlH3xMCQdgYFAKZtiSZMV9ZFz2IMXxzygYW8XLp10v0O8bCksJz+2G5ayHp05hZ7XcNp9JpMFK0mnx/vNWj3bjAVk+6iNNs260ERZueQMq6WAHH4lozh+aw3q6tnsNuvXCrmU3cTbcF2ymOjsySD1M8n5ZYuONp4e8/29dFV/1tDeaGb4rm6Hfo9uRGj8DIvYpkwtkdC7QEhGXBOLyLTLOXASvweNrTF6uXDVjqqBMX5KYwFHUxZb0hZ+LbcOfqBxKkLvKMN9QvdD4s+IPm/JzbjROW89a0qTjC0ASO6gpy7QxcKRcWDgFR/3Q==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509SubjectName>CN=IPAWSOPEN_200003, OU=7F00000100000158E4A89A1A000030D4, OU=Devices IPAWS, OU=National Continuity Programs, O=FEMA IPAWS, C=US</ds:X509SubjectName><ds:X509Certificate>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</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></alert>",
+   "identifier": "AS-HI-ef0ffbd6-9216-489a-b1c7-7ce6848b824f",
+   "sender": "[redacted sender]",
+   "sent": "2018-01-13T18:45:00.000Z",
+   "status": "Actual",
+   "msgType": "Alert",
+   "source": "AlertSense",
+   "scope": "Public",
+   "restriction": null,
+   "addresses": "",
+   "code": [
+    "IPAWSv1.0"
+   ],
+   "note": null,
+   "searchGeometry": null,
+   "incidents": null,
+   "cogId": 200003,
+   "id": "0c0f651e-b3d1-4141-9c5d-6159c153909c",
+   "xmlns": "urn:oasis:names:tc:emergency:cap:1.2",
+   "info": [
+    {
+     "areas": [
+      {
+       "geocode": [
+        {
+         "id": 28931,
+         "name": "SAME",
+         "value": "015000"
+        }
+       ],
+       "areaDesc": "State of Hawaii"
+      }
+     ],
+     "event": "Civil Emergency Message",
+     "expires": "2018-01-13T12:45:00-07:00",
+     "urgency": "Immediate",
+     "category": [
+      "Safety"
+     ],
+     "headline": "False Alarm. There is no missile threat to Hawaii. ",
+     "language": "en-US",
+     "severity": "Extreme",
+     "certainty": "Observed",
+     "effective": "2018-01-13T11:45:00-07:00",
+     "eventCode": [
+      {
+       "id": 153,
+       "name": "SAME",
+       "value": "CEM"
+      }
+     ],
+     "resources": [
+      {
+       "uri": "https://storage-tts.alertsense.com/tts-generated-audio/5fb610030bf8a90624e4d740d51a2daf.mp3",
+       "mimeType": "audio/x-ipaws-audio-mp3",
+       "resourceDesc": "EAS Broadcast Content"
+      }
+     ],
+     "parameters": [
+      {
+       "name": "EAS-ORG",
+       "value": "CIV"
+      },
+      {
+       "name": "CMAMtext",
+       "value": "There is no missile threat or danger to the State of Hawaii. Repeat. False Alarm. "
+      },
+      {
+       "name": "BLOCKCHANNEL",
+       "value": "NWEM"
+      }
+     ],
+     "senderName": "Hawaii Emergency Management Agency,HI",
+     "description": "False Alarm. There is no missile threat or danger to the State of Hawaii. Repeat There is no missile threat or danger to the State of Hawaii. False Alarm. ",
+     "responseType": [
+      "Execute"
+     ]
+    }
+   ]
+  }
+ ]
+}

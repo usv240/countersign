@@ -1,0 +1,124 @@
+{
+  "Comment": "Countersign paging: page the call list until a human decides. Only an officer's decision, through the approval service, ends it. The agent has no permission here.",
+  "StartAt": "Start",
+  "States": {
+    "Start": {
+      "Type": "Pass",
+      "Parameters": {
+        "run_id.$": "$.run_id",
+        "warning_title.$": "$.warning_title",
+        "contacts.$": "$.contacts",
+        "timeout.$": "$.timeout",
+        "max_rounds.$": "$.max_rounds",
+        "index": 0,
+        "round": 1
+      },
+      "Next": "PageContact"
+    },
+    "PageContact": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${PagerArn}",
+        "Payload": {
+          "token.$": "$$.Task.Token",
+          "run_id.$": "$.run_id",
+          "warning_title.$": "$.warning_title",
+          "contact.$": "States.ArrayGetItem($.contacts, $.index)",
+          "round.$": "$.round"
+        }
+      },
+      "TimeoutSecondsPath": "$.timeout",
+      "ResultPath": "$.decision",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.Timeout"],
+          "ResultPath": "$.timed_out",
+          "Next": "NextContact"
+        }
+      ],
+      "Next": "Decided"
+    },
+    "NextContact": {
+      "Type": "Pass",
+      "Parameters": {
+        "run_id.$": "$.run_id",
+        "warning_title.$": "$.warning_title",
+        "contacts.$": "$.contacts",
+        "timeout.$": "$.timeout",
+        "max_rounds.$": "$.max_rounds",
+        "index.$": "States.MathAdd($.index, 1)",
+        "round.$": "$.round",
+        "count.$": "States.ArrayLength($.contacts)"
+      },
+      "Next": "EndOfList"
+    },
+    "EndOfList": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.index",
+          "NumericEqualsPath": "$.count",
+          "Next": "NewRound"
+        }
+      ],
+      "Default": "PageContact"
+    },
+    "NewRound": {
+      "Type": "Pass",
+      "Parameters": {
+        "run_id.$": "$.run_id",
+        "warning_title.$": "$.warning_title",
+        "contacts.$": "$.contacts",
+        "timeout.$": "$.timeout",
+        "max_rounds.$": "$.max_rounds",
+        "index": 0,
+        "round.$": "States.MathAdd($.round, 1)"
+      },
+      "Next": "RoundsLeft"
+    },
+    "RoundsLeft": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.round",
+          "NumericGreaterThanPath": "$.max_rounds",
+          "Next": "EscalateToState"
+        }
+      ],
+      "Default": "PageContact"
+    },
+    "EscalateToState": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "${EscalatedArn}",
+        "Payload": {
+          "run_id.$": "$.run_id"
+        }
+      },
+      "ResultPath": null,
+      "Next": "WaitForState"
+    },
+    "WaitForState": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${PagerArn}",
+        "Payload": {
+          "token.$": "$$.Task.Token",
+          "run_id.$": "$.run_id",
+          "warning_title.$": "$.warning_title",
+          "contact": {"name": "State warning point", "role": "24-hour state desk"},
+          "round.$": "$.round"
+        }
+      },
+      "TimeoutSeconds": 3600,
+      "ResultPath": "$.decision",
+      "Next": "Decided"
+    },
+    "Decided": {
+      "Type": "Succeed"
+    }
+  }
+}

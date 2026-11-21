@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Developers: Countersign API</title>
+<meta name="description" content="Get a free Countersign API key and check any emergency alert against ten rules from your own code. Endpoints, examples, limits and errors.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .dev { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+  .dev > * { min-width: 0; }
+  .toc { position: sticky; top: 16px; display: grid; gap: 4px; font-size: 14px; }
+  .toc a { text-decoration: none; color: var(--muted); padding: 4px 0; }
+  .toc a:hover { color: var(--ink); }
+  @media (max-width: 900px) { .dev { grid-template-columns: minmax(0, 1fr); } .toc { position: static; display: flex; flex-wrap: wrap; gap: 4px 14px; } }
+  .dev section { margin-bottom: 56px; }
+  .dev section > h2 { margin-bottom: 12px; display: flex; align-items: center; }
+  .dev section > p { max-width: 72ch; margin-bottom: 12px; }
+  .tabs2 { display: flex; gap: 4px; margin-bottom: 8px; }
+  .method { display: inline-block; min-width: 46px; padding: 1px 8px; border-radius: 4px; background: var(--surface); font-size: 12px; font-weight: 600; text-align: center; }
+</style>
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/developers.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the documentation</a>
+<header class="bar"></header>
+<main id="main" class="page">
+  <div class="page-head">
+    <div>
+      <h1>Use Countersign from your code</h1>
+      <p>Send any warning and the alert you plan to send. Get back every rule's result, the area check and the number of people it reaches. <strong>The API checks; it never sends.</strong> Free keys, 2,000 calls a day each.</p>
+    </div>
+  </div>
+  <div class="dev">
+    <nav class="toc" aria-label="On this page">
+      <a href="#key">Get a key</a><a href="#try">Try it live</a><a href="#endpoints">Endpoints</a><a href="#request">Request</a>
+      <a href="#response">Response</a><a href="#examples">Examples</a><a href="#errors">Errors and limits</a><a href="#mcp">Agents and MCP</a>
+    </nav>
+    <div>
+      <section id="key" aria-labelledby="key-h">
+        <h2 id="key-h">Get a key<button class="i" data-tip-title="How keys are kept" data-tip="Keys are random 32-byte strings, shown once. Countersign stores only a SHA-256 hash in DynamoDB, so even we cannot show it again. Five keys a day per address."></button></h2>
+        <div class="panel">
+          <div class="field"><label for="label">What is it for? (optional)</label><input id="label" type="text" maxlength="60" placeholder="My county dashboard"></div>
+          <button class="btn" id="get-key" type="button">Create my key</button>
+          <div id="key-out" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section id="try" aria-labelledby="try-h">
+        <h2 id="try-h">Try it live<button class="i" data-tip-title="A real call" data-tip="This sends your request to POST /v1/evaluate on Amazon API Gateway with your key, exactly as your code would."></button></h2>
+        <div class="panel">
+          <div class="field"><label for="try-key">API key</label><input id="try-key" type="text" placeholder="cs_live_..." autocomplete="off" spellcheck="false"></div>
+          <div class="field"><label for="try-body">Request body</label><textarea id="try-body" class="code" spellcheck="false"></textarea></div>
+          <div class="row"><button class="btn" id="try-send" type="button">Send request</button>
+            <select id="try-preset" aria-label="Load an example body" style="max-width:320px"><option value="">Load an example...</option></select></div>
+          <div id="try-out" style="margin-top:14px"></div>
+        </div>
+      </section>
+
+      <section id="endpoints" aria-labelledby="ep-h">
+        <h2 id="ep-h">Endpoints</h2>
+        <p>Base URL: <code id="base-url">this site</code>. All bodies are JSON.</p>
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>Method</th><th>Path</th><th>What it does</th><th>Key</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method">POST</span></td><td>/v1/evaluate</td><td>Check a warning and a proposed alert against the ten rules.</td><td>Yes</td></tr>
+            <tr><td><span class="method">GET</span></td><td>/v1/usage</td><td>Your key's call count.</td><td>Yes</td></tr>
+            <tr><td><span class="method">POST</span></td><td>/api/keys</td><td>Create a key. Returns it once.</td><td>No</td></tr>
+            <tr><td><span class="method">GET</span></td><td>/api/presets</td><td>The demo cases, built from real records.</td><td>No</td></tr>
+            <tr><td><span class="method">GET</span></td><td>/api/presets/{id}</td><td>One case, with its full record.</td><td>No</td></tr>
+            <tr><td><span class="method">GET</span></td><td>/api/live?county=48265</td><td>Active National Weather Service warnings for a county.</td><td>No</td></tr>
+            <tr><td><span class="method">GET</span></td><td>/api/health</td><td>Is the service up.</td><td>No</td></tr>
+          </tbody></table></div>
+      </section>
+
+      <section id="request" aria-labelledby="req-h">
+        <h2 id="req-h">Request</h2>
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>Field</th><th>Type</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td>county_geoid</td><td>string</td><td>The sending office's area. 5 digits for a county, 2 for a state. Required unless preset_id is given.</td></tr>
+            <tr><td>warning</td><td>string or object</td><td>The source: CAP 1.2 XML, an NWS GeoJSON alert, or an OpenFEMA record. Always treated as unsourced.</td></tr>
+            <tr><td>live_warning_id</td><td>string</td><td>Instead of warning: an active NWS alert id. Countersign fetches it itself, so it counts as official.</td></tr>
+            <tr><td>preset_id</td><td>string</td><td>Instead of warning: one of the demo cases.</td></tr>
+            <tr><td>proposal</td><td>object</td><td>The alert you plan to send: text_360, text_90, text_360_es, alert_class, polygon, geocodes, action_ids, approvals, correction_staged, requested_by. Omit to check the warning as it was sent.</td></tr>
+            <tr><td>area_mode</td><td>string</td><td>Optional: warning (clip the warning's polygon to the county), code (county code only) or none.</td></tr>
+            <tr><td>local_places</td><td>string[]</td><td>Place names your office uses, such as rivers and roads, so they are not flagged as invented.</td></tr>
+            <tr><td>include_geometry</td><td>boolean</td><td>Also return the county outline and the warning polygons.</td></tr>
+          </tbody></table></div>
+      </section>
+
+      <section id="response" aria-labelledby="res-h">
+        <h2 id="res-h">Response</h2>
+        <p><b>decision.outcome</b> is one of blocked, needs_1_approval, needs_2_approvals or send_ok. <b>decision.checks</b> holds one entry per rule with status pass, fail, warn or info, and a plain message. <b>decision.facts</b> holds the area, the share of the county and the people it reaches.</p>
+        <pre class="code"><code id="resp-sample">{
+ "decision": {
+  "outcome": "needs_1_approval",
+  "approvals_required": 1,
+  "summary": "Ready for review. Needs 1 approval from distinct officers.",
+  "checks": [{ "rule": "R3", "name": "A real map area, inside the county", "status": "pass",
+              "message": "1217.7 km2, 42.6% of Kerr County, inside the warning polygon. About 22,416 people." }],
+  "facts": { "people_reached_est": 22416, "share_of_jurisdiction": 0.4262 }
+ },
+ "source": "Preset: an unmodified public record",
+ "usage": { "calls": 1, "daily_limit": 2000 }
+}</code></pre>
+      </section>
+
+      <section id="examples" aria-labelledby="ex-h">
+        <h2 id="ex-h">Examples</h2>
+        <div class="tabs2 seg" role="group" aria-label="Language">
+          <button type="button" data-lang="curl" aria-pressed="true">curl</button><button type="button" data-lang="py" aria-pressed="false">Python</button><button type="button" data-lang="js" aria-pressed="false">JavaScript</button>
+        </div>
+        <pre class="code" data-ex="curl"><code></code></pre>
+        <pre class="code" data-ex="py" hidden><code></code></pre>
+        <pre class="code" data-ex="js" hidden><code></code></pre>
+      </section>
+
+      <section id="errors" aria-labelledby="err-h">
+        <h2 id="err-h">Errors and limits</h2>
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>Status</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td>400</td><td>The body is not valid JSON, the county code is not 2 or 5 digits, or the warning cannot be read. The message says which.</td></tr>
+            <tr><td>401</td><td>No x-api-key header, or the key is unknown or revoked.</td></tr>
+            <tr><td>404</td><td>No such route or preset.</td></tr>
+            <tr><td>429</td><td>Over 2,000 calls today for this key, or 500 keyless checks for this address. API Gateway also throttles at 20 requests a second.</td></tr>
+            <tr><td>500</td><td>Our fault. The response names the error type, never internals.</td></tr>
+          </tbody></table></div>
+      </section>
+
+      <section id="mcp" aria-labelledby="mcp-h">
+        <h2 id="mcp-h">Agents and MCP<button class="i" data-term="gateway"></button></h2>
+        <p>Countersign's own agent reaches its tools through AgentCore Gateway over MCP. That gateway admits one IAM role, the agent's, and its Cedar policy denies every other caller by default, so it is deliberately not public. To give your own agent the same rule check, call POST /v1/evaluate as a tool before it does anything with an alert: the result is the same code.</p>
+        <p>The rule engine is plain Python with one dependency (Shapely). The code repository lets you run it offline, rerun every benchmark number without an AWS account, and deploy the whole stack with one command.</p>
+      </section>
+    </div>
+  </div>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>

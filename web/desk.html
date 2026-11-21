@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alert desk: Countersign</title>
+<meta name="description" content="Start the Countersign agent on a real warning, watch every step it takes on AWS, try to make it send, and decide as the duty officer.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/desk.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the desk</a>
+<header class="bar"></header>
+<main id="main" class="page">
+  <div class="page-head">
+    <div>
+      <h1>The alert desk</h1>
+      <p>Start the real agent on a real night. It runs on <abbr data-term="harness">Amazon Bedrock AgentCore</abbr> and you watch every step it takes. Type anything to it, including attacks. <strong>You are the duty officer</strong>: nothing reaches the live phone unless you sign.</p>
+    </div>
+  </div>
+  <ol class="how" aria-label="How the desk works">
+    <li><b>Pick a night</b><span>A real warning, a planted attack, or live weather for any county.</span></li>
+    <li><b>Watch the agent</b><span>Every tool call, every refusal by a hook or policy, as it happens.</span></li>
+    <li><b>Get paged</b><span>Officer A, then B, then C, until someone decides.</span></li>
+    <li><b>Decide</b><span>Approve or reject the draft. A correction is always one click away.</span></li>
+  </ol>
+
+  <div class="desk">
+    <div class="sticky">
+      <section class="panel" aria-labelledby="start-h">
+        <h2 id="start-h">Start a night<button class="i" data-tip-title="What starts" data-tip="A new agent session on the AgentCore managed harness, and a Step Functions paging workflow for this run. Each run has its own id; only this browser can act as its officer."></button></h2>
+        <div class="scenarios" id="scenarios" role="group" aria-label="Scenarios"></div>
+        <div class="field" id="live-county" hidden>
+          <label for="county">County code<button class="i" data-tip-title="County code (GEOID)" data-tip="Five digits: two for the state and three for the county, for example 48265 for Kerr County, Texas, or 06037 for Los Angeles County. The agent will only see official warnings for this county."></button></label>
+          <div class="row"><input id="county" type="text" inputmode="numeric" maxlength="5" value="48265" style="max-width:120px"><button class="btn small secondary" id="check-live" type="button">Check live warnings</button></div>
+          <span class="hint" id="live-result"></span>
+        </div>
+        <div class="field">
+          <label for="msg">Say something to the agent<button class="i" data-tip-title="Try to break it" data-tip="Leave it empty for the ordinary job, or pick one of the stress test's attacks. Whatever you type reaches the agent through Bedrock Guardrails first."></button></label>
+          <textarea id="msg" rows="4" placeholder="Leave empty for the ordinary job, or try an attack."></textarea>
+          <select id="attacks" aria-label="Try an attack from the stress test"><option value="">Try an attack from the stress test...</option></select>
+        </div>
+        <button class="btn" id="start" type="button" style="width:100%">Start the agent</button>
+        <p class="small muted" id="start-status" aria-live="polite" style="margin-top:10px"></p>
+      </section>
+    </div>
+
+    <section class="panel" aria-labelledby="tr-h">
+      <div class="spread"><h2 id="tr-h">What the agent is doing<button class="i" data-tip-title="The transcript" data-tip="Recorded from the harness's event stream: the agent's words, each tool call through AgentCore Gateway, each tool result, and every hook decision. Red rows are calls a layer refused."></button></h2><span class="small muted" id="run-id"></span></div>
+      <div class="transcript" id="transcript"><div class="empty-state">Pick a night and press Start. The first steps appear in a few seconds.</div></div>
+    </section>
+
+    <aside class="officer" aria-labelledby="off-h">
+      <section class="panel">
+        <h2 id="off-h">Paging<button class="i" data-term="stepfn"></button></h2>
+        <ol class="paging" id="paging"><li>Nobody is being paged yet.</li></ol>
+      </section>
+      <section class="panel" id="review">
+        <h2>Your decision<button class="i" data-tip-title="Why there is no recommendation" data-tip="Rule R9. Research on automation bias shows reviewers follow a machine's suggestion even when it is wrong. You see the official source, the draft and the rule results, never the agent's opinion."></button></h2>
+        <div id="review-body"><div class="empty-state">The draft appears here when the agent submits it.</div></div>
+      </section>
+      <section class="panel">
+        <h2>What phones received<button class="i" data-tip-title="Two channels" data-tip="Left: the test channel, which no real phone receives. Right: the live channel, which stands in for FEMA's IPAWS. Only the sender function can publish to it, after your approval and two independent checks."></button></h2>
+        <div class="phones">
+          <div><div class="label">Test channel<button class="i" data-term="test"></button></div><div class="phone"><div class="screen" id="phone-test"><div class="clock" data-clock></div><div class="empty">Nothing yet</div></div></div></div>
+          <div><div class="label">Live channel<button class="i" data-term="live"></button></div><div class="phone"><div class="screen live" id="phone-live"><div class="clock" data-clock></div><div class="empty">Nothing yet</div></div></div></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>

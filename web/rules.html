@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works: Countersign</title>
+<meta name="description" content="Countersign's ten rules in plain language, where each one is enforced on AWS, and the architecture that keeps the agent away from the live channel.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .arch { width: 100%; height: auto; font-family: var(--sans); }
+  .arch .box { fill: var(--raised); stroke: var(--soft); stroke-width: 1; }
+  .arch .box.core { fill: var(--accent); stroke: none; }
+  .arch .box.src { fill: var(--surface); stroke: none; }
+  .arch .box.live { fill: var(--fail-bg); stroke: var(--fail); }
+  .arch text { fill: var(--ink); font-size: 13px; }
+  .arch .core + text, .arch text.on-core { fill: var(--accent-ink); }
+  .arch .t { font-weight: 600; font-size: 14px; }
+  .arch .s { fill: var(--muted); font-size: 12px; }
+  .arch .on-core.s { fill: var(--accent-ink); opacity: 0.85; }
+  .arch .lane { font-family: var(--serif); font-size: 20px; font-weight: 600; fill: var(--ink); }
+  .arch .wall { fill: var(--deep); }
+  .arch .wall-t { fill: var(--deep-ink); font-size: 13px; font-weight: 600; }
+  .arch .ln { fill: none; stroke: var(--muted); stroke-width: 1.5; }
+  .arch .ln.no { stroke: var(--fail); stroke-dasharray: 5 4; }
+  .arch .head { fill: var(--muted); }
+  .arch .x { stroke: var(--fail); stroke-width: 3; stroke-linecap: round; }
+  .rulecards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 860px) { .rulecards { grid-template-columns: 1fr; } }
+  .rulecard dl { display: grid; grid-template-columns: 120px 1fr; gap: 6px 12px; margin: 10px 0 0; font-size: 14px; }
+  .rulecard dt { color: var(--muted); }
+  .rulecard dd { margin: 0; }
+  .rulecard h3 { font-family: var(--serif); font-size: 20px; letter-spacing: -0.01em; }
+  .gloss { columns: 2 360px; column-gap: 24px; }
+  .gloss div { break-inside: avoid; padding: 10px 0; }
+  .gloss b { display: block; }
+  .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+  .steps li { padding: 16px; border-radius: var(--radius); background: var(--raised); }
+  .steps b { display: block; font-family: var(--serif); font-size: 19px; margin-bottom: 6px; }
+  .steps span { color: var(--muted); font-size: 14px; }
+  @media (max-width: 1000px) { .steps { grid-template-columns: 1fr 1fr; } }
+</style>
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/app.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="bar"></header>
+<main id="main" class="page read">
+  <div class="page-head">
+    <div>
+      <h1>How Countersign works</h1>
+      <p>One job, ten rules, and nine places that enforce them. <strong>Every rule is enforced outside the model</strong> at least once, so a model that is fooled still cannot send.</p>
+    </div>
+  </div>
+
+  <section aria-labelledby="flow-h" style="margin-top:12px">
+    <h2 id="flow-h">The job, in five steps</h2>
+    <ol class="steps">
+      <li><b>A warning arrives</b><span>Code fetches it from the National Weather Service. Nothing typed or pasted counts as official.</span></li>
+      <li><b>Paging starts</b><span>Step Functions pages Officer A at once, then B, then C, then the state desk. The agent cannot stop it.</span></li>
+      <li><b>The agent drafts</b><span>Claude Sonnet 4.6 on the AgentCore managed harness writes the alert in English and Spanish, inside the warning's area.</span></li>
+      <li><b>Code checks</b><span>Every draft is checked against all ten rules. A test copy goes to the test channel and a correction is staged.</span></li>
+      <li><b>A person signs</b><span>The officer sees the source and the draft, never an opinion. Only then does the sender, after two checks, publish live.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="arch-h">
+    <h2 id="arch-h">Architecture<button class="i" data-tip-title="How to read it" data-tip="Left: everything the agent can reach. Right: everything only a person can trigger. The dark wall between them is IAM: every role on the left has an explicit deny on the live channel, the approvals table and the sender function."></button></h2>
+    <p>Left of the wall is everything the agent can reach. Right of it is what only a person can trigger. The wall is IAM, tested directly with the IAM policy simulator.</p>
+    <div class="panel"><svg class="arch" viewBox="0 0 1120 640" role="img" aria-labelledby="arch-title arch-desc">
+      <title id="arch-title">Countersign architecture</title>
+      <desc id="arch-desc">The agent side: Bedrock Guardrails hook, the AgentCore managed harness with Claude Sonnet 4.6, the tool-call hook, AgentCore Gateway with Cedar policy, and the tools Lambda that can publish only to the test channel. An IAM wall separates it from the person side: Step Functions paging, the officer's approval page, the approvals table, and the sender Lambda that runs the rule engine and the Automated Reasoning solver before publishing to the live channel. Sources on the right: National Weather Service, FEMA archive and Census boundaries.</desc>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <text class="lane" x="24" y="34">What the agent can reach</text>
+      <text class="lane" x="470" y="34">What only a person can trigger</text>
+      <text class="lane" x="880" y="34">Sources</text>
+
+      <rect class="box" x="24" y="56" width="330" height="58" rx="8"/><text class="t" x="40" y="80">A person types, or a warning arrives</text><text class="s" x="40" y="100">Run started by the API, never by the agent</text>
+      <rect class="box core" x="24" y="132" width="330" height="58" rx="8"/><text class="t on-core" x="40" y="156">Bedrock Guardrails, before-invocation hook</text><text class="s on-core" x="40" y="176">Prompt attack filter on the person's words only</text>
+      <rect class="box core" x="24" y="208" width="330" height="58" rx="8"/><text class="t on-core" x="40" y="232">AgentCore managed harness</text><text class="s on-core" x="40" y="252">Claude Sonnet 4.6, six tools, memory off, 24 steps</text>
+      <rect class="box core" x="24" y="284" width="330" height="58" rx="8"/><text class="t on-core" x="40" y="308">Tool-call hook, fails closed</text><text class="s on-core" x="40" y="328">Denies unknown tools, live channels, opinions</text>
+      <rect class="box core" x="24" y="360" width="330" height="58" rx="8"/><text class="t on-core" x="40" y="384">AgentCore Gateway with Cedar policy</text><text class="s on-core" x="40" y="404">Default deny; agent role only; allowed values only</text>
+      <rect class="box" x="24" y="436" width="330" height="58" rx="8"/><text class="t" x="40" y="460">Tools Lambda: six tools, no send</text><text class="s" x="40" y="480">Rule engine on every draft; area computed by code</text>
+      <rect class="box" x="24" y="512" width="155" height="58" rx="8"/><text class="t" x="38" y="536">Test channel</text><text class="s" x="38" y="556">SNS, no phones</text>
+      <rect class="box" x="199" y="512" width="155" height="58" rx="8"/><text class="t" x="213" y="536">Drafts table</text><text class="s" x="213" y="556">DynamoDB</text>
+      <path class="ln" d="M189,114 V132" marker-end="url(#ar)"/><path class="ln" d="M189,190 V208" marker-end="url(#ar)"/>
+      <path class="ln" d="M189,266 V284" marker-end="url(#ar)"/><path class="ln" d="M189,342 V360" marker-end="url(#ar)"/>
+      <path class="ln" d="M189,418 V436" marker-end="url(#ar)"/><path class="ln" d="M101,494 V512" marker-end="url(#ar)"/><path class="ln" d="M276,494 V512" marker-end="url(#ar)"/>
+
+      <rect class="wall" x="384" y="56" width="56" height="560" rx="6"/>
+      <text class="wall-t" transform="translate(418,336) rotate(-90)" text-anchor="middle">IAM: explicit deny on live, approvals and sender</text>
+      <path class="ln no" d="M354,465 H384"/><line class="x" x1="364" y1="455" x2="376" y2="475"/><line class="x" x1="376" y1="455" x2="364" y2="475"/>
+
+      <rect class="box" x="470" y="56" width="330" height="58" rx="8"/><text class="t" x="486" y="80">Step Functions paging</text><text class="s" x="486" y="100">A, then B, then C, then the state desk</text>
+      <rect class="box" x="470" y="132" width="330" height="58" rx="8"/><text class="t" x="486" y="156">The officer's review page</text><text class="s" x="486" y="176">Source and draft side by side, no recommendation</text>
+      <rect class="box" x="470" y="208" width="330" height="58" rx="8"/><text class="t" x="486" y="232">Approvals table</text><text class="s" x="486" y="252">Written only by the approval service</text>
+      <rect class="box core" x="470" y="284" width="330" height="58" rx="8"/><text class="t on-core" x="486" y="308">Sender Lambda, check one: the rule engine</text><text class="s on-core" x="486" y="328">Re-run on stored records, not on the request</text>
+      <rect class="box core" x="470" y="360" width="330" height="58" rx="8"/><text class="t on-core" x="486" y="384">Check two: Automated Reasoning solver</text><text class="s on-core" x="486" y="404">The release rules as formal logic; must say VALID</text>
+      <rect class="box live" x="470" y="436" width="330" height="58" rx="8"/><text class="t" x="486" y="460">Live channel</text><text class="s" x="486" y="480">SNS, standing in for FEMA's IPAWS</text>
+      <rect class="box" x="470" y="512" width="330" height="58" rx="8"/><text class="t" x="486" y="536">Phones in the area</text><text class="s" x="486" y="556">A correction, if needed, goes to the same area</text>
+      <path class="ln" d="M635,114 V132" marker-end="url(#ar)"/><path class="ln" d="M635,190 V208" marker-end="url(#ar)"/>
+      <path class="ln" d="M635,266 V284" marker-end="url(#ar)"/><path class="ln" d="M635,342 V360" marker-end="url(#ar)"/>
+      <path class="ln" d="M635,418 V436" marker-end="url(#ar)"/><path class="ln" d="M635,494 V512" marker-end="url(#ar)"/>
+
+      <rect class="box src" x="880" y="56" width="216" height="58" rx="8"/><text class="t" x="896" y="80">National Weather Service</text><text class="s" x="896" y="100">Live warnings, api.weather.gov</text>
+      <rect class="box src" x="880" y="132" width="216" height="58" rx="8"/><text class="t" x="896" y="156">FEMA OpenFEMA archive</text><text class="s" x="896" y="176">Real alerts since 2012</text>
+      <rect class="box src" x="880" y="208" width="216" height="58" rx="8"/><text class="t" x="896" y="232">Census TIGERweb</text><text class="s" x="896" y="252">County shapes, population</text>
+      <path class="ln" d="M880,160 C840,160 840,300 800,300" marker-end="url(#ar)"/>
+      <path class="ln" d="M880,85 C850,85 850,600 300,600 L300,494" marker-end="url(#ar)"/>
+    </svg></div>
+  </section>
+
+  <section aria-labelledby="mx-h">
+    <h2 id="mx-h">Where each rule is enforced<button class="i" data-tip-title="Layers, not instructions" data-tip="A dot means the rule is enforced there, by code or configuration. The system prompt states every rule too, but it is never counted as a control."></button></h2>
+    <p>Each row is a rule; each column is a place it is enforced. The prompt is not a column: it states the rules, but it never counts as a control.</p>
+    <div class="table-wrap"><table class="data matrix" id="matrix"></table></div>
+  </section>
+
+  <section aria-labelledby="rules-h">
+    <h2 id="rules-h">The ten rules, in full</h2>
+    <p>Written for the officer who works with the agent. What it can reach, what it must refuse, and the edge case each rule had to decide.</p>
+    <div class="rulecards" id="rulecards"></div>
+  </section>
+
+  <section aria-labelledby="gl-h">
+    <h2 id="gl-h">Words on this site</h2>
+    <div class="gloss panel" id="gloss"></div>
+  </section>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const esc = window.CS_esc;
+  const data = await (await fetch("data/rules.json")).json();
+  const COLS = [["guardrail", "Guardrail"], ["harness_tools", "Tool list"], ["gateway_cedar", "Cedar"], ["hook", "Hook"],
+    ["tool_backend", "Tool code"], ["iam", "IAM"], ["step_functions", "Paging"], ["approval_service", "Sender code"],
+    ["automated_reasoning", "Solver"]];
+  document.getElementById("matrix").innerHTML = `<thead><tr><th>Rule</th>${COLS.map(([, n]) => `<th class="num">${n}</th>`).join("")}</tr></thead>
+    <tbody>${data.rules.map((r) => `<tr><td><b>${r.id}</b> ${esc(r.name)}</td>${COLS.map(([k]) => r.enforced_by.includes(k)
+      ? `<td class="on" aria-label="enforced">${window.CS_ICONS.check.replace('aria-hidden="true"', 'width="16" height="16" aria-hidden="true"')}</td>` : `<td class="off" aria-label="not here">.</td>`).join("")}</tr>`).join("")}</tbody>`;
+  document.getElementById("rulecards").innerHTML = data.rules.map((r) => {
+    const f = data.failures[r.failure] || {};
+    return `<article class="panel rulecard"><h3>${r.id}. ${esc(r.name)}</h3><p style="margin-top:6px">${esc(r.says)}</p>
+      <dl><dt>Can reach</dt><dd>${esc(r.can_access)}</dd><dt>Must refuse</dt><dd>${esc(r.must_refuse)}</dd>
+      <dt>Edge case</dt><dd>${esc(r.edge_case)}</dd><dt>Comes from</dt><dd><a href="${esc(f.source)}">${esc(f.title)}</a></dd></dl></article>`;
+  }).join("");
+  document.getElementById("gloss").innerHTML = Object.values(window.CS_TERMS).map(([t, d]) => `<div><b>${esc(t)}</b>${esc(d)}</div>`).join("");
+  window.CS_wire(document);
+});
+</script>
+</body>
+</html>

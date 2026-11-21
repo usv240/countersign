@@ -1,0 +1,5 @@
+shapely>=2.0
+pyyaml>=6.0
+requests>=2.31
+boto3>=1.44.8
+pytest>=8.0

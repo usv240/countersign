@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test your data: Countersign</title>
+<meta name="description" content="Check any emergency alert or warning against Countersign's ten rules: presets from real records, your own CAP or National Weather Service data, live warnings, and a two-model debate to compare.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .lab { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; align-items: start; }
+  @media (max-width: 1000px) { .lab { grid-template-columns: 1fr; } }
+  .preset { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--bg); }
+  .preset + .preset { margin-top: 8px; }
+  .preset[aria-current="true"] { box-shadow: inset 2px 0 0 var(--accent); background: var(--surface); }
+  .preset p { color: var(--muted); font-size: 13.5px; grid-column: 1 / -1; }
+  .preset .row { grid-row: 1; grid-column: 2; }
+  .debate { display: grid; gap: 10px; }
+  .turn { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--bg); }
+  .turn b { display: block; font-size: 13px; margin-bottom: 4px; }
+  .turn.send { box-shadow: inset 3px 0 0 var(--chart); }
+  .turn.hold { box-shadow: inset 3px 0 0 var(--fail); }
+  .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 560px) { .versus { grid-template-columns: 1fr; } }
+</style>
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/lab.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the lab</a>
+<header class="bar"></header>
+<main id="main" class="page">
+  <div class="page-head">
+    <div>
+      <h1>Test your own data</h1>
+      <p>Bring any warning or alert, or start from a real record, and see what every rule says about it. <strong>Nothing here is sent anywhere.</strong> The check runs on AWS Lambda, the same code the agent and the sender use.</p>
+    </div>
+  </div>
+  <ol class="how" aria-label="How the lab works">
+    <li><b>Choose data</b><span>A preset from a real night, your own file, or a live warning.</span></li>
+    <li><b>Edit the alert</b><span>Change the words, the area, the class, the approvals.</span></li>
+    <li><b>Check it</b><span>All ten rules, the map, and the number of people it reaches.</span></li>
+    <li><b>Compare a debate</b><span>Two models argue send or hold. See where opinion and rules differ.</span></li>
+  </ol>
+
+  <div class="lab">
+    <div>
+      <section class="panel" aria-labelledby="src-h">
+        <h2 id="src-h">1. Choose the data<button class="i" data-tip-title="Three ways in" data-tip="Presets are real public records, two of them modified for attack tests and labelled. Your own data can be CAP 1.2 XML, a National Weather Service GeoJSON alert, or an OpenFEMA archive record. Anything you bring is treated as unsourced, because code did not fetch it from an official feed."></button></h2>
+        <div class="seg" role="group" aria-label="Data source">
+          <button type="button" data-src="preset" aria-pressed="true">Presets</button>
+          <button type="button" data-src="own" aria-pressed="false">Your own</button>
+          <button type="button" data-src="live" aria-pressed="false">Live warning</button>
+        </div>
+        <div id="src-preset" style="margin-top:14px"></div>
+        <div id="src-own" hidden style="margin-top:14px">
+          <div class="field"><label for="own-text">Paste CAP XML, NWS GeoJSON or an OpenFEMA record<button class="i" data-term="cap"></button></label>
+            <textarea id="own-text" class="code" spellcheck="false" placeholder="&lt;alert xmlns=&quot;urn:oasis:names:tc:emergency:cap:1.2&quot;&gt;..."></textarea></div>
+          <div class="row"><label class="btn small secondary" for="own-file" style="cursor:pointer">Upload a file</label><input id="own-file" type="file" accept=".xml,.json,.cap,.geojson,.txt" hidden>
+            <button class="btn small secondary" type="button" id="own-sample">Load a sample</button></div>
+          <div class="field" style="margin-top:14px"><label for="own-county">County or state code<button class="i" data-tip-title="Which office is sending" data-tip="Five digits for a county (48265 is Kerr County, Texas) or two for a state (15 is Hawaii). The area rule checks the alert stays inside it."></button></label>
+            <input id="own-county" type="text" inputmode="numeric" maxlength="5" value="48265" style="max-width:140px"></div>
+        </div>
+        <div id="src-live" hidden style="margin-top:14px">
+          <div class="field"><label for="live-county">County code</label>
+            <div class="row"><input id="live-county" type="text" inputmode="numeric" maxlength="5" value="48265" style="max-width:120px"><button class="btn small secondary" id="live-fetch" type="button">Fetch active warnings</button></div></div>
+          <div id="live-list" class="small muted">Fetches today's official warnings from api.weather.gov for that county.</div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="edit-h">
+        <h2 id="edit-h">2. The alert to check<button class="i" data-tip-title="This is the proposal" data-tip="What someone proposes to send. Leave it as it is to check the record as it went out, or edit it to see which rule each change trips."></button></h2>
+        <div class="field"><label for="t360">Alert text<button class="i" data-tip-title="360 characters" data-tip="Newer phones show up to 360 characters. Name the source, hazard, place, time and what to do. Every number must be in the source."></button></label>
+          <textarea id="t360" rows="4"></textarea><span class="count" id="c360"></span></div>
+        <div class="field"><label for="t90">Short text for older phones</label><input id="t90" type="text"><span class="count" id="c90"></span></div>
+        <div class="field"><label for="t360es">Spanish text (optional)</label><textarea id="t360es" rows="2"></textarea></div>
+        <div class="field"><span>Area<button class="i" data-term="polygon"></button></span>
+          <div class="seg" role="group" aria-label="Area" id="area-seg">
+            <button type="button" data-area="warning" aria-pressed="true">Warning's polygon, clipped to the county</button>
+            <button type="button" data-area="code" aria-pressed="false">County code only</button>
+            <button type="button" data-area="none" aria-pressed="false">No area</button>
+          </div></div>
+        <div class="row">
+          <div class="field" style="flex:1;min-width:180px"><label for="klass">Alert class<button class="i" data-term="imminent"></button></label>
+            <select id="klass"><option>Imminent Threat</option><option>Public Safety</option></select></div>
+          <div class="field" style="flex:1;min-width:180px"><label for="who">Who asks to send<button class="i" data-tip-title="Requested by" data-tip="Choose agent to see rule R2: the agent can never request a live send."></button></label>
+            <select id="who"><option value="officer">An officer</option><option value="agent">The agent</option></select></div>
+          <div class="field" style="flex:1;min-width:140px"><label for="nappr">Officer approvals</label>
+            <select id="nappr"><option value="0">None yet</option><option value="1">One officer</option><option value="2">Two officers</option><option value="same">Same officer twice</option></select></div>
+        </div>
+        <div class="field"><span>Protective actions<button class="i" data-tip-title="The approved library" data-tip="Actions must come from the county's approved list for this hazard, in plain English and Spanish, following the Warning Lexicon research (Sutton, Olson and Waugh, 2024)."></button></span><div id="actions" class="row"></div></div>
+        <label class="check"><input type="checkbox" id="corr" checked> <span>A correction is staged<button class="i" data-tip-title="Rule R6" data-tip="Hawaii's correction took 38 minutes because no template existed. Countersign will not send without one ready."></button></span></label>
+        <label class="check" style="margin-top:8px"><input type="checkbox" id="whole"> <span>An officer confirmed the whole county on purpose</span></label>
+        <div class="row" style="margin-top:16px">
+          <button class="btn" id="run" type="button">Check against the rules</button>
+          <button class="btn secondary" id="debate-btn" type="button">Run the debate</button>
+          <button class="btn secondary small" id="dl-case" type="button">Download this case</button>
+        </div>
+        <p class="small muted" id="run-status" aria-live="polite" style="margin-top:10px"></p>
+      </section>
+    </div>
+
+    <div class="sticky">
+      <section class="panel" aria-labelledby="res-h">
+        <h2 id="res-h">3. What the rules say<button class="i" data-tip-title="Decided by code" data-tip="These results come from the Countersign rule engine on AWS Lambda. A model wrote none of them."></button></h2>
+        <div id="result"><div class="empty-state">Choose data and press Check. Results appear here.</div></div>
+      </section>
+      <section class="panel" aria-labelledby="deb-h">
+        <h2 id="deb-h">4. Opinion versus rules<button class="i" data-tip-title="Why a debate" data-tip="Claude Haiku 4.5 argues send, Amazon Nova Pro argues hold, Claude Sonnet 4.6 concludes. Research finds multi-agent debate does not reliably beat one model (Smit et al., ICML 2024). It is shown here as the alternative Countersign rejects: two models agreeing is still an opinion. It never appears on the officer's screen."></button></h2>
+        <div id="debate"><div class="empty-state">Press Run the debate to hear both sides. It takes about 20 seconds.</div></div>
+      </section>
+    </div>
+  </div>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>

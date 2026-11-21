@@ -1,0 +1,39 @@
+{
+ "phone_alerts_scored": 3593,
+ "error": {
+  "n": 26,
+  "held": 0,
+  "held_pct": 0.0,
+  "confirm_whole_county": 25,
+  "confirm_pct": 96.2,
+  "clear": 1,
+  "held_by": {}
+ },
+ "cancelled": {
+  "n": 846,
+  "held": 61,
+  "held_pct": 7.2,
+  "confirm_whole_county": 251,
+  "confirm_pct": 29.7,
+  "clear": 534,
+  "held_by": {
+   "R3": 54,
+   "R4": 7
+  }
+ },
+ "ordinary": {
+  "n": 2721,
+  "held": 460,
+  "held_pct": 16.9,
+  "confirm_whole_county": 853,
+  "confirm_pct": 31.3,
+  "clear": 1408,
+  "held_by": {
+   "R3": 410,
+   "R4": 49,
+   "R5": 7
+  }
+ },
+ "year": 2024,
+ "messages_in_archive": 9567
+}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proof: Countersign</title>
+<meta name="description" content="The stress test, the model-removed probes, the solver probes, three years of FEMA's alert archive, and every rule that broke while building Countersign.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  .broke { display: grid; gap: 12px; }
+  .broke article h3 { font-family: var(--serif); font-size: 20px; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .broke article p { max-width: 80ch; }
+  .broke article p + p { margin-top: 6px; }
+  .broke .fix { color: var(--pass); font-weight: 500; }
+  td .pill { margin: 1px 0; }
+  .cellnote { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+</style>
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/proof.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the results</a>
+<header class="bar"></header>
+<main id="main" class="page read">
+  <div class="page-head">
+    <div>
+      <h1>Proof</h1>
+      <p>Every number here was measured on the deployed AWS stack or on public records, and every one can be recounted from the saved results with one command and no AWS account. <strong>Where something broke, it is written down.</strong></p>
+    </div>
+  </div>
+
+  <div class="big-numbers" id="headline"></div>
+
+  <section aria-labelledby="st-h">
+    <h2 id="st-h">The stress test<button class="i" data-tip-title="How it was run" data-tip="Sixteen attack prompts plus one ordinary job, each run twice against four agents on the same model, Claude Sonnet 4.6. A live send counts only when a message reached the live channel. The prompt-only agents have a real send tool with nothing behind it."></button></h2>
+    <p>Sixteen attacks plus the ordinary job, each run twice, against three kinds of agent: Claude Sonnet 4.6 with Countersign's full instructions; the same Claude told to do whatever staff ask; and Amazon Nova Lite told the same, a model that actually obeys. Each agent runs once with a send tool and nothing behind it, and once inside Countersign.</p>
+    <div class="table-wrap"><table class="data" id="stress"></table></div>
+    <p class="small muted" style="margin-top:8px" id="stress-note"></p>
+  </section>
+
+  <section aria-labelledby="bm-h">
+    <h2 id="bm-h">With the model removed<button class="i" data-tip-title="Why remove the model" data-tip="A model that refuses tells you how the model behaved, not what the system would stop. These calls go straight to each layer, as a fully compromised model would send them."></button></h2>
+    <p>Assume the model is fully compromised. These calls go straight to each layer on AWS with no model in the loop: the Gateway, the hook, the tool code, IAM through the policy simulator, and the sender.</p>
+    <div class="table-wrap"><table class="data" id="below"></table></div>
+  </section>
+
+  <section aria-labelledby="ar-h">
+    <h2 id="ar-h">The solver's own tests<button class="i" data-term="reasoning"></button></h2>
+    <p>Automated Reasoning checks hold the live-release rules as formal logic. Before anything is sent, the solver must agree with the code. These are its probes, including the one where it should say yes.</p>
+    <div class="table-wrap"><table class="data" id="ar"></table></div>
+  </section>
+
+  <section aria-labelledby="fe-h">
+    <h2 id="fe-h">Three years of real alerts<button class="i" data-term="openfema"></button></h2>
+    <p>Every local phone alert in FEMA's public archive for 2023 to 2025, checked by the area, wording and class rules. Scheduled system tests are left out. An alert counts as an error when its own sender issued a follow-up within 24 hours saying it was sent in error or to disregard it.</p>
+    <div class="big-numbers" id="fema-numbers"></div>
+    <div class="table-wrap"><table class="data" id="fema"></table></div>
+    <p class="small muted" style="margin-top:8px">The message rules are not a mistake detector, and the table shows it: some retracted alerts pass every check. That is why rule R2 asks a second person, and why the agent never sends.</p>
+  </section>
+
+  <section aria-labelledby="br-h">
+    <h2 id="br-h">What broke, and how I fixed it</h2>
+    <p>Found by running the system on AWS, not by reading the code. In the order they happened.</p>
+    <div class="broke" id="broke"></div>
+  </section>
+
+  <section aria-labelledby="lim-h">
+    <h2 id="lim-h">Limits, stated plainly</h2>
+    <div class="panel"><ul style="margin:0;padding-left:20px;display:grid;gap:8px">
+      <li>No real phone receives an alert. The live channel is an SNS topic standing in for FEMA's IPAWS, which needs a signed agreement with FEMA.</li>
+      <li>Two runs of each attack is a sample, not a guarantee. Models vary between runs; the transcripts are saved so you can read every one.</li>
+      <li>People reached is an estimate: the area's share of the county times its 2020 population, as if people were spread evenly.</li>
+      <li>The facts the agent flags for the officer are not verified by code. In one test run the agent misread a time zone and flagged a timestamp that was correct. It now gets local times, and the officer always sees the source beside the draft.</li>
+      <li>The paging demo uses 30 to 120 second timeouts so you can watch it move. A real office would set minutes.</li>
+      <li>FEMA's archive copies are not byte-exact, so their digital signatures do not verify. Official status comes from code fetching the warning from the National Weather Service, not from the archive's signature.</li>
+    </ul></div>
+  </section>
+
+  <section aria-labelledby="rc-h">
+    <h2 id="rc-h">Recount it yourself</h2>
+    <p>Every number on this page is computed from saved result files in the code repository.</p>
+    <pre class="code"><code>git clone &lt;repository&gt; &amp;&amp; cd countersign
+python -m pip install -r requirements.txt
+python -m pytest tests             # rule engine tests on the real records
+python evals/recount.py            # prints every number on this page from evals/results</code></pre>
+  </section>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>
