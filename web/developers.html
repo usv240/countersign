@@ -137,7 +137,7 @@
       <section id="mcp" aria-labelledby="mcp-h">
         <h2 id="mcp-h">Agents and MCP<button class="i" data-term="gateway"></button></h2>
         <p>Countersign's own agent reaches its tools through AgentCore Gateway over MCP. That gateway admits one IAM role, the agent's, and its Cedar policy denies every other caller by default, so it is deliberately not public. To give your own agent the same rule check, call POST /v1/evaluate as a tool before it does anything with an alert: the result is the same code.</p>
-        <p>The rule engine is plain Python with one dependency (Shapely). The code repository lets you run it offline, rerun every benchmark number without an AWS account, and deploy the whole stack with one command.</p>
+        <p>The rule engine is plain Python with one dependency (Shapely). The <a href="https://github.com/usv240/countersign">code repository</a> lets you run it offline, rerun every benchmark number without an AWS account, and deploy the whole stack with one command.</p>
       </section>
     </div>
   </div>

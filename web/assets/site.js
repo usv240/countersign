@@ -204,7 +204,7 @@
     const f = document.querySelector("footer.foot");
     if (!f) return;
     f.innerHTML = `
-      <div><h3>Countersign</h3><ul><li>An AI alert desk that drafts and never sends alone.</li><li>Entry for Agents, your rules, AWS Builder Center, 2026.</li></ul></div>
+      <div><h3>Countersign</h3><ul><li>An AI alert desk that drafts and never sends alone.</li><li>Entry for Agents, your rules, AWS Builder Center, 2026.</li><li><a href="https://github.com/usv240/countersign">Code on GitHub, Apache-2.0</a></li></ul></div>
       <div><h3>Pages</h3><ul>${PAGES.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
       <div><h3>Sources</h3><ul>
         <li><a href="https://docs.fcc.gov/public/attachments/DOC-350119A1.pdf">FCC report on the Hawaii alert</a></li>

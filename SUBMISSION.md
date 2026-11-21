@@ -5,7 +5,7 @@
 Countersign is an AI agent for the overnight desk at a county emergency office. When the National Weather Service issues a warning, it drafts the phone alert for the right area, in English and Spanish, publishes a test copy, stages the correction, and wakes the duty officer. It can never send a live alert itself, and it can never let a warning sit unanswered.
 
 - Live site: https://d17fu9tql039jr.cloudfront.net (start the agent on a real night, try to make it send, sign as the officer)
-- Code: [repository link] (Apache-2.0)
+- Code: https://github.com/usv240/countersign (Apache-2.0)
 - Built on: Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy, Bedrock Guardrails, Automated Reasoning checks
 
 ## Three real nights

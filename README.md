@@ -5,6 +5,7 @@
 The weather service warns. The agent drafts. A person sends.
 
 - Live site: https://d17fu9tql039jr.cloudfront.net
+- Code: https://github.com/usv240/countersign
 - Built for *Agents, your rules: Bedrock Managed Agents build* (AWS Builder Center, November 2026)
 - Runs on the **Amazon Bedrock AgentCore managed harness**
 
