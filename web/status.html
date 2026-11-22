@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operations: Countersign</title>
+<meta name="description" content="Countersign running on AWS: live CloudWatch numbers for what each layer stopped, every alarm, one agent run traced end to end, and how it holds up under load.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/status.css">
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/app.js" defer></script>
+<script src="assets/status.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the operating numbers</a>
+<header class="bar"></header>
+<main id="main" class="page read">
+  <div class="page-head">
+    <div>
+      <h1>Operations</h1>
+      <p id="finding" aria-live="polite">Reading the last 14 days from Amazon CloudWatch.</p>
+    </div>
+    <div class="fresh">
+      <span id="fresh" class="small muted">Not loaded yet</span>
+      <button class="btn small secondary" id="refresh" type="button">Refresh</button>
+    </div>
+  </div>
+
+  <section aria-labelledby="now-h" class="first">
+    <h2 id="now-h">What the layers did<button class="i" data-tip-title="Where these numbers come from" data-tip="Every Countersign function writes its decisions as CloudWatch metrics in Embedded Metric Format: one log line, no extra API call. This page reads them back through GetMetricData, cached for 60 seconds."></button></h2>
+    <div class="tiles" id="tiles" aria-busy="true">
+      <div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div>
+    </div>
+    <div class="split">
+      <div class="panel">
+        <h3>Tool calls the hook denied, by reason<button class="i" data-tip-title="The before-tool-call hook" data-tip="A Lambda the AgentCore harness calls before every tool call. It fails closed. Each refusal is counted by a fixed reason code, never by the text that caused it."></button></h3>
+        <div id="hookby"></div>
+      </div>
+      <div class="panel">
+        <h3>Releases the sender refused, by layer<button class="i" data-tip-title="The sender's checks" data-tip="Officers approved, and the only code that can send live still said no: the rule engine on stored records, the Automated Reasoning solver, or the one-alert-per-warning lock."></button></h3>
+        <div id="refby"></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="al-h">
+    <h2 id="al-h">Alarms<button class="i" data-tip-title="Where alarms go" data-tip="Every alarm publishes to the cs-ops SNS topic. A real office subscribes the duty phone to it. The composite alarm cs-unsafe is the one to wake someone for."></button></h2>
+    <p>Alarms watch what matters for safety, not only uptime: a release that was refused, a hook that failed, paging that stopped, work stuck in the dead-letter queue.</p>
+    <div class="table-wrap"><table class="data" id="alarms"><tbody><tr><td class="muted">Loading alarms</td></tr></tbody></table></div>
+  </section>
+
+  <section aria-labelledby="tr-h">
+    <h2 id="tr-h">One agent run, traced<button class="i" data-term="harness"></button></h2>
+    <p id="trace-lead">The AgentCore harness emits OpenTelemetry spans for the agent loop, every model call and every tool call. X-Ray carries the same trace through the API, both hooks and the paging workflow.</p>
+    <div class="panel">
+      <div class="spread"><h3 id="trace-title">The agent's 35 seconds</h3><span class="legend" id="trace-legend"></span></div>
+      <div id="waterfall" class="waterfall" role="img" aria-label="Waterfall of one agent run"></div>
+      <p class="small muted" id="trace-note"></p>
+    </div>
+    <div class="panel">
+      <h3>Paging did not wait for the agent<button class="i" data-term="stepfn"></button></h3>
+      <div id="lanes" class="lanes"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="fn-h">
+    <h2 id="fn-h">Every function<button class="i" data-tip-title="AWS Lambda metrics" data-tip="Invocations, errors and 95th percentile duration over 14 days, from the AWS/Lambda namespace. Each function runs under its own IAM role."></button></h2>
+    <div class="table-wrap"><table class="data" id="functions"><tbody><tr><td class="muted">Loading</td></tr></tbody></table></div>
+  </section>
+
+  <section aria-labelledby="sc-h">
+    <h2 id="sc-h">Under load<button class="i" data-tip-title="How it was measured" data-tip="python evals/scale.py on the deployed stack: a race of simultaneous approvals, a ramp on the public API through CloudFront, and 50 paging workflows started at once."></button></h2>
+    <div class="tiles" id="scale-tiles"></div>
+    <div class="table-wrap"><table class="data" id="load"></table></div>
+    <p class="small muted" style="margin-top:8px" id="load-note"></p>
+  </section>
+
+  <section aria-labelledby="ax-h">
+    <h2 id="ax-h">Accessibility<button class="i" data-tip-title="What was checked" data-tip="axe-core 4.10.2 against WCAG 2.2 A and AA on every page, light and dark, desktop and phone, plus keyboard focus on every tab stop, reflow at 320 px, 200% text and reduced motion."></button></h2>
+    <p id="ax-lead"></p>
+    <div class="table-wrap"><table class="data" id="a11y"></table></div>
+    <p class="small muted" style="margin-top:8px" id="ax-note"></p>
+  </section>
+
+  <section aria-labelledby="lk-h">
+    <h2 id="lk-h">Where to look in AWS</h2>
+    <div class="layer-list" id="where"></div>
+  </section>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>

@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import boto3  # noqa: E402
 from boto3.dynamodb.conditions import Key  # noqa: E402
 
-from common import T_APPROVALS, T_DRAFTS, T_LEDGER, from_ddb, load_preset, now, table, to_ddb  # noqa: E402
+from common import T_APPROVALS, T_DRAFTS, T_LEDGER, from_ddb, load_preset, log_event, metric, now, table, to_ddb  # noqa: E402
 from countersign.cap import from_openfema  # noqa: E402
 from countersign.gate import evaluate  # noqa: E402
 from countersign.geo import load_jurisdiction  # noqa: E402
@@ -105,18 +105,47 @@ def handler(event, _context):
         ar = ar_check(d, kind) if d["outcome"] == "send_ok" else {"status": "NOT_RUN", "detail": "Gate said no."}
         ok = d["outcome"] == "send_ok" and ar["status"] in ("VALID", "SKIPPED")
     result = {"sent": False, "decision": d, "automated_reasoning": ar}
+    metric("SendAttempt", Kind=kind)
+    claim = None
+    if ok:
+        # One alert per warning (R10), safe under concurrency: claim the slot with a conditional write before
+        # publishing. Two approvals landing in the same instant both pass the gate's registry read above; only
+        # one can win this write. Found by the concurrency test in evals/scale.py.
+        claim = {"pk": f"SENT#{run_id}", "sk": (f"{p.get('warning_id') or 'unsourced'}|{jur.geoid}" if kind == "alert"
+                                               else f"correction|{draft_id}")}
+        try:
+            ledger.put_item(Item=to_ddb(dict(claim, draft_id=draft_id, at=now(), state="claimed")),
+                            ConditionExpression="attribute_not_exists(pk)")
+        except ledger.meta.client.exceptions.ConditionalCheckFailedException:
+            ok, claim = False, None
+            result["refused_by"] = "R10: another send for this warning won the race"
+            d["outcome"] = "blocked"
+    if not ok:
+        refused_by = result.get("refused_by") or ("gate" if d["outcome"] != "send_ok" else "automated_reasoning")
+        result["refused_by"] = refused_by
+        metric("SenderRefused", Kind=kind, By=refused_by.split(":")[0])
+        log_event("sender_refused", run_id=run_id, draft_id=draft_id, kind=kind, by=refused_by,
+                  failed=[c["rule"] for c in d["checks"] if c["status"] == "fail"], solver=ar.get("status"))
     if ok:
         text = p["text_360"]
         msg = {"run_id": run_id, "draft_id": draft_id, "channel": "live", "kind": kind, "text": text,
                "text_90": p.get("text_90"), "text_es": p.get("text_360_es"), "polygon": p.get("polygon"),
                "county": jur.name, "people_reached_est": d["facts"].get("people_reached_est"),
                "officers": sorted({a["officer"] for a in approvals})}
-        mid = boto3.client("sns").publish(TopicArn=LIVE_TOPIC, Message=json.dumps(msg),
-                                          MessageAttributes={"channel": {"DataType": "String", "StringValue": "live"}}
-                                          )["MessageId"] if LIVE_TOPIC else "no-topic"
-        if kind == "alert":
-            ledger.put_item(Item=to_ddb({"pk": f"SENT#{run_id}", "sk": f"{p.get('warning_id') or 'unsourced'}|{jur.geoid}",
-                                         "draft_id": draft_id, "at": now(), "message_id": mid}))
+        try:
+            mid = boto3.client("sns").publish(TopicArn=LIVE_TOPIC, Message=json.dumps(msg),
+                                              MessageAttributes={"channel": {"DataType": "String", "StringValue": "live"}}
+                                              )["MessageId"] if LIVE_TOPIC else "no-topic"
+        except Exception:
+            ledger.delete_item(Key=claim)  # nothing went out, so release the slot for a retry
+            metric("LiveSendFailed", Kind=kind)
+            raise
+        ledger.update_item(Key=claim, UpdateExpression="SET #s = :s, message_id = :m",
+                           ExpressionAttributeNames={"#s": "state"}, ExpressionAttributeValues={":s": "sent", ":m": mid})
+        metric("LiveSent", Kind=kind)
+        metric("PeopleReached", d["facts"].get("people_reached_est") or 0, "None", Kind=kind)
+        log_event("live_sent", run_id=run_id, draft_id=draft_id, kind=kind, message_id=mid,
+                  officers=msg["officers"], county=jur.geoid)
         drafts.update_item(Key={"pk": f"RUN#{run_id}", "sk": f"DRAFT#{draft_id}"},
                            UpdateExpression="SET #s = :s, sent_at = :n",
                            ExpressionAttributeNames={"#s": "status"},

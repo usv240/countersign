@@ -63,6 +63,17 @@ All recountable with `python evals/recount.py` (no AWS account needed).
 | Automated Reasoning solver probes | **7 of 7 correct** |
 | FEMA archive 2023 to 2025: alerts retracted by their own sender as errors | 53; the rules stop 43 (81%) for a person |
 | FEMA archive 2023 to 2025: ordinary alerts that also stop | 46%, mostly "confirm the whole county" |
+| 12 approvals of one draft at the same instant | **1 live alert** (12 before the conditional-write fix) |
+| Public API at 5 to 40 requests a second, 1,500 requests | **0 server errors**; p95 116 ms at 20/s; clean 429s above the throttle |
+| 50 counties paged at once | 50 of 50 reached a person (first page p95 8.4 s), all escalated |
+| axe-core WCAG 2.2 AA, 8 pages, light and dark, desktop and phone | **0 failures** in 32 page views |
+
+## Operations
+
+- **Metrics:** every function writes its decisions as CloudWatch Embedded Metric Format (`aws/lambdas/common.py`): hook denials by reason, sender refusals by layer, rule outcomes, live sends, pages, escalations, API latency.
+- **Traces:** the AgentCore harness emits OpenTelemetry spans (`aws/spans`); X-Ray joins them to the API, the hooks and the paging workflow. `python evals/trace.py <run_id>` exports one run.
+- **Alarms:** 13 alarms and the composite `cs-unsafe`, all to the `cs-ops` SNS topic; dashboard `Countersign`; dead-letter queue `cs-dlq`. `python aws/deploy.py obs`.
+- **Live page:** `/status.html` reads CloudWatch through `GET /api/status` (cached 60 s).
 
 ## Run it
 
@@ -76,6 +87,8 @@ python aws/automated_reasoning.py create # the solver policy and its guardrail
 python aws/deploy.py                     # everything else, us-east-1
 python evals/stress.py --runs 2 --profile hardened|naive|obedient
 python evals/below_model.py              # the model-removed probes
+python evals/scale.py all                # race, load ramp, 50-county paging fan-out
+python evals/a11y.py                     # axe-core WCAG 2.2 AA, keyboard, reflow, reduced motion
 ```
 
 ## Layout
@@ -85,7 +98,8 @@ python evals/below_model.py              # the model-removed probes
 - `aws/lambdas/` tools, hook, sender, API, runner, pager, recorder, debate
 - `aws/deploy.py` one-command deploy; `aws/automated_reasoning.py` the solver policy
 - `evals/` stress test, model-removed probes, FEMA benchmark, recount
-- `web/` the site: landing page, alert desk, test lab, developers, proof, how it works
+- `web/` the site: landing page, alert desk, test lab, developers, proof, operations, how it works
+- `aws/observability.py` alarms, dashboard, dead-letter queue, tracing, access logs
 
 ## Limits
 

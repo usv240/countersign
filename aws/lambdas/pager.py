@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import boto3  # noqa: E402
 
-from common import T_LEDGER, now, table, to_ddb  # noqa: E402
+from common import T_LEDGER, metric, now, table, to_ddb  # noqa: E402
 
 PAGER_TOPIC = os.environ.get("PAGER_TOPIC_ARN", "")
 
@@ -33,6 +33,7 @@ def handler(event, _context):
                                           "channel": "pager", "body": page}))
     if PAGER_TOPIC:
         boto3.client("sns").publish(TopicArn=PAGER_TOPIC, Message=json.dumps(page))
+    metric("PageSent", Round=str(page["round"]))
     return {"paged": contact["name"]}
 
 
@@ -44,4 +45,5 @@ def escalated(event, _context):
                                               "contact": {"name": "State warning point", "role": "24-hour state desk"},
                                               "text": "Nobody at the county answered. The warning and the draft "
                                                       "are escalated to the state warning point.", "at": now()}}))
+    metric("Escalated")
     return {"escalated": True}

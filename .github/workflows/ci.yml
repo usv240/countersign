@@ -1,0 +1,21 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt pytest
+      - name: Rule engine tests on the real Hawaii, Los Angeles and Kerr County records
+        run: python -m pytest tests -q
+      - name: Recount every published number from the saved results
+        run: python evals/recount.py
+      - name: Every Lambda compiles
+        run: python -m py_compile aws/lambdas/*.py aws/*.py evals/*.py

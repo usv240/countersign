@@ -1,0 +1,342 @@
+{
+ "site": "https://d17fu9tql039jr.cloudfront.net",
+ "standard": "WCAG 2.2 level AA (axe-core 4.10.2 automated rules) plus keyboard, reflow, 200% text and reduced-motion checks",
+ "tags": [
+  "wcag2a",
+  "wcag2aa",
+  "wcag21a",
+  "wcag21aa",
+  "wcag22aa"
+ ],
+ "totals": {
+  "pages": 32,
+  "violations": 0,
+  "nodes": 0
+ },
+ "reduced_motion_running_animations": {
+  "index.html": 0,
+  "desk.html": 0,
+  "lab.html": 0,
+  "developers.html": 0,
+  "rules.html": 0,
+  "proof.html": 0,
+  "status.html": 0,
+  "404.html": 0
+ },
+ "rows": [
+  {
+   "page": "index.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 31,
+   "keyboard": {
+    "tab_stops": 60,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "desk.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "keyboard": {
+    "tab_stops": 65,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "lab.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "keyboard": {
+    "tab_stops": 102,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "developers.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 32,
+   "keyboard": {
+    "tab_stops": 69,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "rules.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 29,
+   "keyboard": {
+    "tab_stops": 56,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "proof.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 26,
+   "keyboard": {
+    "tab_stops": 52,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "status.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 27,
+   "keyboard": {
+    "tab_stops": 57,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "404.html",
+   "theme": "light",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 20,
+   "keyboard": {
+    "tab_stops": 22,
+    "without_visible_focus": []
+   },
+   "text_200pct_overflow_px": 0
+  },
+  {
+   "page": "index.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 31,
+   "keyboard": {
+    "tab_stops": 57,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "desk.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "keyboard": {
+    "tab_stops": 66,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "lab.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "keyboard": {
+    "tab_stops": 103,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "developers.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 32,
+   "keyboard": {
+    "tab_stops": 70,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "rules.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 30,
+   "keyboard": {
+    "tab_stops": 57,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "proof.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 27,
+   "keyboard": {
+    "tab_stops": 53,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "status.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "keyboard": {
+    "tab_stops": 58,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "404.html",
+   "theme": "light",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 20,
+   "keyboard": {
+    "tab_stops": 23,
+    "without_visible_focus": []
+   },
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "index.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 31
+  },
+  {
+   "page": "desk.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 28
+  },
+  {
+   "page": "lab.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 28
+  },
+  {
+   "page": "developers.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 32
+  },
+  {
+   "page": "rules.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 29
+  },
+  {
+   "page": "proof.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 26
+  },
+  {
+   "page": "status.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 27
+  },
+  {
+   "page": "404.html",
+   "theme": "dark",
+   "width": "desktop",
+   "axe_violations": [],
+   "axe_passes_checked": 20
+  },
+  {
+   "page": "index.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 31,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "desk.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "lab.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "developers.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 32,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "rules.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 30,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "proof.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 27,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "status.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 28,
+   "reflow_320px_overflow_px": 0
+  },
+  {
+   "page": "404.html",
+   "theme": "dark",
+   "width": "phone",
+   "axe_violations": [],
+   "axe_passes_checked": 20,
+   "reflow_320px_overflow_px": 0
+  }
+ ],
+ "measured_at": "2026-11-22 04:47 UTC",
+ "limits": "Automated checks find only part of accessibility problems. No screen-reader user or disability organisation has tested this site yet."
+}

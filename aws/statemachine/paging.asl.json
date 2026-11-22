@@ -1,5 +1,5 @@
 {
-  "Comment": "Countersign paging: page the call list until a human decides. Only an officer's decision, through the approval service, ends it. The agent has no permission here.",
+  "Comment": "Countersign paging: page the call list until a human decides. Only an officer's decision, through the approval service, ends it. The agent has no permission here. A failing pager is retried, then escalated to the state desk: an error can never end the paging quietly.",
   "StartAt": "Start",
   "States": {
     "Start": {
@@ -32,12 +32,36 @@
       "ResultPath": "$.decision",
       "Catch": [
         {
-          "ErrorEquals": ["States.Timeout"],
+          "ErrorEquals": [
+            "States.Timeout"
+          ],
           "ResultPath": "$.timed_out",
           "Next": "NextContact"
+        },
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.pager_error",
+          "Next": "EscalateToState"
         }
       ],
-      "Next": "Decided"
+      "Next": "Decided",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException",
+            "Lambda.Unknown"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ]
     },
     "NextContact": {
       "Type": "Pass",
@@ -98,7 +122,22 @@
         }
       },
       "ResultPath": null,
-      "Next": "WaitForState"
+      "Next": "WaitForState",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException",
+            "Lambda.Unknown"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ]
     },
     "WaitForState": {
       "Type": "Task",
@@ -109,13 +148,31 @@
           "token.$": "$$.Task.Token",
           "run_id.$": "$.run_id",
           "warning_title.$": "$.warning_title",
-          "contact": {"name": "State warning point", "role": "24-hour state desk"},
+          "contact": {
+            "name": "State warning point",
+            "role": "24-hour state desk"
+          },
           "round.$": "$.round"
         }
       },
       "TimeoutSeconds": 3600,
       "ResultPath": "$.decision",
-      "Next": "Decided"
+      "Next": "Decided",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException",
+            "Lambda.Unknown"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 4,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ]
     },
     "Decided": {
       "Type": "Succeed"

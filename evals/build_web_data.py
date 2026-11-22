@@ -82,7 +82,7 @@ def main() -> None:
     from countersign.lexicon import ACTIONS
     (OUT / "lexicon.json").write_text(json.dumps(ACTIONS, indent=1), encoding="utf-8")
     import shutil
-    for f in ("below-model.json", "automated-reasoning-probes.json", "stress-summary.json"):
+    for f in ("below-model.json", "automated-reasoning-probes.json", "stress-summary.json", "scale.json", "a11y.json"):
         src = ROOT / "evals" / "results" / f
         if src.exists():
             shutil.copy(src, OUT / f)

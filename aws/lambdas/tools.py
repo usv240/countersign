@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import boto3  # noqa: E402
 
-from common import (T_DRAFTS, from_ddb, load_preset, new_id, now, nws_active_for_county, nws_alert,  # noqa: E402
+from common import (T_DRAFTS, from_ddb, metric, load_preset, new_id, now, nws_active_for_county, nws_alert,  # noqa: E402
                     table, to_ddb)
 from countersign.cap import from_nws_feature, from_openfema  # noqa: E402
 from countersign.gate import evaluate  # noqa: E402
@@ -144,6 +144,7 @@ def t_draft_alert(a: dict, cfg: dict) -> dict:
                                            "proposal": proposal, "decision": d.to_dict(), "status": "draft",
                                            "warning_id": wid, "created": now()}))
     audit(cfg["run_id"], "draft", {"draft_id": did, "outcome": d.outcome})
+    metric("GateOutcome", Outcome=d.outcome, Stage="draft")
     return {"draft_id": did, "outcome_if_officers_approve": d.outcome, "summary": d.summary,
             "approvals_needed": d.approvals_required,
             "checks": [{"rule": c.rule, "name": c.name, "status": c.status, "message": c.message} for c in d.checks],
@@ -242,11 +243,14 @@ def handler(event, context):
     try:
         cfg = run_config((event or {}).get("run_id", ""))
         out = HANDLERS[tool](event or {}, cfg)
+        metric("ToolCall", Tool=tool, Result="ok")
         return out
     except ToolError as e:
+        metric("ToolCall", Tool=tool, Result="refused")
         return {"error": str(e)}
     except Exception as e:  # never leak internals to the model
         print("TOOL_ERROR", tool, repr(e))
+        metric("ToolCall", Tool=tool, Result="error")
         return {"error": "INTERNAL_ERROR"}
 
 

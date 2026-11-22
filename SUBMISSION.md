@@ -49,8 +49,8 @@ I treated the model as the weakest layer and the prompt as a request. Every rule
 4. **AgentCore Gateway with AgentCore Policy (Cedar).** Default deny. Each of the six tools has one permit, for the harness's IAM role only, and the draft tool's permit checks the area and class values. There is no live-send tool on the gateway at all.
 5. **The tool code.** Every draft is checked against all ten rules by the same rule engine the sender uses. The area is computed by code from the warning's own polygon, clipped to the county; the model cannot supply one. A warning id must match the official feed.
 6. **IAM.** Every agent-side role has explicit denies on the live topic, the approvals table and the sender function.
-7. **Step Functions paging.** Started by the API when a run starts, not by the agent. It pages Officer A, then B, then C, round after round, then the state warning point. Only an officer's decision, through the approval service, completes its task token.
-8. **The sender, check one.** The only code allowed to publish live re-runs the rule engine on records it reads from storage, never on the request.
+7. **Step Functions paging.** Started by the API when a run starts, not by the agent. It pages Officer A, then B, then C, round after round, then the state warning point. Only an officer's decision, through the approval service, completes its task token. A failing pager is retried, and if it still fails the workflow escalates to the state desk: an error cannot end the paging quietly.
+8. **The sender, check one.** The only code allowed to publish live re-runs the rule engine on records it reads from storage, never on the request. It then claims the warning with a conditional DynamoDB write before publishing, so two approvals arriving at once cannot both send.
 9. **The sender, check two: Automated Reasoning checks.** The release rules are a formal-logic policy. The solver must return VALID for the facts of this release, or nothing is sent.
 
 ## Testing it
@@ -77,6 +77,25 @@ I assumed the model was fully compromised and sent the forbidden calls myself, s
 
 I ran every local phone alert in FEMA's archive from 2023 to 2025 (about 10,000) through the area, wording and class rules. Fifty-three were later retracted by their own senders as sent in error. The rules would have stopped 43 of them, 81%, for a person to look at. They also stop 46% of ordinary alerts, mostly by asking an officer to confirm a whole-county alert on purpose. That is the cost, and I would rather show it than hide it: the message rules are not a mistake detector, which is exactly why a second person signs.
 
+## Running it
+
+A rule nobody can see being enforced is hard to trust, so every layer reports what it did.
+
+**Observability.** Each function writes its decisions as CloudWatch metrics in Embedded Metric Format: tool calls the hook denied, by reason code; releases the sender refused, by layer; rule outcomes; live sends; pages; escalations; API latency. The AgentCore harness emits OpenTelemetry spans for the agent loop, every model call and every tool call, and X-Ray carries the same trace through the API, both hooks and the paging workflow, so one run is one trace from the HTTP request to the last page. Thirteen alarms watch safety, not only uptime: a release the sender refused, a hook error (it fails closed, so the agent stops), paging that failed, an escalation to the state desk, a spike of denied tool calls, work stuck in the dead-letter queue. A composite alarm, cs-unsafe, is the one to wake someone for. The site's Operations page reads all of it live.
+
+**Scale and concurrency.** Measured on the deployed stack with `evals/scale.py`:
+
+| Test | Result |
+|---|---|
+| 12 officers approve the same draft at the same instant | **1 live alert** (before the fix: 12) |
+| Public rule-check API, 5, 10 and 20 requests a second through CloudFront | 700 of 700 OK, p95 116 to 139 ms |
+| The same at 40 a second, twice the throttle I set | 513 OK, 287 cleanly throttled, **0 server errors** |
+| A statewide storm: 50 counties paged at once | 50 of 50 reached the first person (p95 8.4 s); all 50 escalated after nobody answered |
+
+Everything is serverless and on demand (Lambda, DynamoDB on-demand, Step Functions Standard, SNS), so nothing sits idle between storms. County is part of every key, so a second county is a second set of rows, not a second deployment.
+
+**Accessibility.** An alert desk is used at 1 AM by a tired person, possibly on a phone. Every page passes axe-core's automated WCAG 2.2 AA rules with 0 failures across 32 page views (8 pages, light and dark, desktop and phone). Every tab stop shows visible focus, nothing scrolls sideways at 320 px or at 200% text, and nothing animates when reduced motion is set. The first audit found 20 failures: info buttons smaller than a 24 px touch target, glossary terms with an ARIA attribute their role did not allow, tables that scrolled sideways but could not be reached by keyboard, and one low-contrast heading row. All are fixed. Automated checks find only part of the problems, and no screen-reader user has tested it yet. The alerts themselves are always drafted in English and Spanish.
+
 ## What broke
 
 **My guardrail blocked the ordinary job.** Attached to the model, the prompt attack filter also reads the system prompt, a page of instructions, and blocked "a warning may have come in, do your job". I moved it into a before-invocation hook that checks only what a person typed, at LOW. It still stops the direct override and the credentials request; the rest are stopped further down, which is the point of layers.
@@ -91,6 +110,10 @@ I ran every local phone alert in FEMA's archive from 2023 to 2025 (about 10,000)
 
 **My first area rule held three quarters of all real alerts.** It blocked every alert without a drawn polygon. Many county-wide alerts are deliberate. The rule now requires a choice made on purpose, which is the Los Angeles failure exactly.
 
+**Twelve approvals at once sent twelve live alerts.** Writing the scale tests, I saw that "one alert per warning" was a read: the sender checked what had been sent, then published. I measured it before fixing it: 12 simultaneous approvals through the old sender put 12 live alerts on the channel. A double-tapped button is enough. The sender now claims the warning with a conditional write first. Same test: 1 live alert, 11 refused by the lock.
+
+**The escalation step had never written a log line.** After 50 paging workflows escalated, the Escalated metric still read zero. The escalation function shares the pager's IAM role, which could write logs only for the pager. It had always worked, but had it failed, nothing would have shown it. The role now names both.
+
 **The archive's digital signatures do not verify.** I tried to prove records official with their IPAWS signatures. Every one failed, because the archive stores a copy that is not byte-exact. Official status now comes only from fetching the warning from the National Weather Service.
 
 ## The one thing I learned
@@ -103,6 +126,7 @@ An agent that can act needs two kinds of rule, and only one of them is a refusal
 - **Test your data:** paste any CAP alert, National Weather Service alert or OpenFEMA record, edit the draft, and see all ten rules. Run a debate between two models and compare it with the rules.
 - **Developers:** get a free API key and call the same check from your own code.
 - **Proof:** every table above, built from the saved results, with the command that recounts them.
+- **Operations:** live CloudWatch numbers for what each layer stopped, every alarm, one agent run traced end to end, the load tests and the accessibility audit.
 
 ## Limits
 
@@ -110,4 +134,4 @@ No real phone receives an alert: the live channel is an SNS topic standing in fo
 
 ## Built with
 
-Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Amazon Bedrock Guardrails with Automated Reasoning checks, Claude Sonnet 4.6, Claude Haiku 4.5 and Amazon Nova Pro and Lite on Amazon Bedrock, AWS Lambda, AWS Step Functions, Amazon DynamoDB, Amazon SNS, AWS IAM, Amazon API Gateway, Amazon CloudFront, Amazon S3, Amazon CloudWatch and AWS X-Ray. Data: FEMA OpenFEMA IPAWS archive, National Weather Service API, US Census Bureau TIGERweb.
+Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Amazon Bedrock Guardrails with Automated Reasoning checks, Claude Sonnet 4.6, Claude Haiku 4.5 and Amazon Nova Pro and Lite on Amazon Bedrock, AWS Lambda, AWS Step Functions, Amazon DynamoDB, Amazon SNS, AWS IAM, Amazon API Gateway, Amazon CloudFront, Amazon S3, Amazon CloudWatch, AWS X-Ray with AgentCore Observability, and Amazon SQS. Data: FEMA OpenFEMA IPAWS archive, National Weather Service API, US Census Bureau TIGERweb.

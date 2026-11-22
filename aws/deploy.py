@@ -3,6 +3,7 @@
     python aws/deploy.py            # everything
     python aws/deploy.py code       # rebuild and update Lambda code only
     python aws/deploy.py site       # upload the website only
+    python aws/deploy.py obs        # alarms, dashboard, dead-letter queue, traces, access logs
 
 Region us-east-1. Writes the ARNs it creates to aws/state.json.
 """
@@ -199,18 +200,29 @@ def roles(t: dict, st: dict) -> dict:
         {"Effect": "Allow", "Action": ["states:SendTaskSuccess", "states:SendTaskFailure"], "Resource": "*"},
         {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": [arn_fn(f"{P}-runner"), arn_fn(f"{P}-sender")]},
         {"Effect": "Allow", "Action": ["bedrock:InvokeModel", "bedrock:Converse"], "Resource": model_res},
+        {"Effect": "Allow", "Action": ["cloudwatch:GetMetricData", "cloudwatch:DescribeAlarms"], "Resource": "*"},
         deny_live])
     r["runner"] = role(f"{P}-runner-role", lam_trust, [
         logs_stmt(f"{P}-runner"), {"Effect": "Allow", "Action": rw, "Resource": arn_table(TABLES["drafts"])},
+        {"Effect": "Allow", "Action": "sqs:SendMessage", "Resource": f"arn:aws:sqs:{REGION}:{ACCOUNT}:{P}-dlq"},
         {"Effect": "Allow", "Action": ["bedrock-agentcore:InvokeHarness", "bedrock-agentcore:InvokeAgentRuntime"],
          "Resource": f"arn:aws:bedrock-agentcore:{REGION}:{ACCOUNT}:*"}, deny_live, deny_approvals, deny_sender])
     r["pager"] = role(f"{P}-pager-role", lam_trust, [
-        logs_stmt(f"{P}-pager"), {"Effect": "Allow", "Action": ["dynamodb:PutItem"], "Resource": arn_table(TABLES["ledger"])},
+        # Both pager functions run under this role. Before this line named both, cs-escalated could not write a
+        # single log line or metric (found when its Escalated metric read zero after 50 escalations).
+        logs_stmt(f"{P}-pager"), logs_stmt(f"{P}-escalated"),
+        {"Effect": "Allow", "Action": ["dynamodb:PutItem"], "Resource": arn_table(TABLES["ledger"])},
         {"Effect": "Allow", "Action": "sns:Publish", "Resource": pager}, deny_live])
     r["recorder"] = role(f"{P}-recorder-role", lam_trust, [
-        logs_stmt(f"{P}-recorder"), {"Effect": "Allow", "Action": ["dynamodb:PutItem"], "Resource": arn_table(TABLES["ledger"])}])
+        logs_stmt(f"{P}-recorder"), {"Effect": "Allow", "Action": ["dynamodb:PutItem"], "Resource": arn_table(TABLES["ledger"])},
+        {"Effect": "Allow", "Action": "sqs:SendMessage", "Resource": f"arn:aws:sqs:{REGION}:{ACCOUNT}:{P}-dlq"}])
     r["sfn"] = role(f"{P}-paging-role", trust("states.amazonaws.com"), [
-        {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": [arn_fn(f"{P}-pager"), arn_fn(f"{P}-escalated")]}])
+        {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": [arn_fn(f"{P}-pager"), arn_fn(f"{P}-escalated")]},
+        {"Effect": "Allow", "Action": ["xray:PutTraceSegments", "xray:PutTelemetryRecords", "xray:GetSamplingRules",
+                                       "xray:GetSamplingTargets"], "Resource": "*"},
+        {"Effect": "Allow", "Action": ["logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery",
+                                       "logs:DeleteLogDelivery", "logs:ListLogDeliveries", "logs:PutResourcePolicy",
+                                       "logs:DescribeResourcePolicies", "logs:DescribeLogGroups"], "Resource": "*"}])
     ac_cond = {"StringEquals": {"aws:SourceAccount": ACCOUNT}}
     r["gateway"] = role(f"{P}-gateway-role", trust("bedrock-agentcore.amazonaws.com", ac_cond), [
         {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": arn_fn(f"{P}-tools")},
@@ -261,7 +273,8 @@ def lambdas(zpath: Path, r: dict, t: dict, st: dict, only_code: bool = False) ->
         f"{P}-sender": ("sender.handler", r["sender"], 60, 1024, {"LIVE_TOPIC_ARN": t["live"],
                          "AR_GUARDRAIL_ID": st["ar_guardrail_id"], "AR_GUARDRAIL_VERSION": st["ar_guardrail_version"]}),
         f"{P}-api": ("api.handler", r["api"], 30, 1536, {"RUNNER_FN": f"{P}-runner", "SENDER_FN": f"{P}-sender",
-                      "PAGING_SM_ARN": st.get("paging_sm_arn", "")}),
+                      "PAGING_SM_ARN": st.get("paging_sm_arn", ""),
+                      "HTTP_API_ID": st.get("http_api_id", "")}),
         f"{P}-runner": ("runner.handler", r["runner"], 600, 512, {"HARNESS_ARN": st.get("harness_arn", "")}),
         f"{P}-pager": ("pager.handler", r["pager"], 15, 256, {"PAGER_TOPIC_ARN": t["pager"]}),
         f"{P}-escalated": ("pager.escalated", r["pager"], 15, 256, {}),
@@ -278,7 +291,8 @@ def lambdas(zpath: Path, r: dict, t: dict, st: dict, only_code: bool = False) ->
                     lam.get_waiter("function_updated_v2").wait(FunctionName=name)
                     if not only_code:
                         lam.update_function_configuration(FunctionName=name, Role=role_arn, Handler=h, Timeout=timeout,
-                                                          MemorySize=mem, Environment=e, Runtime="python3.12")
+                                                          MemorySize=mem, Environment=e, Runtime="python3.12",
+                                                          TracingConfig={"Mode": "Active"})
                         lam.get_waiter("function_updated_v2").wait(FunctionName=name)
                 except lam.exceptions.ResourceNotFoundException:
                     lam.create_function(FunctionName=name, Runtime="python3.12", Role=role_arn, Handler=h,
@@ -584,6 +598,9 @@ def main(argv):
     if step == "code":
         lambdas(z, st["roles"], st["topics"], st, only_code=True)
         return
+    if step == "obs":
+        import observability
+        return observability.apply()
     if step == "agent":
         r = roles(st["topics"], st)
         lambdas(z, r, st["topics"], st)
@@ -602,6 +619,8 @@ def main(argv):
     http_api()
     site_bucket_and_cdn()
     lambdas(z, r, t, state())  # second pass: now every ARN and URL is known
+    import observability
+    observability.apply()
     if (ROOT / "web" / "index.html").exists():
         upload_site()
     log("done", state().get("site_url"))

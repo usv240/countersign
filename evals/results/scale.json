@@ -1,0 +1,97 @@
+{
+ "race_before_fix": {
+  "concurrent_approvals": 12,
+  "sender": "old copy, run locally",
+  "sent_true": 12,
+  "live_messages_on_channel": 12,
+  "refused": [],
+  "seconds": 11.0,
+  "run_id": "run_28b90e61bc30471d",
+  "measured_at": "2026-11-22 04:21 UTC"
+ },
+ "race": {
+  "concurrent_approvals": 12,
+  "sender": "deployed cs-sender",
+  "sent_true": 1,
+  "live_messages_on_channel": 1,
+  "refused": [
+   "R10: another send for this warning won the race"
+  ],
+  "seconds": 10.0,
+  "run_id": "run_0d7fb6476fcc44aa",
+  "measured_at": "2026-11-22 04:21 UTC"
+ },
+ "fanout": {
+  "counties": 50,
+  "timeout_per_person_s": 20,
+  "first_page_p50_s": 3.3,
+  "first_page_p95_s": 8.4,
+  "first_page_max_s": 8.4,
+  "reached_first_person": 50,
+  "escalated_to_state_after_no_answer": 50,
+  "escalation_p50_s": 66.0,
+  "measured_at": "2026-11-22 04:23 UTC",
+  "pager_entries_each": [
+   5
+  ],
+  "sequence": "Officer A, Officer B, Officer C, escalation notice, page to the state warning point",
+  "note": "Counted from the ledger after every workflow finished: all 50 had the same five entries."
+ },
+ "load": {
+  "endpoint": "POST /v1/evaluate (Kerr County preset: CAP parse, county geometry, all ten rules)",
+  "path": "CloudFront -> API Gateway HTTP API -> Lambda (1536 MB)",
+  "seconds_per_stage": 20,
+  "api_gateway_limit": "20 requests a second, burst 50 (set on purpose)",
+  "stages": [
+   {
+    "target_rps": 5,
+    "requests": 100,
+    "ok_200": 100,
+    "throttled_429": 0,
+    "server_5xx": 0,
+    "network_errors": 0,
+    "p50_ms": 98.8,
+    "p95_ms": 139.4,
+    "p99_ms": 442.8,
+    "mean_ms": 108.0
+   },
+   {
+    "target_rps": 10,
+    "requests": 200,
+    "ok_200": 200,
+    "throttled_429": 0,
+    "server_5xx": 0,
+    "network_errors": 0,
+    "p50_ms": 81.5,
+    "p95_ms": 116.5,
+    "p99_ms": 132.1,
+    "mean_ms": 87.5
+   },
+   {
+    "target_rps": 20,
+    "requests": 400,
+    "ok_200": 400,
+    "throttled_429": 0,
+    "server_5xx": 0,
+    "network_errors": 0,
+    "p50_ms": 74.2,
+    "p95_ms": 115.5,
+    "p99_ms": 127.9,
+    "mean_ms": 80.8
+   },
+   {
+    "target_rps": 40,
+    "requests": 800,
+    "ok_200": 513,
+    "throttled_429": 287,
+    "server_5xx": 0,
+    "network_errors": 0,
+    "p50_ms": 69.8,
+    "p95_ms": 115.3,
+    "p99_ms": 1636.6,
+    "mean_ms": 119.5
+   }
+  ],
+  "measured_at": "2026-11-22 04:23 UTC"
+ }
+}

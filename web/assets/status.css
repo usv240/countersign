@@ -1,0 +1,76 @@
+/* Operations page. Same ledger as the other working pages: ink on stone, white panels, one chart hue. */
+
+.fresh { display: flex; gap: 10px; align-items: center; }
+.read section.first { margin-top: 8px; }
+
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 12px; }
+@media (max-width: 1000px) { .tiles { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .tiles { grid-template-columns: 1fr; } }
+.tile { display: grid; grid-template-rows: auto auto 1fr; gap: 6px; padding: 16px; border-radius: var(--radius); background: var(--raised); min-height: 158px; }
+.tile b { font-family: var(--serif); font-size: 44px; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.tile > span { color: var(--muted); font-size: 14px; }
+.tile .spark { align-self: end; width: 100%; height: 34px; display: block; }
+.tile .spark rect { fill: var(--chart); }
+.tile .spark rect.zero { fill: var(--line); }
+.tile .spark-cap { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.tile.skeleton { background: var(--surface); }
+.tile.alert b { color: var(--fail); }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+.split .panel + .panel { margin-top: 0; }
+
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.bars li { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 4px 10px; align-items: center; font-size: 14px; }
+.bars .track { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--surface); overflow: hidden; }
+.bars .fill { display: block; height: 100%; border-radius: 4px; background: var(--chart); transform-origin: left; }
+.bars .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* waterfall: one row per span, time runs left to right */
+.waterfall { display: grid; gap: 3px; margin-top: 4px; }
+.wf-row { display: grid; grid-template-columns: 210px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 13px; min-height: 22px; }
+.wf-row .nm { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wf-row .nm b { color: var(--ink); font-weight: 500; }
+.wf-row .lane { position: relative; height: 14px; border-radius: 3px; background: var(--surface); }
+.wf-row .seg { position: absolute; top: 0; bottom: 0; min-width: 2px; border-radius: 3px; }
+.wf-row .ms { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.seg.k-agent { background: var(--ink); opacity: 0.85; }
+.seg.k-model { background: var(--chart); }
+.seg.k-tool { background: var(--pass); }
+.seg.k-hook { background: var(--warn); }
+.seg.k-deny { background: var(--fail); }
+.wf-axis { display: grid; grid-template-columns: 210px minmax(0, 1fr) 64px; gap: 10px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.wf-axis .ticks { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) {
+  .wf-row, .wf-axis { grid-template-columns: 112px minmax(0, 1fr) 48px; gap: 6px; }
+}
+.legend .sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; margin: 0 6px 0 0; vertical-align: -1px; }
+
+/* the paging lanes: six minutes on one axis */
+.lanes { display: grid; gap: 12px; }
+.ln { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px; }
+.ln .track { position: relative; height: 30px; border-radius: 4px; background: var(--surface); }
+.ln .span { position: absolute; top: 6px; bottom: 6px; border-radius: 3px; background: var(--ink); }
+.ln .mark { position: absolute; top: 3px; bottom: 3px; width: 3px; border-radius: 2px; background: var(--chart); }
+.ln .mark span { position: absolute; top: -2px; left: 7px; white-space: nowrap; font-size: 12px; color: var(--ink); line-height: 30px; }
+.ln-axis { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px; font-size: 12px; color: var(--muted); }
+.ln-axis .ticks { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) { .ln, .ln-axis { grid-template-columns: 76px minmax(0, 1fr); } .ln .mark span { display: none; } }
+
+.where { display: grid; gap: 4px; }
+.where h3 { margin-bottom: 4px; }
+.where p { color: var(--muted); font-size: 14px; }
+.where code { font-size: 13px; overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .bars .fill, .tile .spark rect { transition: transform 600ms var(--ease-out); }
+  .bars[data-enter] .fill { transform: scaleX(0); }
+}
+
+.wf-row .nm .short { display: none; }
+td.nw { white-space: nowrap; }
+@media (max-width: 700px) {
+  .wf-row .nm .full { display: none; }
+  .wf-row .nm .short { display: inline; }
+  table.data .job { display: none; }
+}

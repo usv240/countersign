@@ -7,6 +7,7 @@ website can show the agent working step by step.
 from __future__ import annotations
 
 import json
+import time
 import os
 import sys
 import uuid
@@ -16,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import boto3  # noqa: E402
 
-from common import T_DRAFTS, from_ddb, now, table, to_ddb  # noqa: E402
+from common import T_DRAFTS, from_ddb, metric, now, table, to_ddb  # noqa: E402
 
 HARNESS_ARN = os.environ.get("HARNESS_ARN", "")
 
@@ -147,6 +148,7 @@ def handler(event, _context):
     table(T_DRAFTS).update_item(Key={"pk": f"RUN#{run_id}", "sk": "CONFIG"}, UpdateExpression="SET agent_status = :s",
                                 ExpressionAttributeValues={":s": "running"})
     record(run_id, "user", {"text": user})
+    t0 = time.time()
     try:
         out = run(run_id, user)
         status = "done"
@@ -158,4 +160,10 @@ def handler(event, _context):
                                 UpdateExpression="SET agent_status = :s, agent_stop = :t, agent_usage = :u",
                                 ExpressionAttributeValues=to_ddb({":s": status, ":t": out.get("stop"),
                                                                   ":u": out.get("usage")}))
+    metric("AgentRun", Status=status)
+    metric("AgentDuration", round((time.time() - t0) * 1000), "Milliseconds")
+    metric("AgentToolCalls", len(out.get("tools") or []), "Count")
+    metric("AgentHookDenials", sum(1 for h in out.get("hooks") or [] if "deny" in json.dumps(h).lower()), "Count")
+    # Token totals are not taken from out["usage"]: that is the final model turn only. The harness's
+    # invoke_agent span in aws/spans carries the run's real totals; the dashboard reads them there.
     return {"status": status, "stop": out.get("stop")}

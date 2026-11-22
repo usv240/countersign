@@ -119,7 +119,16 @@
 
   // Turn every abbr[data-term] into a focusable trigger, and make every .i a real button.
   function wire(scope = document) {
-    scope.querySelectorAll("abbr[data-term]").forEach((a) => { a.tabIndex = 0; a.setAttribute("aria-expanded", "false"); });
+    scope.querySelectorAll("abbr[data-term]").forEach((a) => {
+      a.tabIndex = 0; a.setAttribute("role", "button"); a.setAttribute("aria-expanded", "false");
+    });
+    // A table that scrolls sideways on a phone must be reachable and scrollable from the keyboard.
+    scope.querySelectorAll(".table-wrap").forEach((w) => {
+      if (w.hasAttribute("tabindex")) return;
+      w.tabIndex = 0; w.setAttribute("role", "region");
+      const h = w.closest("section")?.querySelector("h2, h3");
+      w.setAttribute("aria-label", (h ? h.textContent.trim() : "Table") + " (table, scrolls sideways)");
+    });
     scope.querySelectorAll(".i").forEach((b) => {
       if (b.tagName !== "BUTTON") return;
       b.type = "button";
@@ -133,7 +142,7 @@
   // ---------- site bar ----------
   const PAGES = [
     ["index.html", "Home"], ["rules.html", "How it works"], ["desk.html", "Alert desk"],
-    ["lab.html", "Test your data"], ["proof.html", "Proof"], ["developers.html", "Developers"],
+    ["lab.html", "Test your data"], ["proof.html", "Proof"], ["status.html", "Operations"], ["developers.html", "Developers"],
   ];
   function themeButton() {
     const b = document.createElement("button");
@@ -185,7 +194,9 @@
     ["", "AWS IAM", "A separate least-privilege role per function, with explicit denies on the live channel and the approvals table."],
     ["", "Amazon API Gateway", "The public API, with throttling and API keys for developers."],
     ["", "Amazon CloudFront and S3", "Hosts this site, with security headers."],
-    ["", "Amazon CloudWatch and AWS X-Ray", "Logs and traces for every function and every agent step."],
+    ["", "Amazon CloudWatch", "Safety metrics from every function, 13 alarms, one dashboard, structured logs and API access logs. The Operations page reads it live."],
+    ["", "AWS X-Ray and AgentCore Observability", "One trace per run: the API call, the agent loop, every model and tool call, both hooks and the paging workflow, as OpenTelemetry spans."],
+    ["", "Amazon SQS", "A dead-letter queue for background work that fails after its retries, with an alarm on it."],
     ["", "FEMA OpenFEMA IPAWS archive", "The real alert records replayed here, including Hawaii 2018 and Los Angeles 2025."],
     ["", "National Weather Service API", "Live official warnings for any US county."],
     ["", "US Census Bureau TIGERweb", "County boundaries and 2020 population, used to check every alert area and count who it reaches."],

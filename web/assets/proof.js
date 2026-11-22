@@ -26,6 +26,12 @@
     ["The archive's signatures do not verify",
      "Every alert in FEMA's archive carries an IPAWS XML signature. I tried to use it to prove a record is official. Every one failed, unmodified records included: the archive stores a copy that is not byte-exact.",
      "Official status comes only from code fetching the warning from the National Weather Service. Archive records replay the past; they never count as a live source."],
+    ["Twelve approvals at once sent twelve live alerts",
+     "While writing the scale tests I saw that the one-alert-per-warning rule, R10, was a read: the sender looked up what had been sent, then published. Two approvals landing in the same instant would both read \"nothing sent yet\". I measured it before fixing it: 12 simultaneous approvals of one Kerr County draft, run through the old sender, put 12 live alerts on the channel. A double-tapped button or a retried request is enough.",
+     "The sender now claims the warning with a conditional DynamoDB write before it publishes, and releases the claim if the publish fails. The same test on the deployed sender: 12 approvals, 1 live alert, 11 refused by the lock. evals/scale.py race reruns it."],
+    ["The escalation step had never written a log line",
+     "After adding metrics, 50 paging workflows escalated to the state desk and the Escalated metric still read zero. The escalation function shares the pager's IAM role, and that role could write logs only for the pager. The escalation function had worked from the start, but if it had ever failed, nothing would have shown it.",
+     "The role now names both functions. The escalation function logs and counts every escalation, and the cs-escalated alarm watches it."],
   ];
 
   const esc = (s) => window.CS_esc(s);

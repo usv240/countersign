@@ -13,6 +13,8 @@ import re
 
 import boto3
 
+from common import log_event, metric
+
 GUARDRAIL_ID = os.environ.get("AGENT_GUARDRAIL_ID", "")
 GUARDRAIL_VERSION = os.environ.get("AGENT_GUARDRAIL_VERSION", "DRAFT")
 
@@ -25,8 +27,9 @@ OPINION = re.compile(r"\b(i |we )?(recommend|suggest|advise|urge)\b|\byou should
 RUN = re.compile(r"run_[a-f0-9]{16}")
 
 
-def deny(reason: str) -> dict:
-    print(json.dumps({"hook": "deny", "reason": reason}))
+def deny(reason: str, code: str = "other", hook: str = "before_tool_call") -> dict:
+    log_event("hook_deny", hook=hook, code=code, reason=reason)
+    metric("HookDenied", Hook=hook, Reason=code)
     return {"decision": "deny", "reason": f"Blocked by the Countersign tool-call check: {reason}"}
 
 
@@ -43,9 +46,10 @@ def before_invocation(ctx: dict) -> dict:
     Attached to the model instead, the prompt attack filter also reads the system prompt, which is a page of
     instructions by design, and blocks every request (found in testing; see FAILURES.md)."""
     if ctx.get("truncated"):
-        return deny("the request was too large to check.")
+        return deny("the request was too large to check.", "too_large", "before_invocation")
     text = last_user_text(ctx)
     if not text or not GUARDRAIL_ID:
+        metric("HookAllowed", Hook="before_invocation")
         return {"decision": "allow"}
     r = boto3.client("bedrock-runtime").apply_guardrail(
         guardrailIdentifier=GUARDRAIL_ID, guardrailVersion=GUARDRAIL_VERSION, source="INPUT",
@@ -55,7 +59,10 @@ def before_invocation(ctx: dict) -> dict:
         for a in r.get("assessments", []):
             found += [f["type"] for f in (a.get("contentPolicy") or {}).get("filters", []) if f.get("action") == "BLOCKED"]
             found += [t["name"] for t in (a.get("topicPolicy") or {}).get("topics", []) if t.get("action") == "BLOCKED"]
-        return deny("Bedrock Guardrails blocked this message (" + ", ".join(found or ["policy"]) + ").")
+        metric("GuardrailIntervened", Filter=(found or ["policy"])[0])
+        return deny("Bedrock Guardrails blocked this message (" + ", ".join(found or ["policy"]) + ").", "guardrail",
+                    "before_invocation")
+    metric("HookAllowed", Hook="before_invocation")
     return {"decision": "allow"}
 
 
@@ -70,29 +77,30 @@ def handler(event, _context):
     name = raw_name.split("___")[-1].split("/")[-1]
     args = ctx.get("toolInput")
     if isinstance(args, dict) and args.get("truncated"):
-        return deny("the tool input was too large to check.")
+        return deny("the tool input was too large to check.", "too_large")
     if isinstance(args, str):
         try:
             args = json.loads(args)
         except ValueError:
-            return deny("the tool input was not valid JSON.")
+            return deny("the tool input was not valid JSON.", "bad_json")
     args = args or {}
     if name not in ALLOWED:
-        return deny(f"'{raw_name}' is not one of the six Countersign tools.")
+        return deny(f"'{raw_name}' is not one of the six Countersign tools.", "unknown_tool")
     blob = json.dumps(args)
     if LIVE.search(blob):
-        return deny("tool arguments may not set a channel, an approval or an officer. Only officers can send live.")
+        return deny("tool arguments may not set a channel, an approval or an officer. Only officers can send live.", "live_channel")
     if not RUN.fullmatch(str(args.get("run_id", ""))):
-        return deny("missing or malformed run_id.")
+        return deny("missing or malformed run_id.", "bad_run_id")
     if name == "draft_alert":
         if args.get("area") not in AREAS:
-            return deny("area must be warning_polygon or whole_county.")
+            return deny("area must be warning_polygon or whole_county.", "bad_area")
         if args.get("alert_class") not in CLASSES:
-            return deny("alert_class must be Imminent Threat or Public Safety.")
+            return deny("alert_class must be Imminent Threat or Public Safety.", "bad_class")
         if len(str(args.get("text_360", ""))) > 360 or len(str(args.get("text_90", ""))) > 90:
-            return deny("alert text is over the federal length limit.")
+            return deny("alert text is over the federal length limit.", "too_long")
     if name == "submit_for_review":
         concerns = " ".join(str(c) for c in (args.get("concerns") or []))
         if OPINION.search(concerns):
-            return deny("concerns must state facts for the officer, not a recommendation (rule R9).")
+            return deny("concerns must state facts for the officer, not a recommendation (rule R9).", "opinion")
+    metric("HookAllowed", Hook="before_tool_call", Tool=name)
     return {"decision": "allow"}

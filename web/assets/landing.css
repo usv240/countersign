@@ -142,7 +142,7 @@
 /* ---------- the ten rules, one type size ---------- */
 .lineup { padding: 120px var(--margin) 120px; background: var(--surface); font-size: clamp(19px, 1.7vw, 26px); }
 .lineup-head, .lineup-rows li { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 0.8fr); column-gap: 20px; align-items: baseline; }
-.lineup-head { color: var(--soft); font-family: var(--sans); font-size: 15px; padding-bottom: 10px; }
+.lineup-head { color: var(--muted); font-family: var(--sans); font-size: 15px; padding-bottom: 10px; }
 .lineup-part { position: sticky; top: 0; z-index: 2; background: var(--surface); color: var(--accent); margin: 56px 0 14px; padding: 8px 0; }
 .lineup-rows { list-style: none; margin: 0; padding: 0; }
 .lineup-rows li { min-height: 1.6em; padding: 0.18em 0; }

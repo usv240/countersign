@@ -14,6 +14,7 @@ Routes (Amazon API Gateway HTTP API, payload v2):
   POST /api/debate                  two models argue send versus hold; shown next to the rules
   GET  /api/live?county=48265       active National Weather Service warnings for a county
   GET  /api/results                 measured results: benchmark and stress test
+  GET  /api/status                  live operating numbers from CloudWatch: metrics, alarms, latency
 """
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ import json
 import os
 import re
 import sys
+import time
 import traceback
 from pathlib import Path
 
@@ -32,7 +34,7 @@ import boto3  # noqa: E402
 from boto3.dynamodb.conditions import Key  # noqa: E402
 
 from common import (T_APPROVALS, T_DRAFTS, T_KEYS, T_LEDGER, from_ddb, hash_key, list_presets,  # noqa: E402
-                    load_preset, new_api_key, new_id, now, nws_active_for_county, table, to_ddb)
+                    load_preset, metric, new_api_key, new_id, now, nws_active_for_county, table, to_ddb)
 from countersign.cap import from_nws_feature, from_openfema, load_any  # noqa: E402
 from countersign.gate import evaluate, proposal_from_cap  # noqa: E402
 from countersign.geo import clip_to, load_jurisdiction  # noqa: E402
@@ -150,6 +152,7 @@ def do_evaluate(b: dict) -> dict:
     if prop.get("requested_by") not in ("officer", "agent"):
         prop["requested_by"] = "officer"
     d = evaluate(prop, w, jur, local_places=b.get("local_places") or [])
+    metric("GateOutcome", Outcome=d.outcome, Stage="evaluate")
     out = {"decision": d.to_dict(), "source": note, "jurisdiction": {"geoid": jur.geoid, "name": jur.name,
                                                                        "population": jur.population},
            "proposal": prop}
@@ -270,9 +273,113 @@ def stop_paging(run_id: str, why: str) -> None:
                                     ExpressionAttributeValues={":t": True, ":w": why})
 
 
+# ---------- status (observability, public) ----------
+
+HTTP_API_ID = os.environ.get("HTTP_API_ID", "")
+FUNCTIONS = ["cs-tools", "cs-hook", "cs-sender", "cs-api", "cs-runner", "cs-pager", "cs-escalated", "cs-recorder"]
+_status_cache: dict = {}
+
+
+def status() -> dict:
+    """Operating numbers for the last 14 days, read from CloudWatch. Cached for 60 seconds per container so a
+    busy status page cannot run up the CloudWatch bill."""
+    if _status_cache.get("at", 0) > time.time() - 60:
+        return dict(_status_cache["body"], cached=True)
+    cw = boto3.client("cloudwatch")
+    end = int(time.time()) // 3600 * 3600 + 3600
+    start = end - 14 * 86400
+    q, labels = [], {}
+
+    def add(qid, label, expr=None, stat=None):
+        labels[qid] = label
+        if expr:
+            q.append({"Id": qid, "Expression": expr, "Period": 86400, "Label": label})
+        else:
+            q.append({"Id": qid, "MetricStat": {"Metric": stat[0], "Period": 86400, "Stat": stat[1]}, "Label": label})
+
+    def cs(name, dims=None):
+        return {"Namespace": "Countersign", "MetricName": name, "Dimensions": dims or []}
+
+    for i, name in enumerate(["LiveSent", "SenderRefused", "SendAttempt", "HookDenied", "HookAllowed",
+                              "GuardrailIntervened", "ToolCall", "AgentRun", "PageSent", "Escalated",
+                              "ApiRequest", "PeopleReached"]):
+        add(f"m{i}", name, stat=(cs(name), "Sum"))
+    add("hookby", "${PROP('Dim.Reason')}",
+        expr="SEARCH('{Countersign,Hook,Reason} MetricName=\"HookDenied\"', 'Sum', 86400)")
+    add("refby", "${PROP('Dim.By')}",
+        expr="SEARCH('{Countersign,By,Kind} MetricName=\"SenderRefused\"', 'Sum', 86400)")
+    add("gateby", "${PROP('Dim.Outcome')}",
+        expr="SEARCH('{Countersign,Outcome,Stage} MetricName=\"GateOutcome\"', 'Sum', 86400)")
+    add("lat50", "API latency p50 (ms)", stat=(cs("ApiLatency"), "p50"))
+    add("lat95", "API latency p95 (ms)", stat=(cs("ApiLatency"), "p95"))
+    add("agentdur", "Agent run p50 (ms)", stat=(cs("AgentDuration"), "p50"))
+    for i, fn in enumerate(FUNCTIONS):
+        dim = [{"Name": "FunctionName", "Value": fn}]
+        add(f"inv{i}", f"{fn} invocations", stat=({"Namespace": "AWS/Lambda", "MetricName": "Invocations",
+                                                  "Dimensions": dim}, "Sum"))
+        add(f"err{i}", f"{fn} errors", stat=({"Namespace": "AWS/Lambda", "MetricName": "Errors", "Dimensions": dim}, "Sum"))
+        add(f"dur{i}", f"{fn} p95 ms", stat=({"Namespace": "AWS/Lambda", "MetricName": "Duration", "Dimensions": dim}, "p95"))
+    if PAGING_SM:
+        dim = [{"Name": "StateMachineArn", "Value": PAGING_SM}]
+        for k in ("ExecutionsStarted", "ExecutionsSucceeded", "ExecutionsFailed", "ExecutionsTimedOut"):
+            add(f"sfn{k}", k, stat=({"Namespace": "AWS/States", "MetricName": k, "Dimensions": dim}, "Sum"))
+    if HTTP_API_ID:
+        dim = [{"Name": "ApiId", "Value": HTTP_API_ID}]
+        for k, st in (("Count", "Sum"), ("4xx", "Sum"), ("5xx", "Sum")):
+            add(f"gw{k}", f"API Gateway {k}", stat=({"Namespace": "AWS/ApiGateway", "MetricName": k, "Dimensions": dim}, st))
+    groups = {"hookby": "hook_denied_by", "refby": "sender_refused_by", "gateby": "gate_by"}
+    acc: dict = {}
+    token = None
+    while True:
+        kw = {"MetricDataQueries": q, "StartTime": start, "EndTime": end, "ScanBy": "TimestampAscending"}
+        if token:
+            kw["NextToken"] = token
+        r = cw.get_metric_data(**kw)
+        for m in r["MetricDataResults"]:
+            grp, name = (groups[m["Id"]], m["Label"]) if m["Id"] in groups else ("metrics", labels[m["Id"]])
+            bucket = acc.setdefault(grp, {}).setdefault(name, {})
+            for t, v in zip(m["Timestamps"], m["Values"]):
+                day = t.strftime("%Y-%m-%d")
+                bucket[day] = round(bucket.get(day, 0) + v, 1)
+        token = r.get("NextToken")
+        if not token:
+            break
+    series = {g: {n: [{"day": d, "v": v} for d, v in sorted(b.items())] for n, b in names.items()}
+              for g, names in acc.items()}
+    alarms = []
+    for page in cw.get_paginator("describe_alarms").paginate(AlarmNamePrefix="cs-", AlarmTypes=["MetricAlarm", "CompositeAlarm"]):
+        for a in page["MetricAlarms"] + page.get("CompositeAlarms", []):
+            alarms.append({"name": a["AlarmName"], "state": a["StateValue"], "description": a.get("AlarmDescription", ""),
+                           "since": a.get("StateUpdatedTimestamp")})
+    body = {"window_days": 14, "generated_at": int(time.time()), "series": series, "alarms": alarms,
+            "dashboard": "CloudWatch dashboard: Countersign", "cached": False}
+    _status_cache.update(at=time.time(), body=body)
+    return body
+
+
+ROUTES = [(r"/api/presets/[a-z0-9-]+", "/api/presets/{id}"), (r"/api/runs/run_[a-f0-9]{16}/decide", "/api/runs/{id}/decide"),
+          (r"/api/runs/run_[a-f0-9]{16}", "/api/runs/{id}")]
+
+
+def route_name(path: str) -> str:
+    for pat, name in ROUTES:
+        if re.fullmatch(pat, path):
+            return name
+    return path if path.count("/") <= 3 and len(path) < 40 else "other"
+
+
+def handler(event, context):
+    t0 = time.time()
+    out = _route(event, context)
+    path = event.get("rawPath", "/")
+    metric("ApiRequest", Route=route_name(path), Status=str(out.get("statusCode", 0))[0] + "xx")
+    metric("ApiLatency", round((time.time() - t0) * 1000, 1), "Milliseconds", Route=route_name(path))
+    return out
+
+
 # ---------- router ----------
 
-def handler(event, _context):
+def _route(event, _context):
     method = (event.get("requestContext") or {}).get("http", {}).get("method", "GET")
     path = event.get("rawPath", "/")
     q = event.get("queryStringParameters") or {}
@@ -339,6 +446,8 @@ def handler(event, _context):
                 "id": f["properties"].get("id"), "event": f["properties"].get("event"),
                 "headline": f["properties"].get("headline"), "sent": f["properties"].get("sent"),
                 "expires": f["properties"].get("expires"), "has_polygon": bool(f.get("geometry"))} for f in feats]})
+        if path == "/api/status" and method == "GET":
+            return resp(200, status(), {"cache-control": "public, max-age=30"})
         if path == "/api/results" and method == "GET":
             out = {}
             for p in RESULTS.glob("*.json"):

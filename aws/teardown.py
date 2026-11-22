@@ -73,6 +73,20 @@ def main():
     if st.get("http_api_id"):
         step("http api", api.delete_api, ApiId=st["http_api_id"])
 
+    # observability (aws/observability.py)
+    cw, sqs = S.client("cloudwatch"), S.client("sqs")
+    if st.get("alarms"):
+        comp = [n for n in st["alarms"] if n == f"{P}-unsafe"]
+        step("composite alarm", cw.delete_alarms, AlarmNames=comp)  # the composite goes before its children
+        step(f"{len(st['alarms']) - len(comp)} alarms", cw.delete_alarms, AlarmNames=[n for n in st["alarms"] if n not in comp])
+    step("dashboard Countersign", cw.delete_dashboards, DashboardNames=["Countersign"])
+    if st.get("ops_topic"):
+        step("sns topic ops", sns.delete_topic, TopicArn=st["ops_topic"])
+    if st.get("dlq_arn"):
+        step("sqs queue cs-dlq", lambda: sqs.delete_queue(QueueUrl=sqs.get_queue_url(QueueName=f"{P}-dlq")["QueueUrl"]))
+    for lg in (f"/aws/vendedlogs/states/{P}-paging", f"/aws/apigateway/{P}-http-api"):
+        step(f"log group {lg}", logs.delete_log_group, logGroupName=lg)
+
     for name in (st.get("roles") or {}).values():
         rname = name.split("/")[-1]
 

@@ -29,6 +29,21 @@ def main():
     for lab, t in tot.items():
         stop = t["held"] + t["confirm_whole_county"]
         print(f"FEMA archive {lab:9s}: {t['n']:5d} alerts, {stop} stopped for a person ({round(100 * stop / max(1, t['n']))}%), {t['clear']} clear")
+    sc = R / "scale.json"
+    if sc.exists():
+        d = json.loads(sc.read_text())
+        r, rb, fo = d.get("race", {}), d.get("race_before_fix", {}), d.get("fanout", {})
+        print(f"Race, {r.get('concurrent_approvals')} approvals at once: {rb.get('sent_true')} live sends before the fix, "
+              f"{r.get('sent_true')} after")
+        for st in d.get("load", {}).get("stages", []):
+            print(f"Load {st['target_rps']:3d}/s: {st['requests']} requests, {st['ok_200']} ok, {st['throttled_429']} throttled, "
+                  f"{st['server_5xx']} 5xx, p95 {st['p95_ms']} ms")
+        print(f"Fan-out: {fo.get('reached_first_person')} of {fo.get('counties')} counties paged, first page p95 "
+              f"{fo.get('first_page_p95_s')} s, {fo.get('escalated_to_state_after_no_answer')} escalated")
+    ax = R / "a11y.json"
+    if ax.exists():
+        d = json.loads(ax.read_text())
+        print(f"Accessibility: {d['totals']['violations']} axe WCAG 2.2 AA violations in {d['totals']['pages']} page views")
 
 
 if __name__ == "__main__":

@@ -45,6 +45,27 @@ def new_id(prefix: str = "") -> str:
     return prefix + uuid.uuid4().hex[:16]
 
 
+NAMESPACE = "Countersign"
+
+
+def metric(name: str, value: float = 1, unit: str = "Count", **dims: str) -> None:
+    """One CloudWatch metric, written as an Embedded Metric Format log line.
+
+    No API call and no added latency: CloudWatch Logs turns the line into a metric. Each metric is recorded
+    twice, once as a total and once split by its dimensions, so the dashboard can show both. Dimension values
+    are short fixed codes, never user text, so the number of metric series stays small."""
+    dims = {k: str(v)[:40] for k, v in dims.items() if v is not None}
+    sets = [[]] + ([sorted(dims)] if dims else [])
+    print(json.dumps({"_aws": {"Timestamp": int(time.time() * 1000), "CloudWatchMetrics": [{
+        "Namespace": NAMESPACE, "Dimensions": sets, "Metrics": [{"Name": name, "Unit": unit}]}]},
+        name: value, **dims}))
+
+
+def log_event(event: str, **fields: Any) -> None:
+    """A structured JSON log line, searchable in CloudWatch Logs Insights by its event field."""
+    print(json.dumps({"event": event, **fields}, default=str))
+
+
 def to_ddb(obj: Any) -> Any:
     """DynamoDB cannot store floats; store numbers as Decimal and big blobs as JSON strings."""
     return json.loads(json.dumps(obj), parse_float=Decimal)
