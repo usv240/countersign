@@ -22,6 +22,8 @@ PAGER_TOPIC = os.environ.get("PAGER_TOPIC_ARN", "")
 
 
 def handler(event, _context):
+    if event.get("probe"):  # health probe for evals/chaos.py; pages nobody
+        return {"probe": "ok"}
     run_id, contact = event["run_id"], event["contact"]
     page = {"run_id": run_id, "contact": contact, "round": event.get("round", 1),
             "warning": event.get("warning_title", ""), "at": now(),
@@ -39,6 +41,8 @@ def handler(event, _context):
 
 def escalated(event, _context):
     """Last step when the call list has been tried every round: escalate to the state warning point."""
+    if event.get("probe"):
+        return {"probe": "ok"}
     run_id = event["run_id"]
     table(T_LEDGER).put_item(Item=to_ddb({"pk": f"CHANNEL#{run_id}", "sk": f"{now():012d}#page#state",
                                           "channel": "pager", "body": {

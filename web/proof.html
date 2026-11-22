@@ -64,7 +64,7 @@
 
   <section aria-labelledby="op-h">
     <h2 id="op-h">Running it</h2>
-    <p>The <a href="status.html">Operations page</a> reads CloudWatch live: what each layer stopped in the last 14 days, all 13 alarms, one agent run traced from the API call to the last page, the load and concurrency tests, and the accessibility audit.</p>
+    <p>The <a href="status.html">Operations page</a> reads CloudWatch live: what each layer stopped in the last 14 days, all 14 alarms, one agent run traced from the API call to the last page, the load and concurrency tests, 7 of 7 fault experiments held, who can do what proved by IAM Access Analyzer, the cost of a warning, and the accessibility audit. The <a href="https://github.com/usv240/countersign/blob/main/docs/THREAT-MODEL.md">threat model</a> maps every threat to the layer that stops it.</p>
   </section>
 
   <section aria-labelledby="br-h">
@@ -81,6 +81,8 @@
       <li>People reached is an estimate: the area's share of the county times its 2020 population, as if people were spread evenly.</li>
       <li>The facts the agent flags for the officer are not verified by code. In one test run the agent misread a time zone and flagged a timestamp that was correct. It now gets local times, and the officer always sees the source beside the draft.</li>
       <li>The paging demo uses 30 to 120 second timeouts so you can watch it move. A real office would set minutes.</li>
+      <li>Officer identity is a per-run browser token in this demo. A real office needs single sign-on with MFA behind each officer name; the two-person rule is only as strong as that.</li>
+      <li>One region. Paging survives a function outage, not a regional one.</li>
       <li>FEMA's archive copies are not byte-exact, so their digital signatures do not verify. Official status comes from code fetching the warning from the National Weather Service, not from the archive's signature.</li>
     </ul></div>
   </section>

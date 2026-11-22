@@ -1,0 +1,342 @@
+{
+ "experiments": {
+  "sender_down": {
+   "fault": {
+    "method": "AWS FIS experiment",
+    "action": "aws:lambda:invocation-error",
+    "experiment_id": "EXPYcZH54XXJKri1A2",
+    "functions": [
+     "cs-sender"
+    ],
+    "fault_active_after_s": 23.0
+   },
+   "run_id": "run_0904e7a209d44ed0",
+   "during": {
+    "http": 200,
+    "sent": false,
+    "error": "sender_failed",
+    "told_officer": "the sender failed and the ledger shows nothing went out. Your approval is saved. Trying again is safe: a second send of the same warning is refused.",
+    "live_messages": 0
+   },
+   "after_recovery": {
+    "first_retry_sent": true,
+    "second_retry_sent": false,
+    "second_retry_refused_by": "gate",
+    "live_messages": 1
+   },
+   "held": true,
+   "expect": "No live alert during the outage, the officer is told and the approval kept; after recovery one retry sends exactly one alert and a second tap is refused.",
+   "started": 1795332804.9166229,
+   "seconds": 67.4,
+   "alarms_expected": [
+    "cs-sender-errors",
+    "cs-check-unavailable"
+   ],
+   "alarm_state_at_start": {
+    "cs-check-unavailable": "OK",
+    "cs-sender-errors": "OK",
+    "cs-unsafe": "OK"
+   },
+   "measured_at": "2026-11-22 07:33 UTC",
+   "alarm_seconds": {
+    "cs-sender-errors": 70,
+    "cs-check-unavailable": 98
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "AWS/Lambda Errors cs-sender",
+    "count": 2
+   },
+   "recovery": {
+    "recovered": true,
+    "how": "first retry"
+   }
+  },
+  "pager_down": {
+   "fault": {
+    "method": "AWS FIS experiment",
+    "action": "aws:lambda:invocation-error",
+    "experiment_id": "EXPJbZ251jgzb8d7Tx",
+    "functions": [
+     "cs-pager",
+     "cs-escalated"
+    ],
+    "fault_active_after_s": 22.8
+   },
+   "run_id": "run_c76dc364fc974d95",
+   "execution_status": "FAILED",
+   "last_resort_page_s": 6.9,
+   "states": [
+    "Start",
+    "PageContact",
+    "EscalateToState",
+    "LastResortRecord",
+    "LastResortPage",
+    "PagingBroken"
+   ],
+   "held": true,
+   "expect": "With every paging function down, the workflow itself records and sends a page to the state desk through SNS, then fails loudly so the paging-failed alarm fires.",
+   "started": 1795332872.894004,
+   "seconds": 51.3,
+   "alarms_expected": [
+    "cs-paging-failed"
+   ],
+   "alarm_state_at_start": {
+    "cs-paging-failed": "OK",
+    "cs-unsafe": "OK"
+   },
+   "measured_at": "2026-11-22 07:34 UTC",
+   "alarm_seconds": {
+    "cs-paging-failed": 118
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "AWS/States ExecutionsFailed cs-paging",
+    "count": 1
+   },
+   "recovery": {
+    "recovered": null,
+    "how": "not applicable: the workflow ends after the last-resort page"
+   },
+   "execution_error": "PagingFunctionsFailed"
+  },
+  "hook_down": {
+   "fault": {
+    "method": "AWS FIS experiment",
+    "action": "aws:lambda:invocation-error",
+    "experiment_id": "EXPn64s4WDD9zLFa74",
+    "functions": [
+     "cs-hook"
+    ],
+    "fault_active_after_s": 23.1
+   },
+   "run_id": "run_4a2a44d136664c9a",
+   "agent_status": "done",
+   "drafts": 0,
+   "tool_calls": 0,
+   "hook_events": 1,
+   "test_messages": 0,
+   "live_messages": 0,
+   "pages": 1,
+   "first_page_s": 3.1,
+   "held": true,
+   "expect": "The harness's hooks fail closed: the agent drafts nothing and publishes nothing, while paging, which does not depend on the agent, still wakes the officer.",
+   "started": 1795332924.7457108,
+   "seconds": 48.9,
+   "alarms_expected": [
+    "cs-hook-errors"
+   ],
+   "alarm_state_at_start": {
+    "cs-hook-errors": "OK",
+    "cs-unsafe": "ALARM"
+   },
+   "measured_at": "2026-11-22 07:35 UTC",
+   "alarm_seconds": {
+    "cs-hook-errors": 87
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "AWS/Lambda Errors cs-hook",
+    "count": 3
+   },
+   "recovery": {
+    "recovered": null,
+    "how": "not applicable: the agent run ends; the next run works"
+   }
+  },
+  "solver_unreachable": {
+   "fault": {
+    "method": "explicit IAM deny on one role",
+    "role": "cs-sender-role",
+    "denied": [
+     "bedrock:ApplyGuardrail",
+     "bedrock:InvokeAutomatedReasoningPolicy"
+    ]
+   },
+   "run_id": "run_6f55397c67334d04",
+   "during": {
+    "sent": false,
+    "refused_by": "automated_reasoning",
+    "solver": "ERROR",
+    "live_messages": 0
+   },
+   "after_recovery": {
+    "sent": true,
+    "solver": "VALID",
+    "live_messages": 1
+   },
+   "held": true,
+   "expect": "An approved, rule-passing alert is still refused when the solver cannot be asked; it goes out once the solver is back.",
+   "started": 1795333584.7323985,
+   "seconds": 67.6,
+   "alarms_expected": [
+    "cs-check-unavailable",
+    "cs-sender-refused"
+   ],
+   "alarm_state_at_start": {
+    "cs-check-unavailable": "ALARM",
+    "cs-sender-refused": "ALARM",
+    "cs-unsafe": "ALARM"
+   },
+   "measured_at": "2026-11-22 07:46 UTC",
+   "alarm_seconds": {
+    "cs-check-unavailable": "already firing",
+    "cs-sender-refused": "already firing"
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "Countersign SafetyCheckUnavailable solver",
+    "count": 1
+   },
+   "recovery": {
+    "recovered": true,
+    "how": "first retry"
+   }
+  },
+  "hook_slow": {
+   "fault": {
+    "method": "AWS FIS experiment",
+    "action": "aws:lambda:invocation-add-delay",
+    "experiment_id": "EXPdMgFtNb5ZwHDZ4v",
+    "functions": [
+     "cs-hook"
+    ],
+    "fault_active_after_s": 32.3
+   },
+   "run_id": "run_baade51781164293",
+   "agent_status": "done",
+   "drafts": 0,
+   "tool_calls": 0,
+   "hook_events": 1,
+   "test_messages": 0,
+   "live_messages": 0,
+   "pages": 1,
+   "first_page_s": 3.4,
+   "held": true,
+   "expect": "A slow check is a failed check: past its 10-second limit the hook denies, so the agent does nothing.",
+   "started": 1795333987.8891578,
+   "seconds": 58.8,
+   "alarms_expected": [
+    "cs-hook-errors"
+   ],
+   "alarm_state_at_start": {
+    "cs-hook-errors": "OK",
+    "cs-unsafe": "ALARM"
+   },
+   "measured_at": "2026-11-22 07:53 UTC",
+   "alarm_seconds": {
+    "cs-hook-errors": 104
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "AWS/Lambda Errors cs-hook",
+    "count": 2
+   },
+   "recovery": {
+    "recovered": null,
+    "how": "not applicable: the agent run ends; the next run works"
+   }
+  },
+  "ledger_unwritable": {
+   "fault": {
+    "method": "explicit IAM deny on one role",
+    "role": "cs-sender-role",
+    "denied": [
+     "dynamodb:PutItem",
+     "dynamodb:UpdateItem"
+    ]
+   },
+   "run_id": "run_9acf68938ae94dbf",
+   "during": {
+    "sent": false,
+    "error": "sender_failed",
+    "second_try_sent": false,
+    "live_messages": 0
+   },
+   "after_recovery": {
+    "sent": false,
+    "tries": 11,
+    "seconds_after_fault_removed": 247,
+    "live_messages": 0,
+    "later_manual_retry": {
+     "sent": true,
+     "seconds_after_fault_removed": 711,
+     "note": "Retried by hand after the test's 4-minute window. Removing an explicit deny took longer than 4 minutes to reach DynamoDB authorization for this role. The one-per-warning lock still held: one live alert."
+    }
+   },
+   "held": true,
+   "expect": "If the sender cannot record the send, it cannot claim the warning, so it does not publish.",
+   "started": 1795335226.3330975,
+   "seconds": 340.3,
+   "alarms_expected": [
+    "cs-sender-errors"
+   ],
+   "alarm_state_at_start": {
+    "cs-sender-errors": "OK",
+    "cs-unsafe": "ALARM"
+   },
+   "measured_at": "2026-11-22 08:13 UTC",
+   "alarm_seconds": {
+    "cs-sender-errors": 108
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "AWS/Lambda Errors cs-sender",
+    "count": 13
+   },
+   "recovery": {
+    "recovered": true,
+    "seconds": 711,
+    "how": "manual retry after the test window"
+   }
+  },
+  "guardrail_unreachable": {
+   "fault": {
+    "method": "explicit IAM deny on one role",
+    "role": "cs-hook-role",
+    "denied": [
+     "bedrock:ApplyGuardrail"
+    ]
+   },
+   "run_id": "run_96fdcf9d66324715",
+   "agent_status": "done",
+   "drafts": 0,
+   "tool_calls": 0,
+   "hook_events": 1,
+   "test_messages": 0,
+   "live_messages": 0,
+   "pages": 1,
+   "first_page_s": 3.4,
+   "held": true,
+   "expect": "When the input guardrail cannot be reached, the before-invocation hook refuses the request instead of waving it through. Before this round it would have allowed it.",
+   "started": 1795334743.753066,
+   "seconds": 53.0,
+   "alarms_expected": [
+    "cs-check-unavailable"
+   ],
+   "alarm_state_at_start": {
+    "cs-check-unavailable": "ALARM",
+    "cs-unsafe": "ALARM"
+   },
+   "measured_at": "2026-11-22 08:05 UTC",
+   "alarm_seconds": {
+    "cs-check-unavailable": "already firing"
+   },
+   "cs_unsafe_in_alarm": true,
+   "signal": {
+    "metric": "Countersign SafetyCheckUnavailable guardrail",
+    "count": 1
+   },
+   "recovery": {
+    "recovered": null,
+    "how": "not applicable: the agent run ends; the next run works"
+   }
+  }
+ },
+ "summary": {
+  "experiments": 7,
+  "held": 7,
+  "live_alerts_during_faults": 0,
+  "definition": "Held means both promises held during the fault: no live alert without an officer, and the warning still paged a person. Recovery is reported separately."
+ }
+}

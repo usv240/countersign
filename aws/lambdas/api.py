@@ -257,7 +257,23 @@ def decide(run_id: str, b: dict) -> dict:
         if b.get("confirm_whole_county"):
             payload["whole_area_confirmed_by"] = officer
         r = boto3.client("lambda").invoke(FunctionName=SENDER, Payload=json.dumps(payload).encode())
-        out["send"] = json.loads(r["Payload"].read())
+        res = json.loads(r["Payload"].read() or b"{}")
+        if r.get("FunctionError"):
+            # The sender crashed or was unreachable. Say so plainly: the approval is saved, and trying again is
+            # safe because the one-per-warning lock refuses a second send. The cs-sender-errors alarm also fires.
+            metric("SafetyCheckUnavailable", Check="sender")
+            # It may have failed before publishing or after. The ledger, not the reply, says which.
+            went = [x for x in from_ddb(table(T_LEDGER).query(KeyConditionExpression=Key("pk").eq(f"SENT#{run_id}"))["Items"])
+                    if x.get("draft_id") == draft_id and x.get("state") == "sent"]
+            if went:
+                res = {"sent": True, "message_id": went[0].get("message_id"), "error": "sender_reply_lost",
+                       "decision": {"outcome": "send_ok", "summary": "the sender failed after publishing; the ledger "
+                                    "shows the alert went out."}}
+            else:
+                res = {"sent": False, "error": "sender_failed", "decision": {"outcome": "error", "summary": (
+                    "the sender failed and the ledger shows nothing went out. Your approval is saved. Trying again "
+                    "is safe: a second send of the same warning is refused.")}}
+        out["send"] = res
     return out
 
 

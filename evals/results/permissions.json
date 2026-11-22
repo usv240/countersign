@@ -1,0 +1,522 @@
+{
+ "measured_at": "2026-11-22 06:09 UTC",
+ "method": "IAM Access Analyzer CheckAccessNotGranted on every policy of every role; CheckNoPublicAccess; ValidatePolicy",
+ "roles": [
+  "tools",
+  "hook",
+  "sender",
+  "api",
+  "runner",
+  "pager",
+  "recorder",
+  "sfn",
+  "gateway",
+  "harness"
+ ],
+ "matrix": [
+  {
+   "id": "live",
+   "what": "Publish to the live alert channel",
+   "only": [
+    "sender"
+   ],
+   "roles": {
+    "tools": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "hook": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sender": {
+     "granted": true,
+     "expected": true,
+     "ok": true,
+     "reasons": [
+      "One or more of the listed actions and/or resources in the statement with index: 4."
+     ]
+    },
+    "api": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "runner": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "pager": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "recorder": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sfn": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "gateway": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "harness": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    }
+   }
+  },
+  {
+   "id": "sender",
+   "what": "Invoke the sender, the only code that publishes live",
+   "only": [
+    "api"
+   ],
+   "roles": {
+    "tools": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "hook": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sender": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "api": {
+     "granted": true,
+     "expected": true,
+     "ok": true,
+     "reasons": [
+      "One or more of the listed actions and/or resources in the statement with index: 5."
+     ]
+    },
+    "runner": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "pager": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "recorder": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sfn": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "gateway": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "harness": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    }
+   }
+  },
+  {
+   "id": "approve",
+   "what": "Write, change or delete an officer's approval",
+   "only": [
+    "api"
+   ],
+   "roles": {
+    "tools": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "hook": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sender": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "api": {
+     "granted": true,
+     "expected": true,
+     "ok": true,
+     "reasons": [
+      "One or more of the listed actions and/or resources in the statement with index: 2."
+     ]
+    },
+    "runner": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "pager": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "recorder": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sfn": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "gateway": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "harness": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    }
+   }
+  },
+  {
+   "id": "stop_paging",
+   "what": "End the paging (complete or stop the workflow)",
+   "only": [
+    "api"
+   ],
+   "roles": {
+    "tools": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "hook": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sender": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "api": {
+     "granted": true,
+     "expected": true,
+     "ok": true,
+     "reasons": [
+      "One or more of the listed actions in the statement with index: 4."
+     ]
+    },
+    "runner": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "pager": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "recorder": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sfn": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "gateway": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "harness": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    }
+   }
+  },
+  {
+   "id": "silence",
+   "what": "Switch off the alarms or the paging channel",
+   "only": [],
+   "roles": {
+    "tools": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "hook": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sender": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "api": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "runner": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "pager": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "recorder": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sfn": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "gateway": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "harness": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    }
+   }
+  },
+  {
+   "id": "rewrite",
+   "what": "Change its own rules, code or permissions",
+   "only": [],
+   "roles": {
+    "tools": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "hook": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sender": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "api": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "runner": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "pager": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "recorder": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "sfn": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "gateway": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    },
+    "harness": {
+     "granted": false,
+     "expected": false,
+     "ok": true,
+     "reasons": []
+    }
+   }
+  }
+ ],
+ "checks": 60,
+ "wrong": 0,
+ "public": [
+  {
+   "resource": "tools role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "hook role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "sender role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "api role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "runner role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "pager role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "recorder role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "sfn role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "gateway role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "harness role trust policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "live topic policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "pager topic policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "test topic policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "cs-sender function policy",
+   "result": "PASS",
+   "note": "no resource policy"
+  },
+  {
+   "resource": "cs-tools function policy",
+   "result": "PASS",
+   "note": "no resource policy"
+  },
+  {
+   "resource": "cs-hook function policy",
+   "result": "PASS",
+   "note": "no resource policy"
+  },
+  {
+   "resource": "cs-api function policy",
+   "result": "PASS"
+  },
+  {
+   "resource": "site bucket policy (CloudFront only)",
+   "result": "PASS"
+  }
+ ],
+ "lint": {
+  "ERROR": 0,
+  "SECURITY_WARNING": 0,
+  "WARNING": 0,
+  "SUGGESTION": 0
+ },
+ "lint_findings": []
+}

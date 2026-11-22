@@ -44,6 +44,29 @@ def main():
     if ax.exists():
         d = json.loads(ax.read_text())
         print(f"Accessibility: {d['totals']['violations']} axe WCAG 2.2 AA violations in {d['totals']['pages']} page views")
+    p = R / "screenreader.json"
+    if p.exists():
+        d = json.loads(p.read_text())
+        k = d["transcript_kept"]
+        print(f"Screen reader replay: {d['announcement_count']} announcements for {d['events_replayed']} events, "
+              f"transcript {'appended, not rebuilt' if k['same_node'] else 'REBUILT'}, open panel "
+              f"{'kept' if k['details_open'] else 'LOST'}")
+    p = R / "permissions.json"
+    if p.exists():
+        d = json.loads(p.read_text())
+        print(f"Access Analyzer: {d['checks'] - d['wrong']} of {d['checks']} role and permission pairs as designed; "
+              f"{sum(x['result'] == 'PASS' for x in d['public'])} of {len(d['public'])} policies not public; "
+              f"lint errors {d['lint'].get('ERROR', 0)}")
+    p = R / "chaos.json"
+    if p.exists():
+        d = json.loads(p.read_text())
+        for k, e in d["experiments"].items():
+            print(f"Chaos {k:22s} {'held' if e.get('held') else 'DID NOT HOLD'}  alarms {e.get('alarm_seconds')}")
+    p = R / "cost.json"
+    if p.exists():
+        d = json.loads(p.read_text())
+        print(f"Cost: ${d['per_warning_usd']} per warning (${d['model']['usd_without_cache']} model cost without caching), "
+              f"${d['kerr_night']['usd']} for the {d['kerr_night']['warnings']} Kerr County warnings")
 
 
 if __name__ == "__main__":

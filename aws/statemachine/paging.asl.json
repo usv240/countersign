@@ -1,5 +1,5 @@
 {
-  "Comment": "Countersign paging: page the call list until a human decides. Only an officer's decision, through the approval service, ends it. The agent has no permission here. A failing pager is retried, then escalated to the state desk: an error can never end the paging quietly.",
+  "Comment": "Countersign paging: page the call list until a human decides. Only an officer's decision, through the approval service, ends it. The agent has no permission here. A failing pager is retried, then escalated to the state desk; if the paging functions themselves are down, the workflow pages the state desk directly through SNS, with no Lambda in the path, and then fails so the paging-failed alarm fires. An error can never end the paging quietly.",
   "StartAt": "Start",
   "States": {
     "Start": {
@@ -58,6 +58,15 @@
           ],
           "IntervalSeconds": 2,
           "MaxAttempts": 4,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        },
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 2,
           "BackoffRate": 2.0,
           "JitterStrategy": "FULL"
         }
@@ -136,6 +145,24 @@
           "MaxAttempts": 6,
           "BackoffRate": 2.0,
           "JitterStrategy": "FULL"
+        },
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.pager_error",
+          "Next": "LastResortRecord"
         }
       ]
     },
@@ -171,11 +198,123 @@
           "MaxAttempts": 4,
           "BackoffRate": 2.0,
           "JitterStrategy": "FULL"
+        },
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 2,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.pager_error",
+          "Next": "LastResortRecord"
         }
       ]
     },
     "Decided": {
       "Type": "Succeed"
+    },
+    "LastResortRecord": {
+      "Type": "Task",
+      "Comment": "Written by Step Functions itself, so the review page shows the page even with every paging function down.",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "cs-ledger",
+        "Item": {
+          "pk": {
+            "S.$": "States.Format('CHANNEL#{}', $.run_id)"
+          },
+          "sk": {
+            "S": "999999999999#page#last-resort"
+          },
+          "channel": {
+            "S": "pager"
+          },
+          "body": {
+            "M": {
+              "contact": {
+                "M": {
+                  "name": {
+                    "S": "State warning point"
+                  },
+                  "role": {
+                    "S": "24-hour state desk, direct"
+                  }
+                }
+              },
+              "text": {
+                "S": "Countersign's paging functions failed. This page was sent by the workflow itself. An official warning needs a decision."
+              },
+              "warning": {
+                "S.$": "$.warning_title"
+              },
+              "sent_at": {
+                "S.$": "$$.State.EnteredTime"
+              },
+              "last_resort": {
+                "BOOL": true
+              }
+            }
+          }
+        }
+      },
+      "ResultPath": null,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 5,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.record_error",
+          "Next": "LastResortPage"
+        }
+      ],
+      "Next": "LastResortPage"
+    },
+    "LastResortPage": {
+      "Type": "Task",
+      "Comment": "A page with no Lambda in the path.",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${PagerTopicArn}",
+        "Message.$": "States.Format('Countersign LAST RESORT page to the state warning point (24-hour desk): the county paging functions failed. Warning: {}. Run: {}. Open the review page.', $.warning_title, $.run_id)"
+      },
+      "ResultPath": null,
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 5,
+          "BackoffRate": 2.0,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "PagingBroken"
+    },
+    "PagingBroken": {
+      "Type": "Fail",
+      "Error": "PagingFunctionsFailed",
+      "Cause": "The paging functions failed; the state desk was paged directly. The cs-paging-failed alarm fires on this."
     }
   }
 }

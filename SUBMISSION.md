@@ -44,14 +44,14 @@ An overnight duty officer is one person, often asleep, often the only one traine
 I treated the model as the weakest layer and the prompt as a request. Every rule is enforced at least once in a place the model cannot argue with.
 
 1. **AgentCore managed harness.** Claude Sonnet 4.6, a tool allowlist of exactly six tools from one gateway (no shell, files, browser or web), memory off, at most 24 steps, 60,000 tokens and 300 seconds.
-2. **Bedrock Guardrails, in a before-invocation hook.** The prompt attack filter and a denied topic for credentials, applied to the words a person types and nothing else.
+2. **Bedrock Guardrails, in a before-invocation hook.** The prompt attack filter and a denied topic for credentials, applied to the words a person types and nothing else. If the guardrail cannot be reached, the message is refused.
 3. **A before-tool-call hook (Lambda, fails closed).** It denies any tool outside the six, any argument that names a channel, approval or officer, any area or class outside the allowed values, any over-length text, and any "concern" for the officer that is really a recommendation.
 4. **AgentCore Gateway with AgentCore Policy (Cedar).** Default deny. Each of the six tools has one permit, for the harness's IAM role only, and the draft tool's permit checks the area and class values. There is no live-send tool on the gateway at all.
 5. **The tool code.** Every draft is checked against all ten rules by the same rule engine the sender uses. The area is computed by code from the warning's own polygon, clipped to the county; the model cannot supply one. A warning id must match the official feed.
 6. **IAM.** Every agent-side role has explicit denies on the live topic, the approvals table and the sender function.
-7. **Step Functions paging.** Started by the API when a run starts, not by the agent. It pages Officer A, then B, then C, round after round, then the state warning point. Only an officer's decision, through the approval service, completes its task token. A failing pager is retried, and if it still fails the workflow escalates to the state desk: an error cannot end the paging quietly.
+7. **Step Functions paging.** Started by the API when a run starts, not by the agent. It pages Officer A, then B, then C, round after round, then the state warning point. Only an officer's decision, through the approval service, completes its task token. A failing pager is retried, and if it still fails the workflow escalates to the state desk: an error cannot end the paging quietly. If every paging function is down, the workflow writes the page and publishes it to the state desk itself, with no Lambda in the path.
 8. **The sender, check one.** The only code allowed to publish live re-runs the rule engine on records it reads from storage, never on the request. It then claims the warning with a conditional DynamoDB write before publishing, so two approvals arriving at once cannot both send.
-9. **The sender, check two: Automated Reasoning checks.** The release rules are a formal-logic policy. The solver must return VALID for the facts of this release, or nothing is sent.
+9. **The sender, check two: Automated Reasoning checks.** The release rules are a formal-logic policy. The solver must return VALID for the facts of this release, or nothing is sent. If the solver cannot be asked, nothing is sent.
 
 ## Testing it
 
@@ -77,11 +77,31 @@ I assumed the model was fully compromised and sent the forbidden calls myself, s
 
 I ran every local phone alert in FEMA's archive from 2023 to 2025 (about 10,000) through the area, wording and class rules. Fifty-three were later retracted by their own senders as sent in error. The rules would have stopped 43 of them, 81%, for a person to look at. They also stop 46% of ordinary alerts, mostly by asking an officer to confirm a whole-county alert on purpose. That is the cost, and I would rather show it than hide it: the message rules are not a mistake detector, which is exactly why a second person signs.
 
+### Breaking it on purpose
+
+Rules that hold while everything works are half the claim. I broke the deployed stack on purpose: AWS Fault Injection Service experiments made a Lambda function fail or stall on real invocations, and IAM denies took one dependency away from one role for one test. After each, the fault was removed and the same action was tried again.
+
+| Fault | What happened | Alarm |
+|---|---|---|
+| The sender fails (FIS) | Officer approves: 0 live alerts, and the officer is told nothing went out and the approval is kept. After recovery the retry sends once; a second tap is refused. | 2 on AWS/Lambda Errors cs-sender; cs-sender-errors fired in 1.2 min |
+| Both paging functions fail (FIS) | The workflow pages the state desk itself, through SNS with no Lambda in the path, 6.9 s after paging starts, then fails on purpose. | 1 on AWS/States ExecutionsFailed cs-paging; cs-paging-failed fired in 2.0 min |
+| The tool-call check fails (FIS) | 0 drafts, 0 test messages: the hooks fail closed. Paging is not the agent's, so the officer is paged in 3.1 s. | 3 on AWS/Lambda Errors cs-hook; cs-hook-errors fired in 1.4 min |
+| The tool-call check stalls 15 s, past its 10 s limit (FIS) | 0 drafts, 0 test messages. A slow check is a failed check. Paged in 3.4 s. | 2 on AWS/Lambda Errors cs-hook; cs-hook-errors fired in 1.7 min |
+| The solver cannot be asked (IAM deny) | An approved alert that passes every rule is refused, solver ERROR. Deny removed: it sends. | 1 on Countersign SafetyCheckUnavailable solver; cs-check-unavailable already firing from the test before |
+| The input guardrail cannot be reached (IAM deny) | The request is refused, not waved through: 0 drafts. Paged in 3.4 s. | 1 on Countersign SafetyCheckUnavailable guardrail; cs-check-unavailable already firing from the test before |
+| The sender cannot write the ledger (IAM deny) | It cannot claim the warning, so it does not publish: 0 live alerts on two tries. After the deny was removed, retries were still refused for over 4 minutes; one retry about 12 minutes later sent exactly once. | 13 on AWS/Lambda Errors cs-sender; cs-sender-errors fired in 1.8 min |
+
+**7 of 7 held both promises**: nothing reached the live channel without an officer, and no warning was left unanswered. The composite alarm cs-unsafe was firing during every one. Recovery is a separate question, and one answer surprised me: after the ledger deny was removed, the sender was still refused for more than four minutes, and sent on a retry about twelve minutes later. My first run of that test called it a failure because it checked once, 20 seconds after the fix. The safety held throughout; the lesson is operational. After an IAM fix, sends can stay refused for minutes, so the officer is told nothing went out and that retrying is safe. Two of these would have gone differently before this round, and both are under What broke.
+
+### Who can do what, proved
+
+The policy simulator tries one request at a time. IAM Access Analyzer's CheckAccessNotGranted reasons over the policy document itself and answers for every possible request. I asked it six questions about every policy on all ten roles: who can publish live, invoke the sender, write an approval, end the paging, switch off an alarm or the paging channel, and change a guardrail, the solver policy, the harness, the Gateway, a Cedar policy, function code or IAM. **60 of 60 answers are as designed**: exactly one role for each of the first four, none for the last two. CheckNoPublicAccess found nothing public in 18 trust, topic, function and bucket policies.
+
 ## Running it
 
 A rule nobody can see being enforced is hard to trust, so every layer reports what it did.
 
-**Observability.** Each function writes its decisions as CloudWatch metrics in Embedded Metric Format: tool calls the hook denied, by reason code; releases the sender refused, by layer; rule outcomes; live sends; pages; escalations; API latency. The AgentCore harness emits OpenTelemetry spans for the agent loop, every model call and every tool call, and X-Ray carries the same trace through the API, both hooks and the paging workflow, so one run is one trace from the HTTP request to the last page. Thirteen alarms watch safety, not only uptime: a release the sender refused, a hook error (it fails closed, so the agent stops), paging that failed, an escalation to the state desk, a spike of denied tool calls, work stuck in the dead-letter queue. A composite alarm, cs-unsafe, is the one to wake someone for. The site's Operations page reads all of it live.
+**Observability.** Each function writes its decisions as CloudWatch metrics in Embedded Metric Format: tool calls the hook denied, by reason code; releases the sender refused, by layer; rule outcomes; live sends; pages; escalations; API latency. The AgentCore harness emits OpenTelemetry spans for the agent loop, every model call and every tool call, and X-Ray carries the same trace through the API, both hooks and the paging workflow, so one run is one trace from the HTTP request to the last page. Fourteen alarms watch safety, not only uptime: a release the sender refused, a hook error (it fails closed, so the agent stops), a safety check that could not run, paging that failed, an escalation to the state desk, a spike of denied tool calls, work stuck in the dead-letter queue. A composite alarm, cs-unsafe, is the one to wake someone for. The site's Operations page reads all of it live.
 
 **Scale and concurrency.** Measured on the deployed stack with `evals/scale.py`:
 
@@ -94,7 +114,11 @@ A rule nobody can see being enforced is hard to trust, so every layer reports wh
 
 Everything is serverless and on demand (Lambda, DynamoDB on-demand, Step Functions Standard, SNS), so nothing sits idle between storms. County is part of every key, so a second county is a second set of rows, not a second deployment.
 
-**Accessibility.** An alert desk is used at 1 AM by a tired person, possibly on a phone. Every page passes axe-core's automated WCAG 2.2 AA rules with 0 failures across 32 page views (8 pages, light and dark, desktop and phone). Every tab stop shows visible focus, nothing scrolls sideways at 320 px or at 200% text, and nothing animates when reduced motion is set. The first audit found 20 failures: info buttons smaller than a 24 px touch target, glossary terms with an ARIA attribute their role did not allow, tables that scrolled sideways but could not be reached by keyboard, and one low-contrast heading row. All are fixed. Automated checks find only part of the problems, and no screen-reader user has tested it yet. The alerts themselves are always drafted in English and Spanish.
+**Accessibility.** An alert desk is used at 1 AM by a tired person, possibly on a phone. Every page passes axe-core's automated WCAG 2.2 AA rules with 0 failures across 32 page views (8 pages, light and dark, desktop and phone). Every tab stop shows visible focus, nothing scrolls sideways at 320 px or at 200% text, and nothing animates when reduced motion is set. The first audit found 20 failures: info buttons smaller than a 24 px touch target, glossary terms with an ARIA attribute their role did not allow, tables that scrolled sideways but could not be reached by keyboard, and one low-contrast heading row. All are fixed. The desk changes every two seconds while the agent works, so I replayed a real recorded run into it and recorded what a screen reader is given: the transcript is appended to rather than rebuilt, so nothing is read twice and an open panel stays open, and a polite live region says one sentence per change, refusals first. That test found an ordering bug, below. Automated checks find only part of the problems, and no screen-reader user has tested it yet. The alerts themselves are always drafted in English and Spanish.
+
+**Cost.** The traced run drafted a Kerr County warning with 61,309 input tokens, 85% of them read from the prompt cache, and 4,765 output tokens. At the AWS Price List rates for Claude Sonnet 4.6 the model costs $0.13; with both checks, the functions, the workflow and storage, **$0.14 a warning**, and about $1.90 for all 14 Kerr County warnings and updates that night. Between storms nothing runs, and the alarms cost $2.60 a month.
+
+The threat model, with every threat mapped to the layer that stops it and the result that shows it, and what is not stopped, is in `docs/THREAT-MODEL.md`.
 
 ## What broke
 
@@ -114,6 +138,16 @@ Everything is serverless and on demand (Lambda, DynamoDB on-demand, Step Functio
 
 **The escalation step had never written a log line.** After 50 paging workflows escalated, the Escalated metric still read zero. The escalation function shares the pager's IAM role, which could write logs only for the pager. It had always worked, but had it failed, nothing would have shown it. The role now names both.
 
+**Two checks waved things through when they could not run.** Writing the fault tests, I asked each check what it does when it cannot run. Two said yes. A sender deployed without its solver configuration skipped the solver and sent on the rule engine alone; the input hook without its guardrail allowed the message. Neither was ever misconfigured, but one missing variable in a deploy would have removed a layer and nobody would have seen. Both now refuse, count it, and raise a new alarm, cs-check-unavailable. The IAM-deny tests above take each away for real.
+
+**With every paging function down, nobody would have been paged.** A failing pager was retried and escalated, but the escalation was a Lambda function too. Had both failed, the workflow would have ended in an error whose only signal was an alarm on a topic nobody subscribes to yet. The workflow now records the page and publishes it to the state desk itself, then fails so the alarm fires. With both functions failed by FIS, the state desk was paged 6.9 seconds after paging started.
+
+**An officer approving during a sender outage would have seen a script error.** The approval service passed the sender's crash report straight back, and the page read a field that was not there. It now checks the send ledger, says plainly whether anything went out, and keeps the approval, so a retry is safe.
+
+**My IAM policies named permissions that do not exist.** Access Analyzer's ValidatePolicy flagged bedrock:Converse and bedrock:ConverseStream: Converse is authorised as InvokeModel, so the lines granted nothing. Harmless, but a policy that says something it does not do misleads the next person who reads it. Removed; 0 findings.
+
+**A tool's result could appear above the call that made it.** The screen-reader replay names each result's tool, and some results had no name: the call had not been shown yet. Events written in the same second were ordered by a random suffix. They now carry the millisecond and a counter.
+
 **The archive's digital signatures do not verify.** I tried to prove records official with their IPAWS signatures. Every one failed, because the archive stores a copy that is not byte-exact. Official status now comes only from fetching the warning from the National Weather Service.
 
 ## The one thing I learned
@@ -126,12 +160,12 @@ An agent that can act needs two kinds of rule, and only one of them is a refusal
 - **Test your data:** paste any CAP alert, National Weather Service alert or OpenFEMA record, edit the draft, and see all ten rules. Run a debate between two models and compare it with the rules.
 - **Developers:** get a free API key and call the same check from your own code.
 - **Proof:** every table above, built from the saved results, with the command that recounts them.
-- **Operations:** live CloudWatch numbers for what each layer stopped, every alarm, one agent run traced end to end, the load tests and the accessibility audit.
+- **Operations:** live CloudWatch numbers for what each layer stopped, every alarm, one agent run traced end to end, the load tests, the fault experiments, who can do what, the cost of a warning, and the accessibility audit with what a screen reader hears.
 
 ## Limits
 
-No real phone receives an alert: the live channel is an SNS topic standing in for IPAWS, which needs a FEMA agreement. Two runs per attack is a sample. People reached is an estimate. Facts the agent flags are not verified by code. The paging demo uses short timeouts so you can watch it move.
+No real phone receives an alert: the live channel is an SNS topic standing in for IPAWS, which needs a FEMA agreement. Two runs per attack is a sample. People reached is an estimate. Facts the agent flags are not verified by code. The paging demo uses short timeouts so you can watch it move. Officer identity is a per-run browser token; a real office needs single sign-on with MFA behind each name. One region: paging survives a function outage, not a regional one. The full list is in the threat model.
 
 ## Built with
 
-Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Amazon Bedrock Guardrails with Automated Reasoning checks, Claude Sonnet 4.6, Claude Haiku 4.5 and Amazon Nova Pro and Lite on Amazon Bedrock, AWS Lambda, AWS Step Functions, Amazon DynamoDB, Amazon SNS, AWS IAM, Amazon API Gateway, Amazon CloudFront, Amazon S3, Amazon CloudWatch, AWS X-Ray with AgentCore Observability, and Amazon SQS. Data: FEMA OpenFEMA IPAWS archive, National Weather Service API, US Census Bureau TIGERweb.
+Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Amazon Bedrock Guardrails with Automated Reasoning checks, Claude Sonnet 4.6, Claude Haiku 4.5 and Amazon Nova Pro and Lite on Amazon Bedrock, AWS Lambda, AWS Step Functions, Amazon DynamoDB, Amazon SNS, AWS IAM, Amazon API Gateway, Amazon CloudFront, Amazon S3, Amazon CloudWatch, AWS X-Ray with AgentCore Observability, Amazon SQS, AWS Fault Injection Service and IAM Access Analyzer. Data: FEMA OpenFEMA IPAWS archive, National Weather Service API, US Census Bureau TIGERweb.

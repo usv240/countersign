@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import boto3  # noqa: E402
 
-from common import (T_DRAFTS, from_ddb, metric, load_preset, new_id, now, nws_active_for_county, nws_alert,  # noqa: E402
+from common import (T_DRAFTS, event_sk, from_ddb, metric, load_preset, new_id, now, nws_active_for_county, nws_alert,  # noqa: E402
                     table, to_ddb)
 from countersign.cap import from_nws_feature, from_openfema  # noqa: E402
 from countersign.gate import evaluate  # noqa: E402
@@ -70,7 +70,7 @@ def find_warning(cfg: dict, warning_id: str):
 
 
 def audit(run_id: str, kind: str, body: dict) -> None:
-    table(T_DRAFTS).put_item(Item=to_ddb({"pk": f"RUN#{run_id}", "sk": f"EVENT#{now():012d}#{new_id()}",
+    table(T_DRAFTS).put_item(Item=to_ddb({"pk": f"RUN#{run_id}", "sk": event_sk(),
                                            "kind": kind, "body": body, "at": now()}))
 
 

@@ -41,6 +41,18 @@ def now() -> int:
     return int(time.time())
 
 
+_event_seq = 0
+
+
+def event_sk(tag: str = "") -> str:
+    """Sort key for a run's event, in the order it happened: second, millisecond, then a per-process counter.
+    The second stays first so older events (second plus a random suffix) still sort with these."""
+    global _event_seq
+    _event_seq += 1
+    t = time.time()
+    return f"EVENT#{int(t):012d}#{int(t * 1000) % 1000:03d}{_event_seq:06d}{tag or uuid.uuid4().hex[:4]}"
+
+
 def new_id(prefix: str = "") -> str:
     return prefix + uuid.uuid4().hex[:16]
 

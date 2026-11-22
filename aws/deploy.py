@@ -187,9 +187,9 @@ def roles(t: dict, st: dict) -> dict:
         {"Effect": "Allow", "Action": "sns:Publish", "Resource": live},
         {"Effect": "Allow", "Action": "bedrock:ApplyGuardrail", "Resource": [
             f"arn:aws:bedrock:*:{ACCOUNT}:guardrail/{st['ar_guardrail_id']}",
-            f"arn:aws:bedrock:*:{ACCOUNT}:guardrail-profile/*", "arn:aws:bedrock:*:*:guardrail-profile/*"]},
+            "arn:aws:bedrock:*:*:guardrail-profile/*"]},
         {"Effect": "Allow", "Action": "bedrock:InvokeAutomatedReasoningPolicy",
-         "Resource": [st["ar_policy_version_arn"], st["ar_policy_arn"], st["ar_policy_arn"] + ":*"]}])
+         "Resource": [st["ar_policy_arn"], st["ar_policy_arn"] + ":*"]}])
     r["api"] = role(f"{P}-api-role", lam_trust, [
         logs_stmt(f"{P}-api"),
         {"Effect": "Allow", "Action": rw, "Resource": [arn_table(TABLES["drafts"]), arn_table(TABLES["ledger"]),
@@ -199,7 +199,7 @@ def roles(t: dict, st: dict) -> dict:
          "Resource": f"arn:aws:states:{REGION}:{ACCOUNT}:stateMachine:{P}-paging"},
         {"Effect": "Allow", "Action": ["states:SendTaskSuccess", "states:SendTaskFailure"], "Resource": "*"},
         {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": [arn_fn(f"{P}-runner"), arn_fn(f"{P}-sender")]},
-        {"Effect": "Allow", "Action": ["bedrock:InvokeModel", "bedrock:Converse"], "Resource": model_res},
+        {"Effect": "Allow", "Action": "bedrock:InvokeModel", "Resource": model_res},  # Converse is authorised as InvokeModel
         {"Effect": "Allow", "Action": ["cloudwatch:GetMetricData", "cloudwatch:DescribeAlarms"], "Resource": "*"},
         deny_live])
     r["runner"] = role(f"{P}-runner-role", lam_trust, [
@@ -218,6 +218,9 @@ def roles(t: dict, st: dict) -> dict:
         {"Effect": "Allow", "Action": "sqs:SendMessage", "Resource": f"arn:aws:sqs:{REGION}:{ACCOUNT}:{P}-dlq"}])
     r["sfn"] = role(f"{P}-paging-role", trust("states.amazonaws.com"), [
         {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": [arn_fn(f"{P}-pager"), arn_fn(f"{P}-escalated")]},
+        # The last-resort page: with every paging function down, the workflow records and sends the page itself.
+        {"Effect": "Allow", "Action": "dynamodb:PutItem", "Resource": arn_table(TABLES["ledger"])},
+        {"Effect": "Allow", "Action": "sns:Publish", "Resource": pager}, deny_live,
         {"Effect": "Allow", "Action": ["xray:PutTraceSegments", "xray:PutTelemetryRecords", "xray:GetSamplingRules",
                                        "xray:GetSamplingTargets"], "Resource": "*"},
         {"Effect": "Allow", "Action": ["logs:CreateLogDelivery", "logs:GetLogDelivery", "logs:UpdateLogDelivery",
@@ -233,8 +236,9 @@ def roles(t: dict, st: dict) -> dict:
         "StringEquals": {"aws:SourceAccount": ACCOUNT},
         "ArnLike": {"aws:SourceArn": [f"arn:aws:bedrock-agentcore:{REGION}:{ACCOUNT}:harness/*",
                                       f"arn:aws:bedrock-agentcore:{REGION}:{ACCOUNT}:runtime/*"]}}), [
-        {"Effect": "Allow", "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream",
-                                       "bedrock:Converse", "bedrock:ConverseStream"],
+        # Converse and ConverseStream are authorised as these two; "bedrock:Converse" is not an IAM action
+        # (IAM Access Analyzer's ValidatePolicy flagged it, see evals/permissions.py).
+        {"Effect": "Allow", "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
          "Resource": [f"arn:aws:bedrock:{REGION}:{ACCOUNT}:inference-profile/{AGENT_MODEL}",
                       f"arn:aws:bedrock:{REGION}:{ACCOUNT}:inference-profile/us.amazon.nova-lite-v1:0",
                       "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6",
@@ -329,6 +333,7 @@ def subscriptions(t: dict):
 def state_machine(r: dict) -> str:
     asl = (AWS / "statemachine" / "paging.asl.json").read_text()
     asl = asl.replace("${PagerArn}", arn_fn(f"{P}-pager")).replace("${EscalatedArn}", arn_fn(f"{P}-escalated"))
+    asl = asl.replace("${PagerTopicArn}", f"arn:aws:sns:{REGION}:{ACCOUNT}:{P}-pager-channel")
     name = f"{P}-paging"
     arn = f"arn:aws:states:{REGION}:{ACCOUNT}:stateMachine:{name}"
     try:

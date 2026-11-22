@@ -78,11 +78,34 @@
     <p class="small muted" style="margin-top:8px" id="load-note"></p>
   </section>
 
+  <section aria-labelledby="ch-h">
+    <h2 id="ch-h">When parts fail<button class="i" data-tip-title="How the faults were made" data-tip="python evals/chaos.py on the deployed stack. AWS Fault Injection Service experiments make a function fail or stall on real invocations. An explicit IAM deny, attached for one test and then removed, takes a dependency away from one role. Every experiment ends by removing the fault and trying the same action again."></button></h2>
+    <p id="ch-lead">Loading the chaos experiments.</p>
+    <div class="table-wrap"><table class="data" id="chaos"></table></div>
+    <p class="small muted" style="margin-top:8px" id="ch-note"></p>
+  </section>
+
+  <section aria-labelledby="pm-h">
+    <h2 id="pm-h">Who can do what<button class="i" data-tip-title="Proved, not sampled" data-tip="IAM Access Analyzer's CheckAccessNotGranted reasons over each policy document with automated reasoning and answers for every possible request, not one test request. It runs on every policy of all ten roles."></button></h2>
+    <p id="pm-lead"></p>
+    <div class="table-wrap"><table class="data" id="perm"></table></div>
+    <p class="small muted" style="margin-top:8px" id="pm-note"></p>
+  </section>
+
+  <section aria-labelledby="co-h">
+    <h2 id="co-h">What a warning costs<button class="i" data-tip-title="Where prices come from" data-tip="Tokens from the traced run's AgentCore spans. Model, guardrail and solver prices from the AWS Price List API when python evals/cost.py ran. Lambda, Step Functions, DynamoDB and SNS at published us-east-1 on-demand rates."></button></h2>
+    <div class="tiles" id="cost-tiles"></div>
+    <p class="small muted" style="margin-top:8px" id="co-note"></p>
+  </section>
+
   <section aria-labelledby="ax-h">
     <h2 id="ax-h">Accessibility<button class="i" data-tip-title="What was checked" data-tip="axe-core 4.10.2 against WCAG 2.2 A and AA on every page, light and dark, desktop and phone, plus keyboard focus on every tab stop, reflow at 320 px, 200% text and reduced motion."></button></h2>
     <p id="ax-lead"></p>
     <div class="table-wrap"><table class="data" id="a11y"></table></div>
     <p class="small muted" style="margin-top:8px" id="ax-note"></p>
+    <h3 class="sub" id="sr-h">What a screen reader hears at the desk</h3>
+    <p id="sr-lead"></p>
+    <ol class="heard" id="sr-list"></ol>
   </section>
 
   <section aria-labelledby="lk-h">

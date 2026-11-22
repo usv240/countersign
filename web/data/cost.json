@@ -1,0 +1,57 @@
+{
+ "measured_at": "2026-11-22 07:32 UTC",
+ "run_id": "run_74dd1b7866e549ee",
+ "model": {
+  "input_tokens_total": 61309,
+  "cache_read_tokens": 52135,
+  "uncached_input_tokens": 9174,
+  "output_tokens": 4765,
+  "usd": 0.1337,
+  "usd_without_cache": 0.2809,
+  "prices_per_million": {
+   "input": {
+    "usd": 3.3,
+    "usagetype": "USE1-MP:USE1_InputTokenCount-Units"
+   },
+   "output": {
+    "usd": 16.5,
+    "usagetype": "USE1-MP:USE1_OutputTokenCount-Units"
+   },
+   "cache_read": {
+    "usd": 0.33,
+    "usagetype": "USE1-MP:USE1_CacheReadInputTokenCount-Units"
+   },
+   "cache_write": {
+    "usd": 4.125,
+    "usagetype": "USE1-MP:USE1_CacheWriteInputTokenCount-Units"
+   }
+  }
+ },
+ "infrastructure": {
+  "lambda_usd": 0.00095,
+  "step_functions_usd": 0.0003,
+  "dynamodb_usd": 5.3e-05,
+  "sns_usd": 4e-06
+ },
+ "checks": {
+  "input_guardrail_usd": 0.0003,
+  "automated_reasoning_usd": 0.00034,
+  "prices_per_text_unit": {
+   "content": 0.00015,
+   "topic": 0.00015,
+   "reasoning": 0.00017
+  }
+ },
+ "per_warning_usd": 0.136,
+ "idle_month_usd": {
+  "alarms": 2.6,
+  "dashboard_if_over_free_tier": 3.0,
+  "everything_else": 0.0,
+  "note": "Lambda, Step Functions, DynamoDB on demand and SNS cost nothing between storms."
+ },
+ "kerr_night": {
+  "warnings": 14,
+  "source": "data/raw/kerr-county-2025-07-04.json (FEMA IPAWS archive, Flash Flood Warnings and updates for Kerr County, 1 AM to noon local, July 4, 2025)",
+  "usd": 1.9
+ }
+}

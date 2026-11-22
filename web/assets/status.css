@@ -74,3 +74,17 @@ td.nw { white-space: nowrap; }
   .wf-row .nm .short { display: inline; }
   table.data .job { display: none; }
 }
+
+/* chaos, permissions, screen reader */
+h3.sub { font-family: var(--serif); font-size: 20px; letter-spacing: -0.01em; margin: 28px 0 6px; }
+.data td.obs { max-width: 46ch; }
+.data td.obs span { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.perm td, .perm th { text-align: center; }
+.perm td:first-child, .perm th:first-child { text-align: left; }
+.perm .can { font-weight: 600; color: var(--pass); }
+.perm .no { color: var(--muted); }
+ol.heard { margin: 8px 0 0; padding-left: 22px; display: grid; gap: 4px; max-width: 70ch; }
+ol.heard li { font-variant-numeric: tabular-nums; }
+.tile.small-num b { font-size: 36px; }
+.cellnote { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; font-weight: 400; }
+.perm td:first-child { min-width: 17ch; }

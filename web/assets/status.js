@@ -201,14 +201,95 @@
     $("ax-note").textContent = `${a.standard}. ${a.limits} Measured ${a.measured_at} with python evals/a11y.py.`;
   }
 
+  // ---------- chaos ----------
+  const CHAOS = {
+    sender_down: ["The sender fails", "FIS: every invocation of cs-sender errors", (e) => {
+      const d = e.during || {}, a = e.after_recovery || {};
+      return [`Officer approves: ${d.live_messages ?? "?"} live alerts. The officer is told: "${d.told_officer || ""}"`,
+        `After recovery: the retry ${a.first_retry_sent ? "sends" : "does not send"}, a second tap ${a.second_retry_sent ? "also sends" : "is refused"}; ${a.live_messages ?? "?"} live alert in all.`];
+    }],
+    pager_down: ["Both paging functions fail", "FIS: every invocation of cs-pager and cs-escalated errors", (e) => [
+      `The workflow pages the state desk itself, through SNS with no Lambda in the path, after ${e.last_resort_page_s ?? "?"} s.`,
+      `Then it ends ${String(e.execution_status || "").toLowerCase()} on purpose, so the paging alarm fires.`]],
+    hook_down: ["The tool-call check fails", "FIS: every invocation of cs-hook errors", (e) => [
+      `The agent drafts ${e.drafts ?? "?"} alerts and publishes ${e.test_messages ?? "?"} tests: the hooks fail closed.`,
+      `Paging does not depend on the agent: first page after ${e.first_page_s ?? "?"} s.`]],
+    hook_slow: ["The tool-call check stalls", "FIS: 15 seconds added to cs-hook; its limit is 10", (e) => [
+      `A slow check is a failed check: ${e.drafts ?? "?"} drafts, ${e.test_messages ?? "?"} tests.`,
+      `First page after ${e.first_page_s ?? "?"} s.`]],
+    solver_unreachable: ["The solver cannot be asked", "IAM deny on the sender's role for Automated Reasoning", (e) => {
+      const d = e.during || {}, a = e.after_recovery || {};
+      return [`An approved alert that passes every rule is refused (solver: ${d.solver || "?"}); ${d.live_messages ?? "?"} live alerts.`,
+        `Deny removed: it ${a.sent ? "sends" : "does not send"} (solver: ${a.solver || "?"}).`];
+    }],
+    guardrail_unreachable: ["The input guardrail cannot be reached", "IAM deny on the hook's role for Bedrock Guardrails", (e) => [
+      `The request is refused, not waved through: ${e.drafts ?? "?"} drafts, ${e.live_messages ?? "?"} live.`,
+      `First page after ${e.first_page_s ?? "?"} s.`]],
+    ledger_unwritable: ["The sender cannot record a send", "IAM deny on the sender's role for writes to the ledger", (e) => {
+      const d = e.during || {}, a = e.after_recovery || {};
+      return [`It cannot claim the warning, so it does not publish: ${d.live_messages ?? "?"} live alerts.`,
+        a.later_manual_retry ? `Deny removed: still refused for over ${Math.floor((a.seconds_after_fault_removed || 0) / 60)} minutes while IAM caught up; a retry ${Math.round(a.later_manual_retry.seconds_after_fault_removed / 60)} minutes later sent exactly once.` : a.sent ? "Deny removed: it sends once." : "Deny removed: it did not send."];
+    }],
+  };
+
+  function chaos(c) {
+    if (!c || !c.experiments) { $("ch-lead").textContent = "Not run yet."; return; }
+    const rows = Object.keys(CHAOS).filter((k) => c.experiments[k]);
+    const held = rows.filter((k) => c.experiments[k].held).length;
+    $("ch-lead").innerHTML = `<strong>${held} of ${rows.length} faults held both promises</strong>: no live alert without an officer, and the warning never left unanswered. Each row is a real fault on the deployed stack.`;
+    $("chaos").innerHTML = `<thead><tr><th>Fault</th><th>What happened</th><th>Alarm</th><th></th></tr></thead><tbody>${rows.map((k) => {
+      const e = c.experiments[k], [title, how, obs] = CHAOS[k];
+      const [a, b] = e.error ? [e.error, ""] : obs(e);
+      const sig = e.signal ? `${e.signal.count} on ${e.signal.metric}. ` : "";
+      const al = sig + Object.entries(e.alarm_seconds || {}).map(([n, t]) => (t == null ? `${n}: did not fire` : typeof t === "string" ? `${n} ${t} from the test before` : `${n} fired in ${t} s`)).join("; ") + (e.cs_unsafe_in_alarm ? ". cs-unsafe firing." : "");
+      return `<tr><td><b>${esc(title)}</b><span class="cellnote">${esc(how)}</span></td><td class="obs">${esc(a)}<span>${esc(b)}</span></td><td class="obs">${esc(al || "none expected")}</td><td>${pill(e.held ? "pass" : "fail", e.held ? "held" : "did not hold")}</td></tr>`;
+    }).join("")}</tbody>`;
+    $("ch-note").textContent = "Alarm times are seconds from the start of the fault and include CloudWatch's metric delay. cs-unsafe is the composite alarm to wake someone for. Re-run with python evals/chaos.py setup, then run, then clean.";
+  }
+
+  // ---------- permissions ----------
+  function perm(p) {
+    if (!p) return;
+    const roles = p.roles;
+    $("pm-lead").innerHTML = `<strong>${p.checks - p.wrong} of ${p.checks}</strong> role and permission pairs are exactly as designed. Only the sender can publish live; only the approval service can invoke the sender, write an approval or end the paging; no role can silence an alarm or change its own rules. ${p.public.filter((x) => x.result === "PASS").length} of ${p.public.length} policies grant nothing public.`;
+    $("perm").classList.add("perm");
+    $("perm").innerHTML = `<thead><tr><th>Can it...</th>${roles.map((r) => `<th>${esc(r)}</th>`).join("")}</tr></thead><tbody>${p.matrix.map((m) =>
+      `<tr><td>${esc(m.what)}</td>${roles.map((r) => { const x = m.roles[r]; return `<td class="${x.granted ? "can" : "no"}">${x.granted ? "yes" : "no"}${x.ok ? "" : " (wrong)"}</td>`; }).join("")}</tr>`).join("")}</tbody>`;
+    const lint = p.lint || {};
+    $("pm-note").textContent = `${p.method}. Policy lint: ${lint.ERROR || 0} errors, ${lint.SECURITY_WARNING || 0} security warnings. Measured ${p.measured_at} with python evals/permissions.py.`;
+  }
+
+  // ---------- cost ----------
+  function cost(c) {
+    if (!c) return;
+    const m = c.model;
+    const usd = (n) => "$" + Number(n).toFixed(2);
+    $("cost-tiles").innerHTML = [
+      [usd(c.per_warning_usd), "to draft one warning: model, checks, functions, workflow and storage"],
+      [usd(m.usd_without_cache), `the same run without prompt caching; ${Math.round((100 * m.cache_read_tokens) / m.input_tokens_total)}% of input tokens were cache reads`],
+      [usd(c.kerr_night.usd), `for all ${c.kerr_night.warnings} Kerr County warnings and updates on the night of July 4, 2025`],
+      ["$0", `in compute between storms: everything runs on demand. The 14 alarms add ${usd(c.idle_month_usd.alarms)} a month`],
+    ].map(([n, t]) => `<div class="tile"><b>${esc(n)}</b><span>${esc(t)}</span></div>`).join("");
+    const pm = m.prices_per_million;
+    $("co-note").textContent = `Run ${c.run_id}: ${fmt(m.input_tokens_total)} input tokens (${fmt(m.cache_read_tokens)} from cache) and ${fmt(m.output_tokens)} output on Claude Sonnet 4.6, at ${pm.input.usd}, ${pm.cache_read.usd} and ${pm.output.usd} US dollars per million input, cached and output tokens. The dashboard adds 3 dollars a month only beyond CloudWatch's three free dashboards. Measured ${c.measured_at} with python evals/cost.py.`;
+  }
+
+  // ---------- screen reader ----------
+  function sr(r) {
+    if (!r) return;
+    const k = r.transcript_kept || {};
+    $("sr-lead").innerHTML = `A real recorded run (${esc(r.run_id)}, ${r.events_replayed} events) replayed into the desk as it arrived. The transcript is ${k.same_node ? "appended to, never rebuilt" : "rebuilt on every poll"}, so an open panel ${k.details_open ? "stays open" : "closes"} and nothing is read twice. A polite live region says one sentence per change, refusals first. ${esc(r.limits)}`;
+    $("sr-list").innerHTML = r.announcements.map((t) => `<li>${esc(t)}</li>`).join("");
+  }
+
   function where() {
     const W = [
       ["CloudWatch dashboard: Countersign", "Safety, agent, paging, API and infrastructure in one view, with the AgentCore spans as a table.", "aws/observability.py"],
       ["Logs Insights", "Every refusal is a structured line. Try it on the hook's log group:", "filter event = \"hook_deny\" | stats count(*) by code"],
       ["Traces", "AgentCore spans land in aws/spans; X-Ray joins them to the API, hooks and paging. One trace per run.", "python evals/trace.py <run_id>"],
-      ["Alarms and the ops topic", "13 alarms publish to the cs-ops SNS topic. Subscribe a phone to be woken by cs-unsafe.", "aws sns subscribe --topic-arn <cs-ops> --protocol sms"],
+      ["Alarms and the ops topic", "14 alarms publish to the cs-ops SNS topic. Subscribe a phone to be woken by cs-unsafe.", "aws sns subscribe --topic-arn <cs-ops> --protocol sms"],
       ["Dead-letter queue", "Agent runs are never retried, so a failed run lands in cs-dlq at once; the recorder retries twice first. Paging is separate and does not depend on either.", "cs-dlq"],
-      ["Measure it again", "Every number on this page below the alarms comes from a script in the repository.", "python evals/scale.py all && python evals/a11y.py"],
+      ["Measure it again", "Every number on this page below the alarms comes from a script in the repository.", "python evals/scale.py all && python evals/chaos.py run && python evals/permissions.py"],
     ];
     $("where").innerHTML = W.map(([h, p, c]) => `<div class="panel where"><h3>${esc(h)}</h3><p>${esc(p)}</p><code>${esc(c)}</code></div>`).join("");
   }
@@ -217,8 +298,9 @@
     where();
     $("refresh").addEventListener("click", live);
     live();
-    const [t, sc, a] = await Promise.all([data("trace"), data("scale"), data("a11y")]);
-    trace(t); scale(sc); a11y(a);
+    const [t, sc, a, ch, pm, co, srr] = await Promise.all([data("trace"), data("scale"), data("a11y"), data("chaos"),
+      data("permissions"), data("cost"), data("screenreader")]);
+    trace(t); scale(sc); a11y(a); chaos(ch); perm(pm); cost(co); sr(srr);
     window.CS_wire(document);
   });
 })();

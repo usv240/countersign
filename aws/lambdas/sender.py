@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import boto3  # noqa: E402
 from boto3.dynamodb.conditions import Key  # noqa: E402
 
-from common import T_APPROVALS, T_DRAFTS, T_LEDGER, from_ddb, load_preset, log_event, metric, now, table, to_ddb  # noqa: E402
+from common import T_APPROVALS, T_DRAFTS, T_LEDGER, event_sk, from_ddb, load_preset, log_event, metric, now, table, to_ddb  # noqa: E402
 from countersign.cap import from_openfema  # noqa: E402
 from countersign.gate import evaluate  # noqa: E402
 from countersign.geo import load_jurisdiction  # noqa: E402
@@ -54,7 +54,9 @@ def facts_sentence(d: dict, kind: str) -> str:
 
 def ar_check(d: dict, kind: str) -> dict:
     if not AR_GUARDRAIL:
-        return {"status": "SKIPPED", "detail": "Automated Reasoning guardrail not configured."}
+        # Fails closed: a sender deployed without its solver cannot release anything. (It used to skip the check.)
+        metric("SafetyCheckUnavailable", Check="solver")
+        return {"status": "NOT_CONFIGURED", "detail": "The Automated Reasoning guardrail is not configured."}
     rt = boto3.client("bedrock-runtime")
     query = "Facts: " + facts_sentence(d, kind) + " Question: may this live alert be released?"
     answer = "Yes. The live alert may be released."
@@ -64,6 +66,7 @@ def ar_check(d: dict, kind: str) -> dict:
                                         {"text": {"text": answer, "qualifiers": ["guard_content"]}}])
     except Exception as e:
         print("AR_ERROR", repr(e))
+        metric("SafetyCheckUnavailable", Check="solver")
         return {"status": "ERROR", "detail": type(e).__name__}
     findings = []
     for a in r.get("assessments", []):
@@ -76,6 +79,8 @@ def ar_check(d: dict, kind: str) -> dict:
 
 
 def handler(event, _context):
+    if event.get("probe"):  # health probe used by evals/chaos.py to see whether a fault is active; touches nothing
+        return {"probe": "ok"}
     run_id, draft_id, kind = event["run_id"], event["draft_id"], event.get("kind", "alert")
     drafts = table(T_DRAFTS)
     cfg = from_ddb(drafts.get_item(Key={"pk": f"RUN#{run_id}", "sk": "CONFIG"})["Item"])
@@ -103,7 +108,7 @@ def handler(event, _context):
                  whole_area_confirmed_by=event.get("whole_area_confirmed_by"))
         d = evaluate(p, w, jur, sent_registry=sent_keys, local_places=cfg.get("local_places") or []).to_dict()
         ar = ar_check(d, kind) if d["outcome"] == "send_ok" else {"status": "NOT_RUN", "detail": "Gate said no."}
-        ok = d["outcome"] == "send_ok" and ar["status"] in ("VALID", "SKIPPED")
+        ok = d["outcome"] == "send_ok" and ar["status"] == "VALID"
     result = {"sent": False, "decision": d, "automated_reasoning": ar}
     metric("SendAttempt", Kind=kind)
     claim = None
@@ -151,6 +156,6 @@ def handler(event, _context):
                            ExpressionAttributeNames={"#s": "status"},
                            ExpressionAttributeValues={":s": "sent" if kind == "alert" else "corrected", ":n": now()})
         result.update({"sent": True, "message_id": mid})
-    drafts.put_item(Item=to_ddb({"pk": f"RUN#{run_id}", "sk": f"EVENT#{now():012d}#send-{draft_id}-{kind}",
+    drafts.put_item(Item=to_ddb({"pk": f"RUN#{run_id}", "sk": event_sk(f"send-{draft_id}-{kind}"),
                                  "kind": "send_attempt", "body": result, "at": now()}))
     return result

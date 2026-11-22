@@ -4,7 +4,17 @@
   const $ = (s) => document.querySelector(s);
   let A, esc, I;
   let presets = [], attacks = [], selected = "kerr-2025-0114";
-  let runId = null, token = null, pollTimer = null, geoCache = {}, lastDraftKey = "", seen = 0;
+  let runId = null, token = null, pollTimer = null, geoCache = {}, lastDraftKey = "", seen = 0, lastPage = "";
+  const toolNames = {};
+
+  /* Screen readers hear one short sentence per change, not the whole transcript again. */
+  function announce(text) {
+    const el = document.getElementById("sr-announce");
+    if (!el || !text) return;
+    el.textContent = "";
+    setTimeout(() => { el.textContent = text; }, 60);
+  }
+  const headOf = (html) => { const d = document.createElement("div"); d.innerHTML = html; const b = d.querySelector("b"); return b ? b.textContent.trim() : ""; };
   const OFFICERS = [["Officer A", "Duty officer"], ["Officer B", "Deputy coordinator"], ["Officer C", "Emergency management coordinator"]];
 
   function tokens() { try { return JSON.parse(localStorage.getItem("cs-officer") || "{}"); } catch (e) { return {}; } }
@@ -43,7 +53,7 @@
       const r = await window.CS_api("/api/runs", { body });
       runId = r.run_id; token = r.officer_token; saveToken(runId, token);
       history.replaceState(null, "", `?run=${runId}`);
-      seen = 0; lastDraftKey = "";
+      seen = 0; lastDraftKey = ""; lastPage = "";
       $("#transcript").innerHTML = `<div class="thinking"><span class="spinner"></span>The agent is starting. Sessions take a few seconds to open.</div>`;
       $("#start-status").textContent = `Run ${runId} started. You are its officer in this browser.`;
       poll();
@@ -61,6 +71,7 @@
     if (e.kind === "agent_text") return `<div class="step agent"><span class="ic">${I.dot}</span><div><b>The agent says</b><div class="what">${esc(plain(b.text))}</div></div></div>`;
     if (e.kind === "tool_call") {
       const name = String(b.tool || "").split("___").pop();
+      if (b.id) toolNames[b.id] = name;
       const input = typeof b.input === "object" ? b.input : {};
       const brief = name === "draft_alert" ? (input.text_360 || "") : name === "submit_for_review" ? (input.concerns || []).join(" ") : "";
       return `<div class="step"><span class="ic">${I.arrow}</span><div><b>Calls ${esc(name)}</b>${brief ? `<div class="what">${esc(brief)}</div>` : ""}
@@ -69,7 +80,8 @@
     if (e.kind === "tool_result") {
       let r = b.result; let txt = typeof r === "string" ? r : JSON.stringify(r);
       const denied = /AuthorizeAction|policy enforcement|"error"/.test(txt);
-      let head = denied ? "A layer refused it" : "Tool result";
+      const tn = toolNames[b.id];
+      let head = denied ? `A layer refused ${tn || "the call"}` : (tn ? `${tn} answered` : "Tool result");
       if (/AuthorizeAction|policy enforcement/.test(txt)) head = "Refused by the Cedar policy";
       let short = "";
       try { const o = typeof r === "string" ? JSON.parse(r) : r; short = o.error || o.summary || o.note || ""; } catch (x) { short = ""; }
@@ -106,6 +118,7 @@
       return `<li class="${now ? "now" : ""}"><span>${esc(n)}, ${esc(role)}</span><span>${now ? `Paged now${left ? `, next in ${left}` : ""}` : ""}</span></li>`;
     });
     if (current === "State warning point") rows.push(`<li class="now"><span>State warning point, 24-hour desk</span><span>Escalated</span></li>`);
+    if ((run.channel || []).some((c) => c.body && c.body.last_resort)) rows.push(`<li class="now"><span>State warning point, paged directly by the workflow</span><span>Paging functions failed</span></li>`);
     if (decided) rows.unshift(`<li class="done"><span>Paging ended: ${esc(pg.decided || "a decision was made")}</span><span></span></li>`);
     if (!pg.at && !decided) rows.unshift(`<li><span>Paging starts with Officer A</span><span>Round 1</span></li>`);
     else if (pg.round) rows.unshift(`<li><span>Round ${pg.round}</span><span>${timeout}s per person</span></li>`);
@@ -203,10 +216,29 @@
       $("#run-id").textContent = `Run ${runId}`;
       const html = run.events.map(stepHtml).filter(Boolean);
       const status = run.config.agent_status;
-      if (html.length !== seen || status === "done" || status === "error") {
+      const tr = $("#transcript");
+      // Append only the new steps, so open details stay open and assistive technology is not re-read the list.
+      if (tr.dataset.run !== runId || html.length < seen) { tr.innerHTML = ""; tr.dataset.run = runId; seen = 0; }
+      if (html.length > seen) {
+        const think = tr.querySelector(".thinking");
+        const fresh = html.slice(seen).join("");
+        if (think) think.insertAdjacentHTML("beforebegin", fresh); else tr.insertAdjacentHTML("beforeend", fresh);
+        // One sentence per poll: a refusal first, then the newest tool call, then anything else.
+        const heads = html.slice(seen).map(headOf).filter(Boolean);
+        const pickLast = (re) => heads.filter((h) => re.test(h)).pop();
+        const key = pickLast(/^(Refused|A layer refused|The sender refused|Error)/) || pickLast(/^(Calls|Sent live)/) || heads[heads.length - 1];
+        if (key) announce(heads.length > 1 ? `${key}. ${heads.length} new steps.` : `${key}.`);
         seen = html.length;
-        $("#transcript").innerHTML = (html.join("") || "") + (status === "running" || status === "queued"
-          ? `<div class="thinking"><span class="spinner"></span>The agent is working...</div>` : "");
+      }
+      const working = status === "running" || status === "queued";
+      const think = tr.querySelector(".thinking");
+      if (working && !think) tr.insertAdjacentHTML("beforeend", `<div class="thinking"><span class="spinner"></span>The agent is working...</div>`);
+      if (!working && think) { think.remove(); if (status === "done") announce("The agent has finished."); if (status === "error") announce("The agent stopped with an error."); }
+      const pg = run.paging || {};
+      const pageKey = pg.done ? `done:${pg.decided || ""}` : (pg.contact && pg.contact.name) || "";
+      if (pageKey && pageKey !== lastPage) {
+        if (lastPage || !pg.done) announce(pg.done ? `Paging ended: ${pg.decided || "a decision was made"}.` : `Paging ${pg.contact.name}, round ${pg.round || 1}.`);
+        lastPage = pageKey;
       }
       renderPaging(run); renderPhones(run); await renderReview(run);
       const done = (status === "done" || status === "error") && run.paging && run.paging.done;

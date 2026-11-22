@@ -142,7 +142,11 @@ def alarms(st: dict, ops: str, dlq_arn: str) -> list[str]:
     alarm("dlq", "Background work failed after its retries and is waiting in the dead-letter queue.",
           {"Namespace": "AWS/SQS", "MetricName": "ApproximateNumberOfMessagesVisible",
            "Dimensions": [{"Name": "QueueName", "Value": f"{P}-dlq"}], "Statistic": "Maximum"})
-    rule = " OR ".join(f'ALARM("{P}-{n}")' for n in ("sender-errors", "hook-errors", "paging-failed", "dlq"))
+    alarm("check-unavailable", "A safety check could not run: the input guardrail, the solver or the sender was "
+          "unreachable. Each fails closed, so drafts or sends are being refused until it is back.",
+          m("SafetyCheckUnavailable"))
+    rule = " OR ".join(f'ALARM("{P}-{n}")' for n in ("sender-errors", "hook-errors", "paging-failed", "dlq",
+                                                     "check-unavailable"))
     cw.put_composite_alarm(AlarmName=f"{P}-unsafe", AlarmRule=rule, ActionsEnabled=True, AlarmActions=[ops],
                            OKActions=[ops], AlarmDescription="Any failure that could stop an alert or stop paging. "
                            "This is the one to wake someone for.")

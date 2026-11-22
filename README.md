@@ -67,13 +67,18 @@ All recountable with `python evals/recount.py` (no AWS account needed).
 | Public API at 5 to 40 requests a second, 1,500 requests | **0 server errors**; p95 116 ms at 20/s; clean 429s above the throttle |
 | 50 counties paged at once | 50 of 50 reached a person (first page p95 8.4 s), all escalated |
 | axe-core WCAG 2.2 AA, 8 pages, light and dark, desktop and phone | **0 failures** in 32 page views |
+| A real agent run replayed into the desk, as a screen reader receives it | appended, never rebuilt; one announcement per change, refusals first |
+| IAM Access Analyzer on all 10 roles: who can send live, invoke the sender, approve, end paging, silence alarms, rewrite rules | **60 of 60** as designed; 0 public; 0 policy errors |
+| Chaos on the deployed stack (AWS FIS and IAM denies): sender, pagers, hook down or stalled, solver, guardrail, ledger unreachable | **7 of 7 held**: no live alert without an officer, the warning always paged |
+| Cost to draft one warning (Claude Sonnet 4.6, AWS Price List API) | **$0.14**; $1.90 for all 14 Kerr County warnings that night |
 
 ## Operations
 
 - **Metrics:** every function writes its decisions as CloudWatch Embedded Metric Format (`aws/lambdas/common.py`): hook denials by reason, sender refusals by layer, rule outcomes, live sends, pages, escalations, API latency.
 - **Traces:** the AgentCore harness emits OpenTelemetry spans (`aws/spans`); X-Ray joins them to the API, the hooks and the paging workflow. `python evals/trace.py <run_id>` exports one run.
-- **Alarms:** 13 alarms and the composite `cs-unsafe`, all to the `cs-ops` SNS topic; dashboard `Countersign`; dead-letter queue `cs-dlq`. `python aws/deploy.py obs`.
+- **Alarms:** 14 alarms and the composite `cs-unsafe`, including `cs-check-unavailable` when a safety check cannot run, all to the `cs-ops` SNS topic; dashboard `Countersign`; dead-letter queue `cs-dlq`. `python aws/deploy.py obs`.
 - **Live page:** `/status.html` reads CloudWatch through `GET /api/status` (cached 60 s).
+- **Threat model:** [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) maps each threat to the layer that stops it and the result that shows it, and lists what is not stopped.
 
 ## Run it
 
@@ -89,6 +94,10 @@ python evals/stress.py --runs 2 --profile hardened|naive|obedient
 python evals/below_model.py              # the model-removed probes
 python evals/scale.py all                # race, load ramp, 50-county paging fan-out
 python evals/a11y.py                     # axe-core WCAG 2.2 AA, keyboard, reflow, reduced motion
+python evals/screenreader.py             # replay a real run into the desk and record what is announced
+python evals/permissions.py              # IAM Access Analyzer: who can do each dangerous thing
+python evals/chaos.py setup && python evals/chaos.py run && python evals/chaos.py clean   # fault injection
+python evals/cost.py                     # cost per warning from the trace and the AWS Price List API
 ```
 
 ## Layout
@@ -97,7 +106,8 @@ python evals/a11y.py                     # axe-core WCAG 2.2 AA, keyboard, reflo
 - `rules/rules.yaml` the rule set, the single source of truth
 - `aws/lambdas/` tools, hook, sender, API, runner, pager, recorder, debate
 - `aws/deploy.py` one-command deploy; `aws/automated_reasoning.py` the solver policy
-- `evals/` stress test, model-removed probes, FEMA benchmark, recount
+- `evals/` stress test, model-removed probes, FEMA benchmark, scale, chaos, permissions, accessibility, cost, recount
+- `docs/THREAT-MODEL.md` threats, the layer that stops each, the evidence, and what is left
 - `web/` the site: landing page, alert desk, test lab, developers, proof, operations, how it works
 - `aws/observability.py` alarms, dashboard, dead-letter queue, tracing, access logs
 
@@ -107,6 +117,8 @@ python evals/a11y.py                     # axe-core WCAG 2.2 AA, keyboard, reflo
 - Two runs per attack is a sample. Transcripts are saved in `evals/results/`.
 - People reached is an estimate: the area's share of the county times its 2020 Census population.
 - Facts the agent flags for the officer are not verified by code; the officer always sees the source beside them.
+- Officer identity is a per-run browser token in the demo. A real office needs single sign-on with MFA behind each officer name.
+- One region. Paging survives a function outage, not a regional one.
 
 ## Data and credits
 

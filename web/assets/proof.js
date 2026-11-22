@@ -32,6 +32,21 @@
     ["The escalation step had never written a log line",
      "After adding metrics, 50 paging workflows escalated to the state desk and the Escalated metric still read zero. The escalation function shares the pager's IAM role, and that role could write logs only for the pager. The escalation function had worked from the start, but if it had ever failed, nothing would have shown it.",
      "The role now names both functions. The escalation function logs and counts every escalation, and the cs-escalated alarm watches it."],
+    ["Two checks waved things through when they could not run",
+     "Writing the fault tests, I asked each check what it does when it cannot run. Two said yes. A sender deployed without its solver configuration skipped the solver and sent on the rule engine alone; the input hook without its guardrail allowed the message. Neither was ever misconfigured, but one missing variable would have removed a layer silently.",
+     "Both now refuse, count it, and raise a new alarm, cs-check-unavailable. The chaos tests take each away with an IAM deny: the approved alert is refused until the solver is back, and the request is refused until the guardrail is back."],
+    ["With every paging function down, nobody would have been paged",
+     "A failing pager was retried and escalated, but the escalation was a Lambda function too. Had both failed, the workflow would have ended in an error whose only signal was an alarm on a topic nobody subscribes to yet.",
+     "The workflow now records the page and publishes it to the state desk itself, Step Functions calling DynamoDB and SNS directly, then fails so the alarm fires. With both functions failed by AWS Fault Injection Service, the state desk was paged 6.9 seconds after paging started."],
+    ["An officer approving during a sender outage would have seen a script error",
+     "The approval service passed the sender's crash report straight back, and the desk read a field that was not there.",
+     "It now checks the send ledger, says plainly whether anything went out, and keeps the approval. With the sender failed by FIS, the officer was told nothing went out; after recovery the retry sent once and a second tap was refused."],
+    ["My IAM policies named permissions that do not exist",
+     "IAM Access Analyzer's ValidatePolicy flagged bedrock:Converse and bedrock:ConverseStream. Converse is authorised as InvokeModel, so those lines granted nothing. Harmless, but a policy that says something it does not do misleads whoever reads it next.",
+     "Removed. ValidatePolicy now finds nothing on any of the ten roles."],
+    ["A tool's result could appear above the call that made it",
+     "The screen-reader replay names each tool result, and some had no name because their call had not been shown yet. Events written in the same second were ordered by a random suffix.",
+     "Every event now carries the millisecond and a counter, so the desk shows them in the order they happened."],
   ];
 
   const esc = (s) => window.CS_esc(s);

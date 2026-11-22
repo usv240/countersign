@@ -48,12 +48,20 @@ def before_invocation(ctx: dict) -> dict:
     if ctx.get("truncated"):
         return deny("the request was too large to check.", "too_large", "before_invocation")
     text = last_user_text(ctx)
-    if not text or not GUARDRAIL_ID:
+    if not text:
         metric("HookAllowed", Hook="before_invocation")
         return {"decision": "allow"}
-    r = boto3.client("bedrock-runtime").apply_guardrail(
-        guardrailIdentifier=GUARDRAIL_ID, guardrailVersion=GUARDRAIL_VERSION, source="INPUT",
-        content=[{"text": {"text": text[:20000]}}])
+    if not GUARDRAIL_ID:  # fails closed: without its guardrail the input check refuses instead of skipping
+        metric("SafetyCheckUnavailable", Check="guardrail")
+        return deny("the input guardrail is not configured.", "no_guardrail", "before_invocation")
+    try:
+        r = boto3.client("bedrock-runtime").apply_guardrail(
+            guardrailIdentifier=GUARDRAIL_ID, guardrailVersion=GUARDRAIL_VERSION, source="INPUT",
+            content=[{"text": {"text": text[:20000]}}])
+    except Exception as e:  # Bedrock unreachable or access removed: refuse, never wave the message through
+        print("GUARDRAIL_ERROR", repr(e))
+        metric("SafetyCheckUnavailable", Check="guardrail")
+        return deny("the input guardrail could not be reached.", "guardrail_error", "before_invocation")
     if r.get("action") == "GUARDRAIL_INTERVENED":
         found = []
         for a in r.get("assessments", []):
