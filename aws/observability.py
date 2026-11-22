@@ -11,7 +11,8 @@ What it sets up, all prefixed cs-:
   * CloudWatch dashboard "Countersign": safety, agent, paging, API and infrastructure in one view, including
     the AgentCore harness's own OpenTelemetry spans (aws/spans) for model and tool calls.
 
-Cost: 12 standard alarms and 1 composite alarm, about USD 1.70 a month; the dashboard is within the free three.
+Cost: 14 standard alarms (17 metrics with the metric-math ones) and 1 composite alarm, about USD 2.60 a month
+(see evals/cost.py); the dashboard is within the free three.
 Custom metrics come from Embedded Metric Format log lines (aws/lambdas/common.py: metric), so no PutMetricData calls.
 """
 from __future__ import annotations

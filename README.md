@@ -38,6 +38,8 @@ Every rule, in plain language, with what it can reach, what it must refuse and i
 
 ## Architecture
 
+![Countersign architecture: what the agent can reach, the IAM wall, and what only a person can trigger](docs/screenshots/11-architecture.jpg)
+
 ```
 person or warning
   -> Bedrock Guardrails (before-invocation hook, the person's words only)

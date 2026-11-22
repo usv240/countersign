@@ -70,7 +70,7 @@
   <section aria-labelledby="arch-h">
     <h2 id="arch-h">Architecture<button class="i" data-tip-title="How to read it" data-tip="Left: everything the agent can reach. Right: everything only a person can trigger. The dark wall between them is IAM: every role on the left has an explicit deny on the live channel, the approvals table and the sender function."></button></h2>
     <p>Left of the wall is everything the agent can reach. Right of it is what only a person can trigger. The wall is IAM, tested directly with the IAM policy simulator.</p>
-    <div class="panel"><svg class="arch" viewBox="0 0 1120 640" role="img" aria-labelledby="arch-title arch-desc">
+    <div class="panel"><svg class="arch" viewBox="0 0 1120 668" role="img" aria-labelledby="arch-title arch-desc">
       <title id="arch-title">Countersign architecture</title>
       <desc id="arch-desc">The agent side: Bedrock Guardrails hook, the AgentCore managed harness with Claude Sonnet 4.6, the tool-call hook, AgentCore Gateway with Cedar policy, and the tools Lambda that can publish only to the test channel. An IAM wall separates it from the person side: Step Functions paging, the officer's approval page, the approvals table, and the sender Lambda that runs the rule engine and the Automated Reasoning solver before publishing to the live channel. Sources on the right: National Weather Service, FEMA archive and Census boundaries.</desc>
       <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
@@ -109,7 +109,8 @@
       <rect class="box src" x="880" y="132" width="216" height="58" rx="8"/><text class="t" x="896" y="156">FEMA OpenFEMA archive</text><text class="s" x="896" y="176">Real alerts since 2012</text>
       <rect class="box src" x="880" y="208" width="216" height="58" rx="8"/><text class="t" x="896" y="232">Census TIGERweb</text><text class="s" x="896" y="252">County shapes, population</text>
       <path class="ln" d="M880,160 C840,160 840,300 800,300" marker-end="url(#ar)"/>
-      <path class="ln" d="M880,85 C850,85 850,600 300,600 L300,494" marker-end="url(#ar)"/>
+      <path class="ln" d="M1096,85 H1108 V632 H189 V500" marker-end="url(#ar)"/>
+      <text class="s" x="470" y="656">The tools' code fetches official warnings itself. The wall stops sending, not reading.</text>
     </svg></div>
   </section>
 
