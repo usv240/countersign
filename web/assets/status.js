@@ -268,7 +268,7 @@
       [usd(c.per_warning_usd), "to draft one warning: model, checks, functions, workflow and storage"],
       [usd(m.usd_without_cache), `the same run without prompt caching; ${Math.round((100 * m.cache_read_tokens) / m.input_tokens_total)}% of input tokens were cache reads`],
       [usd(c.kerr_night.usd), `for all ${c.kerr_night.warnings} Kerr County warnings and updates on the night of July 4, 2025`],
-      ["$0", `in compute between storms: everything runs on demand. The 14 alarms add ${usd(c.idle_month_usd.alarms)} a month`],
+      ["$0", `in compute between storms: everything runs on demand. The 15 alarms add ${usd(c.idle_month_usd.alarms)} a month`],
     ].map(([n, t]) => `<div class="tile"><b>${esc(n)}</b><span>${esc(t)}</span></div>`).join("");
     const pm = m.prices_per_million;
     $("co-note").textContent = `Run ${c.run_id}: ${fmt(m.input_tokens_total)} input tokens (${fmt(m.cache_read_tokens)} from cache) and ${fmt(m.output_tokens)} output on Claude Sonnet 4.6, at ${pm.input.usd}, ${pm.cache_read.usd} and ${pm.output.usd} US dollars per million input, cached and output tokens. The dashboard adds 3 dollars a month only beyond CloudWatch's three free dashboards. Measured ${c.measured_at} with python evals/cost.py.`;
@@ -287,7 +287,7 @@
       ["CloudWatch dashboard: Countersign", "Safety, agent, paging, API and infrastructure in one view, with the AgentCore spans as a table.", "aws/observability.py"],
       ["Logs Insights", "Every refusal is a structured line. Try it on the hook's log group:", "filter event = \"hook_deny\" | stats count(*) by code"],
       ["Traces", "AgentCore spans land in aws/spans; X-Ray joins them to the API, hooks and paging. One trace per run.", "python evals/trace.py <run_id>"],
-      ["Alarms and the ops topic", "14 alarms publish to the cs-ops SNS topic. Subscribe a phone to be woken by cs-unsafe.", "aws sns subscribe --topic-arn <cs-ops> --protocol sms"],
+      ["Alarms and the ops topic", "15 alarms publish to the cs-ops SNS topic. Subscribe a phone to be woken by cs-unsafe.", "aws sns subscribe --topic-arn <cs-ops> --protocol sms"],
       ["Dead-letter queue", "Agent runs are never retried, so a failed run lands in cs-dlq at once; the recorder retries twice first. Paging is separate and does not depend on either.", "cs-dlq"],
       ["Measure it again", "Every number on this page below the alarms comes from a script in the repository.", "python evals/scale.py all && python evals/chaos.py run && python evals/permissions.py"],
     ];

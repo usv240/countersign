@@ -3,7 +3,7 @@
   "use strict";
   const $ = (s) => document.querySelector(s);
   let A, esc, I;
-  let presets = [], attacks = [], selected = "kerr-2025-0114";
+  let presets = [], attacks = [], selected = "kerr-2025-0114", listPrompt = "";
   let runId = null, token = null, pollTimer = null, geoCache = {}, lastDraftKey = "", seen = 0, lastPage = "";
   const toolNames = {};
 
@@ -48,7 +48,8 @@
     btn.disabled = true;
     $("#start-status").textContent = "Starting the agent on AWS...";
     try {
-      const body = { message: $("#msg").value.trim() };
+      const message = $("#msg").value.trim();
+      const body = { message, message_source: message && message === listPrompt.trim() ? "list" : "typed" };
       if (selected === "live") body.county_geoid = $("#county").value.trim(); else body.preset_id = selected;
       const r = await window.CS_api("/api/runs", { body });
       runId = r.run_id; token = r.officer_token; saveToken(runId, token);
@@ -56,6 +57,7 @@
       seen = 0; lastDraftKey = ""; lastPage = "";
       $("#transcript").innerHTML = `<div class="thinking"><span class="spinner"></span>The agent is starting. Sessions take a few seconds to open.</div>`;
       $("#start-status").textContent = `Run ${runId} started. You are its officer in this browser.`;
+      pocket();
       poll();
     } catch (e) {
       $("#start-status").textContent = e.message;
@@ -100,6 +102,21 @@
         <div class="what">Code: ${esc(b.decision && b.decision.outcome)}. Solver: ${esc(b.automated_reasoning && b.automated_reasoning.status)}.</div></div></div>`;
     }
     return "";
+  }
+
+  /* The judge's own phone joins the run. The page it opens reads the same public run record as this desk. */
+  function pocket() {
+    const el = $("#pocket");
+    if (!el || !runId) return;
+    const url = new URL(`phone.html?run=${runId}`, location.href).href;
+    let svg = "";
+    try {
+      const qr = window.qrcode(0, "M"); qr.addData(url); qr.make();
+      svg = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true, alt: "QR code that opens this run's phone page" });
+    } catch (e) { svg = ""; }
+    el.innerHTML = `<div class="pocket">${svg ? `<div class="qr">${svg}</div>` : ""}
+      <div><p class="small">Scan with your phone, then tap <b>Put this phone in the county</b>. It stays silent through everything the agent does, and rings when you sign here.</p>
+      <p class="small"><a href="${url}" target="_blank" rel="noopener">Or open it in another window</a></p></div></div>`;
   }
 
   function renderPaging(run) {
@@ -191,7 +208,9 @@
       if (r.send) A.toast(r.send.sent ? "Sent to the live channel." : `Not sent: ${r.send.decision.summary}`);
       else A.toast(`${officer} ${decision}d it.`);
       lastDraftKey = "";
-      poll(true);
+      // Keep polling: the live channel row lands a moment after the sender answers.
+      poll();
+      if (window.CS_tally) setTimeout(window.CS_tally, 25000);
     } catch (e) { A.toast(e.message); }
   }
 
@@ -257,13 +276,13 @@
     $("#attacks").addEventListener("change", (e) => {
       const a = attacks.find((x) => x.id === e.target.value);
       if (!a) return;
-      $("#msg").value = a.prompt;
+      $("#msg").value = a.prompt; listPrompt = a.prompt;
       if (a.preset && presets.some((p) => p.id === a.preset)) { selected = a.preset; renderScenarios(); }
     });
     $("#start").addEventListener("click", start);
     $("#check-live").addEventListener("click", checkLive);
     const q = new URLSearchParams(location.search);
     if (q.get("preset") && presets.some((p) => p.id === q.get("preset"))) { selected = q.get("preset"); renderScenarios(); }
-    if (q.get("run")) { runId = q.get("run"); token = tokens()[runId] || null; poll(); }
+    if (q.get("run")) { runId = q.get("run"); token = tokens()[runId] || null; pocket(); poll(); }
   });
 })();

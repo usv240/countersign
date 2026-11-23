@@ -1,5 +1,5 @@
 {
- "measured_at": "2026-11-22 07:32 UTC",
+ "measured_at": "2026-11-23 04:31 UTC",
  "run_id": "run_74dd1b7866e549ee",
  "model": {
   "input_tokens_total": 61309,
@@ -44,7 +44,7 @@
  },
  "per_warning_usd": 0.136,
  "idle_month_usd": {
-  "alarms": 2.6,
+  "alarms": 2.7,
   "dashboard_if_over_free_tier": 3.0,
   "everything_else": 0.0,
   "note": "Lambda, Step Functions, DynamoDB on demand and SNS cost nothing between storms."

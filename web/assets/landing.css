@@ -233,3 +233,8 @@
 /* Section entrances, only when script runs; content is visible by default. */
 .rise-ready > * { opacity: 0; transform: translateY(20px); }
 .risen > * { opacity: 1; transform: none; transition: opacity 520ms ease, transform 700ms var(--ease-out); }
+
+/* The public tally, under the 22 and the 0 */
+.tally-wrap { max-width: 760px; margin: clamp(32px, 5vw, 56px) auto 0; }
+.tally-wrap h3 { font-family: var(--serif); font-weight: 600; font-size: var(--step-lead); margin: 0 0 14px; display: flex; align-items: center; }
+.stair-note a { color: var(--deep-ink); text-underline-offset: 3px; }

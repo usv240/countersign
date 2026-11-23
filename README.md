@@ -8,6 +8,10 @@ The weather service warns. The agent drafts. A person sends.
 - Code: https://github.com/usv240/countersign
 - Built for *Agents, your rules: Bedrock Managed Agents build* (AWS Builder Center, November 2026)
 - Runs on the **Amazon Bedrock AgentCore managed harness**
+- Try it with your phone: start a night on the alert desk and scan the code. Your phone stays silent through everything the agent does and rings only when you sign as the officer.
+- Three nights, two clocks (`nights.html`): each real night minute by minute from the public record, beside Countersign's measured run on the same record.
+
+![Kerr County, two clocks: the public record beside Countersign's measured run](docs/screenshots/12-nights.jpg)
 
 ## Why
 
@@ -68,9 +72,12 @@ All recountable with `python evals/recount.py` (no AWS account needed).
 | 12 approvals of one draft at the same instant | **1 live alert** (12 before the conditional-write fix) |
 | Public API at 5 to 40 requests a second, 1,500 requests | **0 server errors**; p95 116 ms at 20/s; clean 429s above the throttle |
 | 50 counties paged at once | 50 of 50 reached a person (first page p95 8.4 s), all escalated |
-| axe-core WCAG 2.2 AA, 8 pages, light and dark, desktop and phone | **0 failures** in 32 page views |
+| axe-core WCAG 2.2 AA, 10 pages, light and dark, desktop and phone | **0 failures** in 40 page views |
 | A real agent run replayed into the desk, as a screen reader receives it | appended, never rebuilt; one announcement per change, refusals first |
 | IAM Access Analyzer on all 10 roles: who can send live, invoke the sender, approve, end paging, silence alarms, rewrite rules | **60 of 60** as designed; 0 public; 0 policy errors |
+| The three real nights run on AWS, timed from the record's arrival | Kerr County: officer paged in 3 s, draft ready in 44 s, sent once after the signature. Hawaii and Los Angeles signed by one officer alone: **refused** |
+| The 16 attacks again, through the public site's front door | **0 live alerts**; paging started in 16 of 16 |
+| Every live alert checked at the phone end against the approval records (public tally) | **0 unsigned** |
 | Chaos on the deployed stack (AWS FIS and IAM denies): sender, pagers, hook down or stalled, solver, guardrail, ledger unreachable | **7 of 7 held**: no live alert without an officer, the warning always paged |
 | Cost to draft one warning (Claude Sonnet 4.6, AWS Price List API) | **$0.14**; $1.90 for all 14 Kerr County warnings that night |
 
@@ -78,7 +85,7 @@ All recountable with `python evals/recount.py` (no AWS account needed).
 
 - **Metrics:** every function writes its decisions as CloudWatch Embedded Metric Format (`aws/lambdas/common.py`): hook denials by reason, sender refusals by layer, rule outcomes, live sends, pages, escalations, API latency.
 - **Traces:** the AgentCore harness emits OpenTelemetry spans (`aws/spans`); X-Ray joins them to the API, the hooks and the paging workflow. `python evals/trace.py <run_id>` exports one run.
-- **Alarms:** 14 alarms and the composite `cs-unsafe`, including `cs-check-unavailable` when a safety check cannot run, all to the `cs-ops` SNS topic; dashboard `Countersign`; dead-letter queue `cs-dlq`. `python aws/deploy.py obs`.
+- **Alarms:** 15 alarms with the composite `cs-unsafe`, including `cs-check-unavailable` when a safety check cannot run and `cs-live-unsigned` when a live alert arrives with no approval on record, all to the `cs-ops` SNS topic; dashboard `Countersign`; dead-letter queue `cs-dlq`. `python aws/deploy.py obs`.
 - **Live page:** `/status.html` reads CloudWatch through `GET /api/status` (cached 60 s).
 - **Threat model:** [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) maps each threat to the layer that stops it and the result that shows it, and lists what is not stopped.
 
@@ -100,6 +107,9 @@ python evals/screenreader.py             # replay a real run into the desk and r
 python evals/permissions.py              # IAM Access Analyzer: who can do each dangerous thing
 python evals/chaos.py setup && python evals/chaos.py run && python evals/chaos.py clean   # fault injection
 python evals/cost.py                     # cost per warning from the trace and the AWS Price List API
+python evals/nights.py                   # the three real nights on the deployed stack, timed from the record's arrival
+python evals/site_attacks.py             # the 16 attacks again, through the public site
+python evals/tally_backfill.py           # once: count runs and live alerts recorded before the public tally existed
 ```
 
 ## Layout

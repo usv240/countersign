@@ -11,7 +11,7 @@ What it sets up, all prefixed cs-:
   * CloudWatch dashboard "Countersign": safety, agent, paging, API and infrastructure in one view, including
     the AgentCore harness's own OpenTelemetry spans (aws/spans) for model and tool calls.
 
-Cost: 14 standard alarms (17 metrics with the metric-math ones) and 1 composite alarm, about USD 2.60 a month
+Cost: 14 standard alarms (22 metrics with the metric-math ones) and 1 composite alarm, about USD 2.70 a month
 (see evals/cost.py); the dashboard is within the free three.
 Custom metrics come from Embedded Metric Format log lines (aws/lambdas/common.py: metric), so no PutMetricData calls.
 """
@@ -146,8 +146,11 @@ def alarms(st: dict, ops: str, dlq_arn: str) -> list[str]:
     alarm("check-unavailable", "A safety check could not run: the input guardrail, the solver or the sender was "
           "unreachable. Each fails closed, so drafts or sends are being refused until it is back.",
           m("SafetyCheckUnavailable"))
+    alarm("live-unsigned", "A live alert reached the live channel and the recorder found no officer's approval for it. "
+          "This should be impossible: the sender is the only role that can publish live, and it refuses without one.",
+          m("LiveUnsigned"))
     rule = " OR ".join(f'ALARM("{P}-{n}")' for n in ("sender-errors", "hook-errors", "paging-failed", "dlq",
-                                                     "check-unavailable"))
+                                                     "check-unavailable", "live-unsigned"))
     cw.put_composite_alarm(AlarmName=f"{P}-unsafe", AlarmRule=rule, ActionsEnabled=True, AlarmActions=[ops],
                            OKActions=[ops], AlarmDescription="Any failure that could stop an alert or stop paging. "
                            "This is the one to wake someone for.")

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16191d">
+<title>A phone in the county: Countersign</title>
+<meta name="description" content="Your phone becomes a phone in the county. It stays silent while the agent drafts and while people attack it, and rings only when an officer signs.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/phone.css">
+<script src="assets/config.js"></script>
+<script src="assets/phone.js" defer></script>
+</head>
+<body class="handset">
+<main id="main">
+  <section class="join" id="join" aria-labelledby="join-h">
+    <p class="kicker">Countersign demo</p>
+    <h1 id="join-h">Make this phone one of the phones in <span id="join-county">the county</span>.</h1>
+    <p class="lede">Every phone in the county gets the alert only when the officer at the desk signs it. Until then this one stays silent, whatever the agent is told.</p>
+    <button class="btn join-btn" id="join-btn" type="button">Put this phone in the county</button>
+    <p class="fine">If an alert is signed, this phone plays a short tone and vibrates where the browser allows it. It is a demo, not a real alert. Nothing about you or this phone is collected.</p>
+    <p class="fine" id="join-missing" hidden>There is no run in this link. Open the alert desk on a laptop, start a night and scan the code it shows. <a href="desk.html">Open the alert desk</a></p>
+  </section>
+
+  <section class="lock" id="lock" hidden aria-labelledby="lock-h">
+    <h1 class="visually-hidden" id="lock-h">Phone lock screen</h1>
+    <div class="clock" id="clock" aria-hidden="true"></div>
+    <div class="date" id="date" aria-hidden="true"></div>
+    <p class="where" id="where"></p>
+    <div class="quiet" id="quiet" aria-live="polite">
+      <b>Silent</b>
+      <span id="quiet-line">Waiting for the agent to start.</span>
+    </div>
+    <ul class="watch" id="watch" aria-label="What is happening at the desk"></ul>
+    <div class="alerts" id="alerts"></div>
+    <p class="fine foot-note">Countersign demo. No real phone alert is sent. <a href="index.html">What is this?</a></p>
+  </section>
+</main>
+
+<div class="wea" id="wea" hidden role="alertdialog" aria-modal="true" aria-labelledby="wea-h" aria-describedby="wea-text">
+  <div class="wea-card">
+    <p class="wea-demo">Countersign demo. Not a real alert.</p>
+    <h2 id="wea-h">Emergency Alert</h2>
+    <p class="wea-text" id="wea-text"></p>
+    <p class="wea-es" id="wea-es" hidden lang="es"></p>
+    <p class="wea-meta" id="wea-meta"></p>
+    <div class="wea-actions">
+      <button class="btn secondary" id="wea-lang" type="button" hidden>En espanol</button>
+      <button class="btn" id="wea-ok" type="button">OK</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

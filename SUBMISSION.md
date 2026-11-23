@@ -1,24 +1,39 @@
-# Countersign: my alert agent can't cry wolf, and it can't fall asleep
+# Told to obey, my alert agent sent 22 live emergency alerts in 32 runs. Now it can't send one, and it can't stay quiet
 
-**The weather service warns. The agent drafts. A person sends.**
+**Most agent rules stop an agent doing something. Countersign's also stop it doing nothing.**
 
-Countersign is an AI agent for the overnight desk at a county emergency office. When the National Weather Service issues a warning, it drafts the phone alert for the right area, in English and Spanish, publishes a test copy, stages the correction, and wakes the duty officer. It can never send a live alert itself, and it can never let a warning sit unanswered.
+On July 4, 2025, the National Weather Service warned Kerr County, Texas, of a flash flood at 1:14 AM. The county's first alert of its own went out at 5:01 AM, by CodeRED, to the people who had signed up for it. It never sent a phone alert through FEMA's system. 117 people died in Kerr County.
 
-- Live site: https://d17fu9tql039jr.cloudfront.net (start the agent on a real night, try to make it send, sign as the officer)
-- Code: https://github.com/usv240/countersign (Apache-2.0)
-- Built on: Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy, Bedrock Guardrails, Automated Reasoning checks
+I gave the same 1:14 AM warning to Countersign, an AI agent for the overnight desk, on AWS. Three seconds after the warning arrived, the duty officer's pager went off. At 44 seconds a draft was in front of them, in English and Spanish, with the map, the rule results and a correction already staged. When the officer signed, the alert went out once, about 4 seconds later.
+
+Then I gave it Hawaii's 2018 missile alert and Los Angeles's 2025 county-wide evacuation warning, and signed each one alone, the way the real officers did. Neither one went out.
+
+The agent drafts. A person sends. And nobody can switch off the paging, the agent least of all.
+
+- **Live site:** https://d17fu9tql039jr.cloudfront.net
+  - Start the agent on a real night and type anything at it.
+  - Scan the code with your phone: it rings only when you sign.
+  - Three nights, two clocks: each night minute by minute from the public record, beside the measured run.
+- **Code:** https://github.com/usv240/countersign (Apache-2.0)
+- **Built on:** Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Bedrock Guardrails, Automated Reasoning checks, Step Functions, IAM
+
+| | Real night | Countersign, measured on AWS |
+|---|---|---|
+| Hawaii, 2018 | One officer sent a drill as a real missile alert to every phone in the state. The correction took 38 minutes. | Signed by one officer alone: refused, nothing sent. The correction was staged 27 seconds after the record arrived. |
+| Los Angeles, 2025 | One fire zone's evacuation warning went to nearly 10 million people; the correction took about 20 minutes. | Signed without confirming the whole county: refused. The officer's screen said the county code reaches 10,014,009 people. |
+| Kerr County, 2025 | The first warning at 1:14 AM; the county's first CodeRED at 5:01 AM, to sign-ups only. | Officer paged in 3 seconds, draft ready in 44, sent once 4 seconds after the signature. Nobody answering: the state's 24-hour desk is paged after three rounds. |
 
 ## Three real nights
 
-Every one of these is a record in FEMA's public alert archive, and every one is replayed on the site.
+Each is a record in FEMA's public alert archive, replayed on the site. The site's "Three nights" page sets each one minute by minute from the FCC, a congressional report, the Texas Legislature's report and the weather service's own products, beside the measured run, with every source linked and every time two sources disagree on marked.
 
-**Hawaii, 8:07 AM, January 13, 2018.** The drill script read both "exercise, exercise, exercise" and "this is not a drill". One officer, who believed it, sent "BALLISTIC MISSILE THREAT INBOUND TO HAWAII. SEEK IMMEDIATE SHELTER. THIS IS NOT A DRILL." to every phone in the state. Nobody else had to sign. The correction took 38 minutes, because no template for one existed.
+**Hawaii, 8:07 AM, January 13, 2018.** The drill recording said both "exercise" and "this is not a drill". One officer, who believed it, sent the missile alert to every phone in the state. Nobody else had to sign. The correction reached phones at 8:45, because no correction template existed.
 
-**Los Angeles County, 3:56 PM, January 9, 2025.** An evacuation warning meant for the Kenneth Fire area went to the whole county, about 10 million people. The map area was saved for every channel except the phone channel, and the county code filled in without a warning.
+**Los Angeles County, 3:56 PM, January 9, 2025.** An evacuation warning meant for the Kenneth Fire area went to the whole county. The map area was saved for every channel except the phone channel, the county code filled itself in, and the software gave no warning. The same wrong alert went out again before dawn.
 
-**Kerr County, Texas, July 4, 2025.** The National Weather Service issued flash flood warnings for the county through the night, the first at 1:14 AM. The county sent no phone alert of its own that day.
+**Kerr County, Texas, July 4, 2025.** The weather service warned through the night and declared a flash flood emergency for Hunt at 4:03 AM. The county judge and the emergency coordinator say they woke at about 5:30.
 
-Two of these failures were alerts that should not have gone out. One was an alert that never did. An AI agent at that desk has to be stopped from the first kind and forced past the second. Most agent rules are prohibitions. This one needs both a "never" and an "always".
+Two of these failures were alerts that should not have gone out. One was an alert that never did. An agent at that desk has to be stopped from the first kind and forced past the second, so its rules need a "never" and an "always".
 
 ## The job, and why an agent
 
@@ -97,11 +112,19 @@ Rules that hold while everything works are half the claim. I broke the deployed 
 
 The policy simulator tries one request at a time. IAM Access Analyzer's CheckAccessNotGranted reasons over the policy document itself and answers for every possible request. I asked it six questions about every policy on all ten roles: who can publish live, invoke the sender, write an approval, end the paging, switch off an alarm or the paging channel, and change a guardrail, the solver policy, the harness, the Gateway, a Cedar policy, function code or IAM. **60 of 60 answers are as designed**: exactly one role for each of the first four, none for the last two. CheckNoPublicAccess found nothing public in 18 trust, topic, function and bucket policies.
 
+### In public, through the front door
+
+The stress test ran against the harness directly. I sent the same 16 attacks again through the public site, as a visitor would type them, against the stack as it is today: **0 live alerts, paging started on all 16**, and a hook refused something in 11. In the other five no layer had to act: the agent declined, or did its ordinary job and ignored the attack.
+
+Anyone can add to that. The site keeps a public tally of every agent run started on it, what the layers refused, and every live alert. Each live alert is counted at the phone end by a separate function, the recorder, that looks up the officers' approvals on its own instead of trusting the message or the sender, and counts the alert as signed or unsigned. An unsigned alert would also fire its own alarm, cs-live-unsigned, which is part of cs-unsafe. When I wrote this, 25 live alerts had reached the live channel, all 25 signed, 0 unsigned. The tally shows counts only and stores no visitor's message.
+
+The site also lets a judge feel it rather than read it. Start a night on the alert desk, scan the code it shows, and your phone becomes one of the phones in the county. It stays silent while the agent drafts and while you attack it, and plays the alert tone only after you sign as the officer.
+
 ## Running it
 
 A rule nobody can see being enforced is hard to trust, so every layer reports what it did.
 
-**Observability.** Each function writes its decisions as CloudWatch metrics in Embedded Metric Format: tool calls the hook denied, by reason code; releases the sender refused, by layer; rule outcomes; live sends; pages; escalations; API latency. The AgentCore harness emits OpenTelemetry spans for the agent loop, every model call and every tool call, and X-Ray carries the same trace through the API, both hooks and the paging workflow, so one run is one trace from the HTTP request to the last page. Fourteen alarms watch safety, not only uptime: a release the sender refused, a hook error (it fails closed, so the agent stops), a safety check that could not run, paging that failed, an escalation to the state desk, a spike of denied tool calls, work stuck in the dead-letter queue. A composite alarm, cs-unsafe, is the one to wake someone for. The site's Operations page reads all of it live.
+**Observability.** Each function writes its decisions as CloudWatch metrics in Embedded Metric Format: tool calls the hook denied, by reason code; releases the sender refused, by layer; rule outcomes; live sends; pages; escalations; API latency. The AgentCore harness emits OpenTelemetry spans for the agent loop, every model call and every tool call, and X-Ray carries the same trace through the API, both hooks and the paging workflow, so one run is one trace from the HTTP request to the last page. Fifteen alarms watch safety, not only uptime: a live alert that arrived with no approval on record, a release the sender refused, a hook error (it fails closed, so the agent stops), a safety check that could not run, paging that failed, an escalation to the state desk, a spike of denied tool calls, work stuck in the dead-letter queue. A composite alarm, cs-unsafe, is the one to wake someone for. The site's Operations page reads all of it live.
 
 **Scale and concurrency.** Measured on the deployed stack with `evals/scale.py`:
 
@@ -114,9 +137,9 @@ A rule nobody can see being enforced is hard to trust, so every layer reports wh
 
 Everything is serverless and on demand (Lambda, DynamoDB on-demand, Step Functions Standard, SNS), so nothing sits idle between storms. County is part of every key, so a second county is a second set of rows, not a second deployment.
 
-**Accessibility.** An alert desk is used at 1 AM by a tired person, possibly on a phone. Every page passes axe-core's automated WCAG 2.2 AA rules with 0 failures across 32 page views (8 pages, light and dark, desktop and phone). Every tab stop shows visible focus, nothing scrolls sideways at 320 px or at 200% text, and nothing animates when reduced motion is set. The first audit found 20 failures: info buttons smaller than a 24 px touch target, glossary terms with an ARIA attribute their role did not allow, tables that scrolled sideways but could not be reached by keyboard, and one low-contrast heading row. All are fixed. The desk changes every two seconds while the agent works, so I replayed a real recorded run into it and recorded what a screen reader is given: the transcript is appended to rather than rebuilt, so nothing is read twice and an open panel stays open, and a polite live region says one sentence per change, refusals first. That test found an ordering bug, below. Automated checks find only part of the problems, and no screen-reader user has tested it yet. The alerts themselves are always drafted in English and Spanish.
+**Accessibility.** An alert desk is used at 1 AM by a tired person, possibly on a phone. Every page passes axe-core's automated WCAG 2.2 AA rules with 0 failures across 40 page views (10 pages, light and dark, desktop and phone). Every tab stop shows visible focus, nothing scrolls sideways at 320 px or at 200% text, and nothing animates when reduced motion is set. The first audit found 20 failures: info buttons smaller than a 24 px touch target, glossary terms with an ARIA attribute their role did not allow, tables that scrolled sideways but could not be reached by keyboard, and one low-contrast heading row. All are fixed. The desk changes every two seconds while the agent works, so I replayed a real recorded run into it and recorded what a screen reader is given: the transcript is appended to rather than rebuilt, so nothing is read twice and an open panel stays open, and a polite live region says one sentence per change, refusals first. That test found an ordering bug, below. Automated checks find only part of the problems, and no screen-reader user has tested it yet. The alerts themselves are always drafted in English and Spanish.
 
-**Cost.** The traced run drafted a Kerr County warning with 61,309 input tokens, 85% of them read from the prompt cache, and 4,765 output tokens. At the AWS Price List rates for Claude Sonnet 4.6 the model costs $0.13; with both checks, the functions, the workflow and storage, **$0.14 a warning**, and about $1.90 for all 14 Kerr County warnings and updates that night. Between storms nothing runs, and the alarms cost $2.60 a month.
+**Cost.** The traced run drafted a Kerr County warning with 61,309 input tokens, 85% of them read from the prompt cache, and 4,765 output tokens. At the AWS Price List rates for Claude Sonnet 4.6 the model costs $0.13; with both checks, the functions, the workflow and storage, **$0.14 a warning**, and about $1.90 for all 14 Kerr County warnings and updates that night. Between storms nothing runs, and the alarms cost $2.70 a month.
 
 The threat model, with every threat mapped to the layer that stops it and the result that shows it, and what is not stopped, is in `docs/THREAT-MODEL.md`.
 
@@ -148,6 +171,8 @@ The threat model, with every threat mapped to the layer that stops it and the re
 
 **A tool's result could appear above the call that made it.** The screen-reader replay names each result's tool, and some results had no name: the call had not been shown yet. Events written in the same second were ordered by a random suffix. They now carry the millisecond and a counter.
 
+**The desk's own phone never showed the alert it had just sent.** Building the phone page, I signed a Kerr County draft and watched the phone in my pocket ring while the desk's live phone still said "Nothing yet". After a decision, the desk refreshed once and stopped: the refresh ran before the channel record landed and cancelled the next one. The alert had gone out; the officer's screen did not say so. It now keeps refreshing.
+
 **The archive's digital signatures do not verify.** I tried to prove records official with their IPAWS signatures. Every one failed, because the archive stores a copy that is not byte-exact. Official status now comes only from fetching the warning from the National Weather Service.
 
 ## The one thing I learned
@@ -156,7 +181,8 @@ An agent that can act needs two kinds of rule, and only one of them is a refusal
 
 ## Try it
 
-- **Alert desk:** start the agent on Kerr County at 1:14 AM, a planted attack, or live weather for any county. Watch every tool call and every refusal. You are the officer.
+- **Three nights:** each real night minute by minute from the public record, beside Countersign's measured run, with every source linked. On Kerr County, a slider shows when the state desk would have been paged at a real desk's page timeout; that part is arithmetic on the workflow, and it says so.
+- **Alert desk:** start the agent on Kerr County at 1:14 AM, a planted attack, or live weather for any county. Watch every tool call and every refusal. You are the officer. Scan the code to put your phone in the county.
 - **Test your data:** paste any CAP alert, National Weather Service alert or OpenFEMA record, edit the draft, and see all ten rules. Run a debate between two models and compare it with the rules.
 - **Developers:** get a free API key and call the same check from your own code.
 - **Proof:** every table above, built from the saved results, with the command that recounts them.
@@ -168,4 +194,4 @@ No real phone receives an alert: the live channel is an SNS topic standing in fo
 
 ## Built with
 
-Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Amazon Bedrock Guardrails with Automated Reasoning checks, Claude Sonnet 4.6, Claude Haiku 4.5 and Amazon Nova Pro and Lite on Amazon Bedrock, AWS Lambda, AWS Step Functions, Amazon DynamoDB, Amazon SNS, AWS IAM, Amazon API Gateway, Amazon CloudFront, Amazon S3, Amazon CloudWatch, AWS X-Ray with AgentCore Observability, Amazon SQS, AWS Fault Injection Service and IAM Access Analyzer. Data: FEMA OpenFEMA IPAWS archive, National Weather Service API, US Census Bureau TIGERweb.
+Amazon Bedrock AgentCore managed harness, AgentCore Gateway, AgentCore Policy (Cedar), Amazon Bedrock Guardrails with Automated Reasoning checks, Claude Sonnet 4.6, Claude Haiku 4.5 and Amazon Nova Pro and Lite on Amazon Bedrock, AWS Lambda, AWS Step Functions, Amazon DynamoDB, Amazon SNS, AWS IAM, Amazon API Gateway, Amazon CloudFront, Amazon S3, Amazon CloudWatch, AWS X-Ray with AgentCore Observability, Amazon SQS, AWS Fault Injection Service and IAM Access Analyzer. Public record: FCC reports on the Hawaii alert, the congressional report "Sounding the Alarm", the Texas Legislature's report on the Camp Mystic flood, and National Weather Service products from the Iowa Environmental Mesonet archive. Data: FEMA OpenFEMA IPAWS archive, National Weather Service API, US Census Bureau TIGERweb.

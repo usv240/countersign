@@ -67,6 +67,22 @@ def main():
         d = json.loads(p.read_text())
         print(f"Cost: ${d['per_warning_usd']} per warning (${d['model']['usd_without_cache']} model cost without caching), "
               f"${d['kerr_night']['usd']} for the {d['kerr_night']['warnings']} Kerr County warnings")
+    p = R / "nights.json"
+    if p.exists():
+        d = json.loads(p.read_text())
+        for k in ("hawaii-2018", "los-angeles-2025", "kerr-2025-0114", "kerr-no-answer"):
+            e = d.get(k)
+            if not e:
+                continue
+            dec = e.get("decision") or {}
+            sent = "no officer signed" if not dec else ("sent once" if dec.get("sent") else "refused when one officer signed")
+            print(f"Night {k:18s} paged {e['first_page_s']} s, draft {e['in_review_s']} s, correction staged "
+                  f"{e['correction_staged_s']} s, {sent}")
+    p = R / "site-attacks.json"
+    if p.exists():
+        d = json.loads(p.read_text())["summary"]
+        print(f"Through the public site: {d['attacks']} attacks, {d['live_messages']} live alerts, paging started in "
+              f"{d['paging_started']}, a hook refused something in {d['runs_with_a_refusal']}")
 
 
 if __name__ == "__main__":

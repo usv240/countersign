@@ -51,7 +51,7 @@ Evidence ids point to the saved results: **S** stress test (`evals/results/stres
 | The pager function fails | Retries, then escalation; if every paging function is down, the workflow writes the page and publishes it to SNS itself, with no Lambda in the path, then fails so the alarm fires | C: both paging functions failed by FIS; the state desk was paged in 6.9 s |
 | The input or tool-call check fails or stalls | Hooks fail closed (`failureMode: deny`): the agent does nothing. Paging does not depend on the agent | C: hook failed by FIS, and delayed past its 10-second limit |
 | The input guardrail cannot be reached | The hook refuses instead of allowing. (Until this round it allowed.) | C: guardrail denied by IAM |
-| A failure nobody notices | 14 alarms on safety signals, composite `cs-unsafe`; each chaos experiment records how long its alarm took | C: alarm times per experiment |
+| A failure nobody notices | 15 alarms on safety signals, including one for a live alert with no approval on record, composite `cs-unsafe`; each chaos experiment records how long its alarm took | C: alarm times per experiment |
 | The escalation step fails silently | It logs and counts every escalation; it could not log at all until this was found | Proof page, "What broke" |
 
 ### Steering the officer

@@ -1,0 +1,57 @@
+/* Three nights, two clocks */
+.night-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.night-tabs button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--raised); color: var(--ink); font: 500 15px/1 var(--sans); cursor: pointer; transition: background-color 160ms ease, transform 160ms var(--ease-out); }
+.night-tabs button:active { transform: scale(0.97); }
+.night-tabs button[aria-pressed="true"] { background: var(--deep); border-color: var(--deep); color: var(--deep-ink); }
+@media (hover: hover) and (pointer: fine) { .night-tabs button:hover:not([aria-pressed="true"]) { background: var(--surface); } }
+
+.night-head h2 { font-family: var(--serif); font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem); line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 8px; }
+.night-head p { margin: 0 0 18px; font-size: var(--step-lead); line-height: 1.4; max-width: 60ch; color: var(--ink); }
+.night-stats { margin-bottom: 26px; }
+
+.clock-legend { display: grid; grid-template-columns: 116px 1fr 1fr; gap: 0 16px; margin-bottom: 8px; font-size: var(--step-small); color: var(--muted); }
+.clock-legend .real { grid-column: 2; }
+.clock-legend .cs { grid-column: 3; }
+
+.clocks { list-style: none; margin: 0 0 24px; padding: 0; border-top: 1px solid var(--line); }
+.clocks li { display: grid; grid-template-columns: 116px 1fr 1fr; gap: 0 16px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.clocks .when { display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
+.clocks .when time { font-weight: 600; font-size: 15px; color: var(--ink); }
+.clocks .since { font-size: 12.5px; color: var(--muted); }
+.clocks .lane { border-radius: var(--radius-sm); padding: 10px 12px; }
+.clocks .lane p { margin: 0; line-height: 1.5; }
+.clocks .who { display: none; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+.clocks li.real .lane { grid-column: 2; background: var(--surface); }
+.clocks li.cs .lane { grid-column: 3; background: var(--pass-bg); }
+.clocks li.real.bad .lane { background: var(--fail-bg); }
+.clocks li.real.late .lane { background: var(--warn-bg); }
+.cite { display: inline-grid; place-items: center; min-width: 24px; height: 24px; margin-left: 4px; padding: 0 5px; border-radius: 12px; background: var(--raised); color: var(--info); font-size: 12px; font-weight: 600; text-decoration: none; vertical-align: 1px; }
+.cite:hover { text-decoration: underline; }
+
+.what-if { margin: 0 0 22px; }
+.what-if h3 { font-family: var(--serif); font-size: 1.35rem; margin: 0 0 8px; display: flex; align-items: center; }
+.what-if input[type="range"] { width: 100%; max-width: 420px; accent-color: var(--accent); min-height: 32px; }
+.wi-out { font-size: var(--step-body); line-height: 1.5; max-width: 70ch; }
+.wi-pages { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.wi-pages li { background: var(--surface); border-radius: var(--radius-sm); padding: 7px 10px; font-size: 14px; }
+.wi-pages li time { font-weight: 600; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.wi-pages li.state { background: var(--warn-bg); }
+
+.contested { background: var(--info-bg); border-radius: var(--radius-sm); padding: 12px 14px; line-height: 1.5; max-width: 80ch; }
+.sources { margin: 14px 0 0; }
+.sources summary { cursor: pointer; font-weight: 500; min-height: 32px; }
+.sources ol { margin: 8px 0 0; padding-left: 22px; line-height: 1.55; }
+.sources li:target { background: var(--warn-bg); }
+.method { margin-top: 36px; }
+.method ul { margin: 0; padding-left: 20px; line-height: 1.6; }
+.method li + li { margin-top: 6px; }
+
+@media (max-width: 760px) {
+  .clock-legend { display: none; }
+  .clocks li { grid-template-columns: 1fr; gap: 6px; }
+  .clocks .when { grid-auto-flow: column; justify-content: start; gap: 10px; align-items: baseline; }
+  .clocks li.real .lane, .clocks li.cs .lane { grid-column: 1; }
+  .clocks .who { display: block; }
+}
+.night-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.night-stats b { font-size: clamp(2rem, 1.4rem + 2.4vw, 2.75rem); overflow-wrap: anywhere; }

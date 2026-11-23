@@ -215,6 +215,11 @@ def roles(t: dict, st: dict) -> dict:
         {"Effect": "Allow", "Action": "sns:Publish", "Resource": pager}, deny_live])
     r["recorder"] = role(f"{P}-recorder-role", lam_trust, [
         logs_stmt(f"{P}-recorder"), {"Effect": "Allow", "Action": ["dynamodb:PutItem"], "Resource": arn_table(TABLES["ledger"])},
+        # The witness at the phone end: it reads the approvals on its own (read only) and may update only the
+        # public tally's rows, nothing else in the ledger.
+        {"Effect": "Allow", "Action": ["dynamodb:Query"], "Resource": arn_table(TABLES["approvals"])},
+        {"Effect": "Allow", "Action": ["dynamodb:UpdateItem"], "Resource": arn_table(TABLES["ledger"]),
+         "Condition": {"ForAllValues:StringEquals": {"dynamodb:LeadingKeys": ["TALLY"]}}},
         {"Effect": "Allow", "Action": "sqs:SendMessage", "Resource": f"arn:aws:sqs:{REGION}:{ACCOUNT}:{P}-dlq"}])
     r["sfn"] = role(f"{P}-paging-role", trust("states.amazonaws.com"), [
         {"Effect": "Allow", "Action": "lambda:InvokeFunction", "Resource": [arn_fn(f"{P}-pager"), arn_fn(f"{P}-escalated")]},

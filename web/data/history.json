@@ -1,0 +1,340 @@
+{
+ "note": "What happened on each night, from dated public sources. Times are local. Where sources differ, the entry says so. Countersign's side of the page comes from evals/results/nights.json, measured on the deployed stack.",
+ "nights": [
+  {
+   "id": "hawaii-2018",
+   "preset": "hawaii-2018",
+   "title": "Hawaii, January 13, 2018",
+   "tz": "HST",
+   "t0": "8:05",
+   "t0_label": "the drill begins",
+   "failure": "A drill sent as real, by one person, and 38 minutes to correct it.",
+   "events": [
+    {
+     "t": "8:05",
+     "m": 0,
+     "text": "A no-notice drill begins at a shift change. The recording says \"exercise\" and also \"this is not a drill\".",
+     "src": [
+      "fcc-p",
+      "fcc-w"
+     ]
+    },
+    {
+     "t": "8:07",
+     "m": 2,
+     "text": "One warning officer, believing it real, picks the live template and confirms. The alert goes to every phone in the state. No second person had to sign.",
+     "src": [
+      "fcc-p",
+      "fcc-f"
+     ],
+     "kind": "bad"
+    },
+    {
+     "t": "8:08",
+     "m": 3,
+     "text": "The officer's own phone sounds. It is the watch center's first sign the alert went out.",
+     "src": [
+      "fcc-w"
+     ]
+    },
+    {
+     "t": "8:09",
+     "m": 4,
+     "text": "The agency's director tells the governor the alert is false.",
+     "src": [
+      "fcc-w"
+     ]
+    },
+    {
+     "t": "8:12",
+     "m": 7,
+     "text": "A cancellation stops rebroadcasts. It sends nothing to the phones.",
+     "src": [
+      "fcc-w"
+     ]
+    },
+    {
+     "t": "8:20",
+     "m": 15,
+     "text": "The agency posts \"no missile threat\" on Twitter. Phones still show the alert.",
+     "src": [
+      "fcc-f"
+     ]
+    },
+    {
+     "t": "8:27",
+     "m": 22,
+     "text": "Staff choose a message code for the correction. There is no correction template.",
+     "src": [
+      "fcc-p",
+      "fcc-w"
+     ]
+    },
+    {
+     "t": "8:31",
+     "m": 26,
+     "text": "A supervisor starts writing the correction.",
+     "src": [
+      "fcc-p"
+     ]
+    },
+    {
+     "t": "8:45",
+     "m": 40,
+     "text": "The correction reaches phones, 38 minutes after the false alert.",
+     "src": [
+      "fcc-p",
+      "fcc-w"
+     ],
+     "kind": "late"
+    }
+   ],
+   "contested": "Hawaii's own report puts the send at 8:06; the FCC puts it at 8:07. The FCC's preliminary report has the Facebook post at 8:20, its final report at 8:23.",
+   "reach": "It reached 1.4 million residents and about 200,000 visitors."
+  },
+  {
+   "id": "los-angeles-2025",
+   "preset": "los-angeles-2025",
+   "title": "Los Angeles County, January 9 and 10, 2025",
+   "tz": "PST",
+   "t0": "3:46 PM",
+   "t0_label": "drafting begins",
+   "failure": "One fire zone's evacuation warning sent to the whole county, then sent again before dawn.",
+   "events": [
+    {
+     "t": "3:46 PM",
+     "m": 0,
+     "text": "Staff begin drafting an evacuation warning for Calabasas, Agoura Hills and West Hills, near the Kenneth Fire.",
+     "src": [
+      "garcia"
+     ]
+    },
+    {
+     "t": "3:56 PM",
+     "m": 10,
+     "text": "It goes to the whole county. The map area was saved for every channel except the phone channel, the county code filled itself in, and the software gave no warning.",
+     "src": [
+      "garcia"
+     ],
+     "kind": "bad"
+    },
+    {
+     "t": "3:59 PM",
+     "m": 13,
+     "text": "Cancelled, 2 minutes 47 seconds after it went out.",
+     "src": [
+      "garcia"
+     ]
+    },
+    {
+     "t": "4:16 PM",
+     "m": 30,
+     "text": "A correction goes out, about 20 minutes after the false alert.",
+     "src": [
+      "garcia"
+     ],
+     "kind": "late"
+    },
+    {
+     "t": "Jan 10, 4:24 AM",
+     "m": null,
+     "text": "The same wrong alert reaches phones again before dawn. The county acknowledges it nearly three hours later.",
+     "src": [
+      "laist",
+      "cbs"
+     ],
+     "kind": "bad"
+    }
+   ],
+   "contested": "The repeat alert is reported as around 4 AM (CBS Los Angeles) and 4:24 AM (LAist); no official time was found. The congressional report gives 3:56 PM for the first alert and about 20 minutes to the correction; USA Today reported the correction at 4:19 PM.",
+   "reach": "It reached nearly 10 million people."
+  },
+  {
+   "id": "kerr-2025-0114",
+   "preset": "kerr-2025-0114",
+   "title": "Kerr County, Texas, July 4, 2025",
+   "tz": "CDT",
+   "t0": "1:14 AM",
+   "t0_label": "the first flash flood warning",
+   "failure": "The weather service warned all night. The county sent no phone alert of its own.",
+   "events": [
+    {
+     "t": "Jul 3, 1:18 PM",
+     "m": null,
+     "text": "The weather service issues a flood watch for Kerr County.",
+     "src": [
+      "iem-ffa"
+     ]
+    },
+    {
+     "t": "1:14 AM",
+     "m": 0,
+     "text": "First flash flood warning for Hunt, Ingram and Kerrville. The weather service's own alert reaches phones.",
+     "src": [
+      "iem-ffw1",
+      "tx-report"
+     ]
+    },
+    {
+     "t": "2:20 AM",
+     "m": 66,
+     "text": "Water enters a riverside cabin at Camp Mystic.",
+     "src": [
+      "tx-report"
+     ]
+    },
+    {
+     "t": "3:00 AM",
+     "m": 106,
+     "text": "About now the Hunt gauge nears 10 feet and the camp starts moving campers from riverside cabins.",
+     "src": [
+      "tx-report"
+     ]
+    },
+    {
+     "t": "3:35 AM",
+     "m": 141,
+     "text": "The warning is extended to 7 AM. Four to eight inches of rain have fallen.",
+     "src": [
+      "iem-ffw1"
+     ]
+    },
+    {
+     "t": "4:03 AM",
+     "m": 169,
+     "text": "Flash flood emergency for Hunt: the weather service's highest level.",
+     "src": [
+      "iem-ffs"
+     ],
+     "kind": "bad"
+    },
+    {
+     "t": "4:22 AM",
+     "m": 188,
+     "text": "The Hunt volunteer fire department asks for a CodeRED message.",
+     "src": [
+      "kxxv"
+     ]
+    },
+    {
+     "t": "5:01 AM",
+     "m": 227,
+     "text": "The county's first CodeRED goes out, for the Hunt area only. CodeRED reaches only people who signed up for it.",
+     "src": [
+      "kxxv",
+      "tribune"
+     ],
+     "kind": "late"
+    },
+    {
+     "t": "5:10 AM",
+     "m": 236,
+     "text": "The Hunt gauge crests at 37.52 feet, the highest on record.",
+     "src": [
+      "tx-report"
+     ]
+    },
+    {
+     "t": "5:30 AM",
+     "m": 256,
+     "text": "About now, by their own account, the county judge and the emergency coordinator wake up.",
+     "src": [
+      "ksat"
+     ]
+    },
+    {
+     "t": "5:34 AM",
+     "m": 260,
+     "text": "Flash flood emergency from Hunt through Kerrville and Center Point.",
+     "src": [
+      "iem-ffw2"
+     ]
+    },
+    {
+     "t": "All day",
+     "m": null,
+     "text": "Neither the county nor the city sends a phone alert through FEMA's system. 117 people died in Kerr County, 37 of them children.",
+     "src": [
+      "tribune",
+      "tx-report"
+     ],
+     "kind": "bad"
+    }
+   ],
+   "contested": "The county's first CodeRED is 5:01 in the sheriff's account and 5:02 in city records. The flash flood emergency is 4:03 in the product itself; some accounts give 4:04 or 4:23, when it was posted online. The camp's evacuation is about 3 AM in the legislative report; early family accounts said 2 to 2:30.",
+   "reach": "About 52,600 people live in Kerr County."
+  }
+ ],
+ "sources": {
+  "fcc-p": {
+   "title": "FCC Public Safety and Homeland Security Bureau, preliminary report on the Hawaii false alert",
+   "date": "2018-01-30",
+   "url": "https://docs.fcc.gov/public/attachments/DOC-348923A1.pdf"
+  },
+  "fcc-w": {
+   "title": "FCC staff presentation on the Hawaii false alert (James Wiley)",
+   "date": "2018-01-30",
+   "url": "https://docs.fcc.gov/public/attachments/DOC-348923A2.pdf"
+  },
+  "fcc-f": {
+   "title": "FCC final report on the Hawaii false alert",
+   "date": "2018-04",
+   "url": "https://docs.fcc.gov/public/attachments/DOC-350119A1.pdf"
+  },
+  "garcia": {
+   "title": "Rep. Robert Garcia, Sounding the Alarm: report on false emergency alerts",
+   "date": "2025-05-12",
+   "url": "https://robertgarcia.house.gov/sites/evo-subsites/robertgarcia.house.gov/files/evo-media-document/false-alerts-final-report-5.10.pdf"
+  },
+  "laist": {
+   "title": "LAist, on the repeat evacuation alert",
+   "date": "2025-01-09, updated 2025-02-19",
+   "url": "https://laist.com/news/la-county-alert-prepare-evacuation"
+  },
+  "cbs": {
+   "title": "CBS Los Angeles, on the erroneous evacuation alerts",
+   "date": "2025-01-10",
+   "url": "https://www.cbsnews.com/amp/losangeles/news/los-angeles-county-residents-erroneous-fire-evacuation-alerts"
+  },
+  "iem-ffa": {
+   "title": "NWS Austin/San Antonio flood watch, IEM text archive",
+   "date": "2025-07-03",
+   "url": "https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=FFAEWX&e=202507031818"
+  },
+  "iem-ffw1": {
+   "title": "NWS flash flood warning for central Kerr County, IEM text archive",
+   "date": "2025-07-04",
+   "url": "https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=FFWEWX&e=202507040614"
+  },
+  "iem-ffs": {
+   "title": "NWS flash flood emergency for Hunt, IEM text archive",
+   "date": "2025-07-04",
+   "url": "https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=FFSEWX&e=202507040903"
+  },
+  "iem-ffw2": {
+   "title": "NWS flash flood emergency, Hunt through Kerrville and Center Point, IEM text archive",
+   "date": "2025-07-04",
+   "url": "https://mesonet.agron.iastate.edu/wx/afos/p.php?pil=FFWEWX&e=202507041034"
+  },
+  "tx-report": {
+   "title": "Texas Legislature investigating committees, Report on the Camp Mystic Flood Disaster of July 4, 2025",
+   "date": "2026-06",
+   "url": "https://www.house.texas.gov/pdfs/committees/355/Report-on-the-Camp-Mystic-Flood-Disaster-of-July-4-2025.pdf"
+  },
+  "tribune": {
+   "title": "Texas Tribune, on the Kerrville flood response",
+   "date": "2025-07-30",
+   "url": "https://www.texastribune.org/2025/07/30/texas-kerrville-hill-country-floods-response-emails/"
+  },
+  "kxxv": {
+   "title": "KXXV, the Kerr County sheriff's timeline of the early hours",
+   "date": "2025-07-31",
+   "url": "https://www.kxxv.com/news/local-news/in-your-neighborhood/kerr-county-sheriff-details-timeline-for-early-hours-of-july-4-floods"
+  },
+  "ksat": {
+   "title": "KSAT, flood timeline: alerts, response and pivotal moments",
+   "date": "2025-08-03",
+   "url": "https://www.ksat.com/news/local/2025/08/03/flood-timeline-alerts-emergency-response-and-pivotal-moments-in-july-4-tragedy-in-the-hill-country/"
+  }
+ }
+}

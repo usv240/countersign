@@ -141,7 +141,7 @@
 
   // ---------- site bar ----------
   const PAGES = [
-    ["index.html", "Home"], ["rules.html", "How it works"], ["desk.html", "Alert desk"],
+    ["index.html", "Home"], ["nights.html", "Three nights"], ["rules.html", "How it works"], ["desk.html", "Alert desk"],
     ["lab.html", "Test your data"], ["proof.html", "Proof"], ["status.html", "Operations"], ["developers.html", "Developers"],
   ];
   function themeButton() {
@@ -196,7 +196,7 @@
     ["", "AWS Fault Injection Service", "Breaks the sender, the pagers and the hook on purpose, to show nothing is sent and nobody is left unpaged when parts fail."],
     ["", "Amazon API Gateway", "The public API, with throttling and API keys for developers."],
     ["", "Amazon CloudFront and S3", "Hosts this site, with security headers."],
-    ["", "Amazon CloudWatch", "Safety metrics from every function, 14 alarms, one dashboard, structured logs and API access logs. The Operations page reads it live."],
+    ["", "Amazon CloudWatch", "Safety metrics from every function, 15 alarms, one dashboard, structured logs and API access logs. The Operations page reads it live."],
     ["", "AWS X-Ray and AgentCore Observability", "One trace per run: the API call, the agent loop, every model and tool call, both hooks and the paging workflow, as OpenTelemetry spans."],
     ["", "Amazon SQS", "A dead-letter queue for background work that fails after its retries, with an alarm on it."],
     ["", "FEMA OpenFEMA IPAWS archive", "The real alert records replayed here, including Hawaii 2018 and Los Angeles 2025."],
@@ -242,6 +242,26 @@
     return data;
   }
   window.CS_api = api;
+
+  // ---------- the public tally: filled into every [data-tally] on the page ----------
+  async function tally() {
+    const els = document.querySelectorAll("[data-tally]");
+    if (!els.length) return;
+    let t;
+    try { t = await api("/api/tally"); } catch (e) { els.forEach((el) => { el.innerHTML = '<p class="small muted">The counts are not reachable right now.</p>'; }); return; }
+    const f = (n) => Number(n || 0).toLocaleString("en-US");
+    const refused = t.refused.hook + t.refused.policy + t.refused.tool;
+    const html = `<dl class="tally-grid">
+        <div><dt>Agent runs started on this site</dt><dd>${f(t.runs)}</dd></div>
+        <div><dt>Runs where someone typed to the agent</dt><dd>${f(t.typed + t.from_list)}</dd></div>
+        <div><dt>Tool calls a layer refused</dt><dd>${f(refused)}</dd></div>
+        <div class="zero"><dt>Live alerts with no officer's signature</dt><dd>${f(t.live.unsigned)}</dd></div>
+      </dl>
+      <p class="small muted">${f(t.live.arrived)} live alert${t.live.arrived === 1 ? "" : "s"} reached the live channel, every one checked at the phone end against the approval records: ${f(t.live.signed)} signed by an officer, ${f(t.live.unsigned)} unsigned. Refusals: ${f(t.refused.hook)} by the hooks, ${f(t.refused.policy)} by the Cedar policy, ${f(t.refused.tool)} by the tool code.</p>`;
+    els.forEach((el) => { el.innerHTML = html; });
+  }
+  window.CS_tally = tally;
+  document.addEventListener("DOMContentLoaded", tally);
   window.CS_esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   // ---------- section entrances: visible by default, lifted only when script runs ----------

@@ -20,7 +20,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "evals" / "results" / "a11y.json"
-PAGES = [p for p in ("index.html", "desk.html", "lab.html", "developers.html", "rules.html", "proof.html", "status.html", "404.html")
+PAGES = [p for p in ("index.html", "nights.html", "desk.html", "phone.html", "lab.html", "developers.html", "rules.html", "proof.html",
+                      "status.html", "404.html")
          if (ROOT / "web" / p).exists()]
 TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 CDN = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js"

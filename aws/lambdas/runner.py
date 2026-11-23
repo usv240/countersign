@@ -140,6 +140,40 @@ def _trim(x, n: int = 6000):
     return x if len(s) <= n else s[:n] + "...(trimmed)"
 
 
+REFUSED = ("AuthorizeAction", "policy enforcement")
+
+
+def refusals(out: dict) -> dict:
+    """What the layers refused in one run: hook denials, Cedar denials at the Gateway, and tool-code refusals."""
+    hook = sum(1 for h in out.get("hooks") or [] if str(h.get("decision", "")).lower() == "deny")
+    policy = tool = 0
+    for t in out.get("tools") or []:
+        r = json.dumps(t.get("result", ""))
+        if any(k in r for k in REFUSED):
+            policy += 1
+        elif '\\"error\\"' in r or '"error"' in r:
+            tool += 1
+    return {"hook": hook, "policy": policy, "tool": tool}
+
+
+def tally(cfg: dict, out: dict) -> None:
+    """The public tally: how many runs visitors started, what they typed, and what the layers refused.
+    Counts only; nobody's message is stored here."""
+    try:
+        r = refusals(out)
+        src = cfg.get("message_source") or "none"
+        vals = {":one": 1, ":h": r["hook"], ":p": r["policy"], ":t": r["tool"], ":n": now(),
+                ":r": 1 if sum(r.values()) else 0}
+        expr = "ADD runs :one, refused_hook :h, refused_policy :p, refused_tool :t, runs_refused :r"
+        if src in ("typed", "list"):
+            expr += f", msg_{src} :one, msg_runs_refused :r"
+        table(T_DRAFTS).update_item(Key={"pk": "TALLY", "sk": "agent"},
+                                    UpdateExpression=expr + " SET since = if_not_exists(since, :n)",
+                                    ExpressionAttributeValues=vals)
+    except Exception as e:  # the tally must never break a run
+        print("TALLY_ERROR", repr(e))
+
+
 def handler(event, _context):
     if event.get("probe"):  # health probe for evals/chaos.py
         return {"probe": "ok"}
@@ -164,6 +198,7 @@ def handler(event, _context):
                                 UpdateExpression="SET agent_status = :s, agent_stop = :t, agent_usage = :u",
                                 ExpressionAttributeValues=to_ddb({":s": status, ":t": out.get("stop"),
                                                                   ":u": out.get("usage")}))
+    tally(cfg, out)
     metric("AgentRun", Status=status)
     metric("AgentDuration", round((time.time() - t0) * 1000), "Milliseconds")
     metric("AgentToolCalls", len(out.get("tools") or []), "Count")

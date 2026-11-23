@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three nights, two clocks: Countersign</title>
+<meta name="description" content="Hawaii 2018, Los Angeles 2025 and Kerr County 2025, minute by minute from public records, beside what Countersign did with the same records on AWS.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/nights.css">
+<script src="assets/config.js"></script>
+<script src="assets/site.js" defer></script>
+<script src="assets/nights.js" defer></script>
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to the nights</a>
+<header class="bar"></header>
+<main id="main" class="page read">
+  <div class="page-head">
+    <div>
+      <h1>Three nights, two clocks</h1>
+      <p>On the left, what happened, minute by minute, from the FCC, Congress, the Texas Legislature and the weather service's own products. On the right, what Countersign did when it was given the same record on AWS, timed by the run itself. <strong>Nothing on the right is a mock-up.</strong><button class="i" data-tip-title="How the right side was measured" data-tip="evals/nights.py starts the agent through the public site's API on each real record, reads the run back every second, and signs as Officer A the way the real officer did. The times are from that run. Rerun it any time; the page reads evals/results/nights.json."></button></p>
+    </div>
+  </div>
+  <nav class="night-tabs" aria-label="Choose a night" id="night-tabs"></nav>
+  <div id="nights"><p class="muted">Loading the records...</p></div>
+  <section class="panel method" aria-labelledby="m-h">
+    <h2 id="m-h">What the two clocks do and do not show</h2>
+    <ul>
+      <li>The left side is the public record. Where sources disagree on a time, the night says so below its timeline.</li>
+      <li>The right side starts when the record reaches Countersign. In real life it would arrive from the weather service's feed, or, for Hawaii, from the drill's script.</li>
+      <li>The paging uses short timeouts on this demo so a visitor can watch it move. The Kerr County slider shows the same workflow at a desk's real timeout. That part is arithmetic on the workflow's configuration, not a measurement, and it is labelled that way.</li>
+      <li>Countersign would not have stopped the rain. On Kerr County, it would have had a draft in front of a person within a minute of the first warning, and it would not have stopped paging until someone decided.</li>
+    </ul>
+  </section>
+</main>
+<section data-stack></section>
+<footer class="foot"></footer>
+</body>
+</html>

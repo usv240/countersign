@@ -11,6 +11,7 @@
 <script src="assets/config.js"></script>
 <script src="assets/site.js" defer></script>
 <script src="assets/app.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous" defer></script>
 <script src="assets/desk.js" defer></script>
 </head>
 <body class="app">
@@ -48,6 +49,10 @@
         <button class="btn" id="start" type="button" style="width:100%">Start the agent</button>
         <p class="small muted" id="start-status" aria-live="polite" style="margin-top:10px"></p>
       </section>
+      <section class="panel tally" aria-labelledby="tally-h">
+        <h2 id="tally-h">Everyone who tried<button class="i" data-tip-title="Counted live" data-tip="Every run started on this site, mine included. The runner counts what each run's layers refused. The recorder at the phone end checks every live alert that arrives against the officers' approvals on its own, and counts it signed or unsigned. Counts only: no message is stored for this."></button></h2>
+        <div class="tally-body" data-tally><p class="small muted">Loading the counts...</p></div>
+      </section>
     </div>
 
     <section class="panel" aria-labelledby="tr-h">
@@ -64,6 +69,10 @@
       <section class="panel" id="review">
         <h2>Your decision<button class="i" data-tip-title="Why there is no recommendation" data-tip="Rule R9. Research on automation bias shows reviewers follow a machine's suggestion even when it is wrong. You see the official source, the draft and the rule results, never the agent's opinion."></button></h2>
         <div id="review-body"><div class="empty-state">The draft appears here when the agent submits it.</div></div>
+      </section>
+      <section class="panel" aria-labelledby="pocket-h">
+        <h2 id="pocket-h">Put your phone in the county<button class="i" data-tip-title="Your phone, a phone in the county" data-tip="Scan the code. Your phone joins this run as one of the phones in the county. It stays silent while the agent drafts and while anyone attacks it. It rings only after you sign as the officer here, because only then does anything reach the live channel."></button></h2>
+        <div id="pocket"><p class="small muted">Start a night and a code for your phone appears here.</p></div>
       </section>
       <section class="panel">
         <h2>What phones received<button class="i" data-tip-title="Two channels" data-tip="Left: the test channel, which no real phone receives. Right: the live channel, which stands in for FEMA's IPAWS. Only the sender function can publish to it, after your approval and two independent checks."></button></h2>

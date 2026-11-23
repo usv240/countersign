@@ -15,6 +15,7 @@ Routes (Amazon API Gateway HTTP API, payload v2):
   GET  /api/live?county=48265       active National Weather Service warnings for a county
   GET  /api/results                 measured results: benchmark and stress test
   GET  /api/status                  live operating numbers from CloudWatch: metrics, alarms, latency
+  GET  /api/tally                   public counts: runs, what visitors typed, what was refused, live alerts signed
 """
 from __future__ import annotations
 
@@ -199,6 +200,8 @@ def start_run(b: dict, event) -> dict:
     cfg = {"pk": f"RUN#{run_id}", "sk": "CONFIG", "run_id": run_id, "preset_id": preset_id, "county_geoid": geoid,
            "county_name": county, "title": title, "created": now(), "secret_hash": hash_key(secret),
            "agent_status": "queued", "local_places": b.get("local_places") or [], "page_timeout": timeout,
+           "message_source": (("list" if b.get("message_source") == "list" else "typed")
+                              if (b.get("message") or "").strip() else "none"),
            "ttl_at": now() + 7 * 86400}
     table(T_DRAFTS).put_item(Item=to_ddb(cfg))
     if PAGING_SM:
@@ -287,6 +290,34 @@ def stop_paging(run_id: str, why: str) -> None:
         table(T_LEDGER).update_item(Key={"pk": f"PAGING#{run_id}", "sk": "CURRENT"},
                                     UpdateExpression="SET done = :t, decided = :w",
                                     ExpressionAttributeValues={":t": True, ":w": why})
+
+
+# ---------- public tally ----------
+
+_tally_cache: dict = {}
+
+
+def tally() -> dict:
+    """Counts only. The runner adds what each run's layers refused; the recorder, at the phone end, checks every
+    live alert that arrives against the approval records on its own and counts it signed or unsigned."""
+    if _tally_cache.get("at", 0) > time.time() - 20:
+        return _tally_cache["body"]
+    def both(t, sk):
+        # The live counters, plus the one-off count of what was recorded before they existed (evals/tally_backfill.py)
+        now_, old = (from_ddb(table(t).get_item(Key={"pk": "TALLY", "sk": k}).get("Item") or {}) for k in (sk, sk + "-backfill"))
+        out = {k: int(now_.get(k) or 0) + int(old.get(k) or 0) for k in set(now_) | set(old)
+               if k not in ("pk", "sk", "since", "until", "written")}
+        out["since"] = min([x for x in (now_.get("since"), old.get("since")) if x] or [None]) if (now_ or old) else None
+        return out
+    a, lv = both(T_DRAFTS, "agent"), both(T_LEDGER, "live")
+    n = lambda d, k: int(d.get(k) or 0)  # noqa: E731
+    body = {"runs": n(a, "runs"), "typed": n(a, "msg_typed"), "from_list": n(a, "msg_list"),
+            "runs_refused": n(a, "runs_refused"), "message_runs_refused": n(a, "msg_runs_refused"),
+            "refused": {"hook": n(a, "refused_hook"), "policy": n(a, "refused_policy"), "tool": n(a, "refused_tool")},
+            "live": {"arrived": n(lv, "arrived"), "signed": n(lv, "signed"), "unsigned": n(lv, "unsigned")},
+            "since": {"runs": a.get("since"), "live": lv.get("since")}, "generated_at": int(time.time())}
+    _tally_cache.update(at=time.time(), body=body)
+    return body
 
 
 # ---------- status (observability, public) ----------
@@ -462,6 +493,8 @@ def _route(event, _context):
                 "id": f["properties"].get("id"), "event": f["properties"].get("event"),
                 "headline": f["properties"].get("headline"), "sent": f["properties"].get("sent"),
                 "expires": f["properties"].get("expires"), "has_polygon": bool(f.get("geometry"))} for f in feats]})
+        if path == "/api/tally" and method == "GET":
+            return resp(200, tally(), {"cache-control": "public, max-age=15"})
         if path == "/api/status" and method == "GET":
             return resp(200, status(), {"cache-control": "public, max-age=30"})
         if path == "/api/results" and method == "GET":
